@@ -38,5 +38,10 @@ public class VendorServiceService {
     public void deleteService(Long id) {  
         VendorService serviceToDelete = vendorServiceRepository.findById(id).orElseThrow();  
         vendorServiceRepository.delete(serviceToDelete);  
+    } 
+    
+ // Método para obtener todos los servicios por el ID del usuario  
+    public List<VendorService> getServicesByUserId(Long userId) {  
+        return vendorServiceRepository.findByUsers_Id(userId); // Asegúrate de definir este método en tu repositorio  
     }  
 }

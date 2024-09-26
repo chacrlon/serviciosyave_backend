@@ -56,8 +56,8 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/mobilepayment/create").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/mobilepayment/").permitAll()  
 
-                // CRUD para servicios, permitiendo solo a usuarios autenticados  
-                .requestMatchers("/api/service/**").authenticated()// Permitir acceso a todos los endpoints bajo /register  
+                // CRUD para servicios, permitiendo solo a usuarios autenticados   
+                .requestMatchers(HttpMethod.GET, "/api/service/users").permitAll()
                 
                 // Otras configuraciones para usuarios y administradores  
                 .requestMatchers(HttpMethod.GET, "/register/{id}").hasAnyRole("USER", "ADMIN")  

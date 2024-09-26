@@ -64,6 +64,9 @@ String hola = " holiwirivirivis ";
         return null; // Retorna null si no hay un usuario autenticado
     }
 
-    
+ // Nuevo método para buscar un usuario por ID  
+    public User findById(Long id) {  
+        return repository.findById(id).orElse(null); // Asegúrate de que este método esté definido en tu UserRepository  
+    } 
   
 }
