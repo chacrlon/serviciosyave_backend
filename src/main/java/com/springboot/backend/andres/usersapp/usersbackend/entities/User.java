@@ -1,5 +1,6 @@
 package com.springboot.backend.andres.usersapp.usersbackend.entities;
 
+import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
@@ -17,6 +18,7 @@ import jakarta.persistence.JoinColumn;
 import jakarta.persistence.JoinTable;
 import jakarta.persistence.ManyToMany;
 import jakarta.persistence.OneToMany;
+import jakarta.persistence.OneToOne;
 import jakarta.persistence.Table;
 import jakarta.persistence.Transient;
 import jakarta.persistence.UniqueConstraint;
@@ -73,8 +75,12 @@ public class User implements IUser {
     private boolean isEmailVerified; // true si esta verificado, false si no esta verificado  
     private String verificationCode; // código de verificación para el correo   
     
-    @OneToMany(mappedBy = "users")  
-    private List<VendorService> vendorServices;
+    @OneToMany(mappedBy = "userId") // Cambiatelo a userId  
+    private List<VendorService> vendorServices;  
+    
+    @OneToOne(cascade = CascadeType.ALL)  
+    @JoinColumn(name = "ubicacion_id", referencedColumnName = "id")  
+    private Ubication ubicacion;
 
     public User() {
         this.roles = new ArrayList<>();
@@ -167,5 +173,25 @@ public class User implements IUser {
         this.admin = admin;
     }
 
+	public List<VendorService> getVendorServices() {
+		return vendorServices;
+	}
+
+	public void setVendorServices(List<VendorService> vendorServices) {
+		this.vendorServices = vendorServices;
+	}
+
+	public Ubication getUbicacion() {
+		return ubicacion;
+	}
+
+	public void setUbicacion(Ubication ubicacion) {
+		this.ubicacion = ubicacion;
+	}
+
+	public void setEmailVerified(boolean isEmailVerified) {
+		this.isEmailVerified = isEmailVerified;
+	}
+ 
     
 }

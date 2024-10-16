@@ -26,12 +26,20 @@ public class VendorServiceService {
     }  
 
     public VendorService updateService(Long id, VendorService serviceDetails) {  
-        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();  
-        // Actualiza los campos modificables  
+    	
+        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();   
+        
+     // Actualiza los campos modificables  
         serviceToUpdate.setNombre(serviceDetails.getNombre());  
         serviceToUpdate.setDescripcion(serviceDetails.getDescripcion());  
         serviceToUpdate.setPrecio(serviceDetails.getPrecio());  
         serviceToUpdate.setDestacado(serviceDetails.getDestacado());  
+        serviceToUpdate.setCategoria(serviceDetails.getCategoria());  
+        serviceToUpdate.setSubcategoria(serviceDetails.getSubcategoria());  
+        serviceToUpdate.setRemoto(serviceDetails.getRemoto());  
+        serviceToUpdate.setLatitude(serviceDetails.getLatitude());  
+        serviceToUpdate.setLongitude(serviceDetails.getLongitude());    
+        
         return vendorServiceRepository.save(serviceToUpdate);  
     }  
 
@@ -42,6 +50,10 @@ public class VendorServiceService {
     
  // Método para obtener todos los servicios por el ID del usuario  
     public List<VendorService> getServicesByUserId(Long userId) {  
-        return vendorServiceRepository.findByUsers_Id(userId); // Asegúrate de definir este método en tu repositorio  
-    }  
+        return vendorServiceRepository.findByUserId(userId); // Cambié a findByUserId  
+    }
+    
+    public List<VendorService> getNearbyServices(double latitude, double longitude, double distance) {  
+        return vendorServiceRepository.findNearbyServices(latitude, longitude, distance);  
+    }
 }

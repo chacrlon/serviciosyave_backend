@@ -25,6 +25,7 @@ import org.springframework.web.bind.annotation.RequestParam;
 import org.springframework.web.bind.annotation.RestController;
 
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;
 import com.springboot.backend.andres.usersapp.usersbackend.models.UserRequest;
 import com.springboot.backend.andres.usersapp.usersbackend.services.EmailService;
 import com.springboot.backend.andres.usersapp.usersbackend.services.UserService;
@@ -125,5 +126,17 @@ public class UserController {
             errors.put(error.getField(), "El campo " + error.getField() + " " + error.getDefaultMessage());
         });
         return ResponseEntity.badRequest().body(errors);
+    }
+    
+    
+ // En UserController.java  
+    @GetMapping("/{userId}/services")  
+    public ResponseEntity<?> getServicesByUserId(@PathVariable Long userId) {  
+        List<VendorService> services = service.findServicesByUserId(userId);  
+        if (services.isEmpty()) {  
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)  
+                    .body(Collections.singletonMap("error", "No se encontraron servicios para el usuario con ID: " + userId));  
+        }  
+        return ResponseEntity.ok(services);  
     }
 }

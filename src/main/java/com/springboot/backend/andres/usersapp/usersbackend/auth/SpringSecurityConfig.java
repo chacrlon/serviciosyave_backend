@@ -55,9 +55,9 @@ public class SpringSecurityConfig {
                 // Permitir acceso a todos los endpoints de Mobile Payment  
                 .requestMatchers(HttpMethod.POST, "/api/mobilepayment/create").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/mobilepayment/").permitAll()  
-
-                // CRUD para servicios, permitiendo solo a usuarios autenticados   
-                .requestMatchers(HttpMethod.GET, "/api/service/users").permitAll()
+                
+             // Permitir acceso a todos los endpoints de Service  
+                .requestMatchers("/api/service/**").permitAll()  // <--- Añadir esta línea  
                 
                 // Otras configuraciones para usuarios y administradores  
                 .requestMatchers(HttpMethod.GET, "/register/{id}").hasAnyRole("USER", "ADMIN")  

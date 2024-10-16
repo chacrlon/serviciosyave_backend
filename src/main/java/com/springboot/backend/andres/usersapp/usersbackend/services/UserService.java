@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;
 import com.springboot.backend.andres.usersapp.usersbackend.models.UserRequest;
 
 public interface UserService {
@@ -23,4 +24,7 @@ public interface UserService {
     Optional<User> update(UserRequest user, Long id);
 
     void deleteById(Long id);
+    
+ // En UserService.java  
+    List<VendorService> findServicesByUserId(Long userId);
 }

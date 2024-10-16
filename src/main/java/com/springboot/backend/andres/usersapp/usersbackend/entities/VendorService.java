@@ -1,11 +1,10 @@
 package com.springboot.backend.andres.usersapp.usersbackend.entities;  
 
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;  
 import jakarta.persistence.GeneratedValue;  
 import jakarta.persistence.GenerationType;  
 import jakarta.persistence.Id;  
-import jakarta.persistence.JoinColumn;  
-import jakarta.persistence.ManyToOne;  
 import jakarta.persistence.Table;  
 import lombok.Data;  
 
@@ -20,11 +19,15 @@ public class VendorService {
     private String nombre;  
     private String descripcion;  
     private Double precio;  
-    private Boolean destacado;  
+    private Boolean destacado; 
+    private String categoria;
+    private String subcategoria;
+    private Boolean remoto;
+    private double latitude;  
+    private double longitude;
     
-    @ManyToOne  
-    @JoinColumn(name = "users_id")  
-    private User users; // Esta es la relación con la entidad User  
+    @Column(name = "users_id") 
+    private Long userId; // Guardamos solo el ID del usuario  
 
 	public Long getId() {
 		return id;
@@ -66,13 +69,55 @@ public class VendorService {
 		this.destacado = destacado;
 	}
 
-	public User getUsers() {
-		return users;
+	public String getCategoria() {
+		return categoria;
 	}
 
-	public void setUsers(User users) {
-		this.users = users;
+	public void setCategoria(String categoria) {
+		this.categoria = categoria;
 	}
-    
+
+	public String getSubcategoria() {
+		return subcategoria;
+	}
+
+	public void setSubcategoria(String subcategoria) {
+		this.subcategoria = subcategoria;
+	}
+
+	public Boolean getRemoto() {
+		return remoto;
+	}
+
+	public void setRemoto(Boolean remoto) {
+		this.remoto = remoto;
+	}
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+
+	public double getLatitude() {
+		return latitude;
+	}
+
+	public void setLatitude(double latitude) {
+		this.latitude = latitude;
+	}
+
+	public double getLongitude() {
+		return longitude;
+	}
+
+	public void setLongitude(double longitude) {
+		this.longitude = longitude;
+	}
+
+	
+
     
 }

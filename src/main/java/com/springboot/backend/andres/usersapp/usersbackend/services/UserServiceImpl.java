@@ -8,6 +8,7 @@ import java.util.List;
 import java.util.Optional;
 import java.util.UUID;
 
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
@@ -17,10 +18,12 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.springboot.backend.andres.usersapp.usersbackend.entities.Role;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;
 import com.springboot.backend.andres.usersapp.usersbackend.models.IUser;
 import com.springboot.backend.andres.usersapp.usersbackend.models.UserRequest;
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.RoleRepository;
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.UserRepository;
+import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorServiceRepository;
 
 @Service
 public class UserServiceImpl implements UserService{
@@ -29,6 +32,10 @@ public class UserServiceImpl implements UserService{
     private RoleRepository roleRepository;
     private final EmailService emailService;
     private PasswordEncoder passwordEncoder;
+    // En UserServiceImpl.java  
+    @Autowired  
+    private VendorServiceRepository vendorServiceRepository; // Asegúrate de tener un repositorio para VendorService  
+
     
     
     public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, EmailService emailService) {
@@ -100,6 +107,11 @@ public class UserServiceImpl implements UserService{
         return roles;
     }
   
+    
 
-
+    @Override  
+    @Transactional(readOnly = true)  
+    public List<VendorService> findServicesByUserId(Long userId) {  
+        return vendorServiceRepository.findByUserId(userId); // Cambié a findByUserId  
+    }
 }

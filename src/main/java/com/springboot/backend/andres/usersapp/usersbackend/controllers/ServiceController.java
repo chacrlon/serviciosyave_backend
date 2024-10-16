@@ -34,7 +34,7 @@ public class ServiceController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  
         }  
 
-        vendorService.setUsers(user);  
+        vendorService.setUserId(userId);  
         VendorService createdService = vendorServiceService.createService(vendorService);  
         return ResponseEntity.status(HttpStatus.CREATED).body(createdService);  
     }  
@@ -53,9 +53,11 @@ public class ServiceController {
     @GetMapping("/user")  
     public ResponseEntity<List<VendorService>> getAllServicesByUser() {  
         // Obtener la autenticación actual  
+    	
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
         Long userId = (Long) authentication.getDetails(); // Obtener el userId desde los detalles  
 
+        System.out.println(" el user id del servicio es : "+userId);
         // Obtener todos los servicios creados por el usuario autenticado  
         List<VendorService> services = vendorServiceService.getServicesByUserId(userId);  
         
@@ -64,6 +66,18 @@ public class ServiceController {
 
     @PutMapping("/{id}")  
     public ResponseEntity<VendorService> updateService(@PathVariable Long id, @RequestBody VendorService vendorServiceDetails) {  
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
+        Long userId = (Long) authentication.getDetails();  
+
+        // Validar si el servicio a actualizar pertenece al usuario autenticado  
+        VendorService existingService = vendorServiceService.getServiceById(id)  
+            .orElseThrow();  
+
+        if (!existingService.getUserId().equals(userId)) {  
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // El usuario no tiene permiso para actualizar este servicio  
+        }  
+
+        // Actualizar el servicio  
         VendorService updatedService = vendorServiceService.updateService(id, vendorServiceDetails);  
         return ResponseEntity.ok(updatedService);  
     }  
@@ -72,5 +86,15 @@ public class ServiceController {
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {  
         vendorServiceService.deleteService(id);  
         return ResponseEntity.noContent().build();  
+    }  
+    
+    @GetMapping("/nearby")  
+    public ResponseEntity<List<VendorService>> getNearbyServices(  
+            @RequestParam double latitude,  
+            @RequestParam double longitude,  
+            @RequestParam double distance) {  
+        
+        List<VendorService> nearbyServices = vendorServiceService.getNearbyServices(latitude, longitude, distance);  
+        return ResponseEntity.ok(nearbyServices);  
     }  
 }

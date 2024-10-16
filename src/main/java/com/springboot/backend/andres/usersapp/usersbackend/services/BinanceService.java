@@ -1,14 +1,10 @@
 package com.springboot.backend.andres.usersapp.usersbackend.services;  
 
 import org.springframework.stereotype.Service;  
-import com.springboot.backend.andres.usersapp.usersbackend.entities.Binance;
-import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Binance;  
+import com.springboot.backend.andres.usersapp.usersbackend.entities.User;  
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.BinanceRepository;  
-
-import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.data.domain.Page;
-import org.springframework.data.domain.Pageable;
-
+import org.springframework.beans.factory.annotation.Autowired; 
 import java.util.List;  
 import java.util.Optional;  
 
@@ -16,7 +12,7 @@ import java.util.Optional;
 public class BinanceService {  
 
     @Autowired  
-    private BinanceRepository binanceRepository; 
+    private BinanceRepository binanceRepository;   
 
     public Binance createBinance(Binance binance) {  
         return binanceRepository.save(binance);  
@@ -31,11 +27,21 @@ public class BinanceService {
     }  
 
     public Binance updateBinance(Long id, Binance binance) {  
-        binance.setId(id); // Asegúrate de que tu entidad Binance tenga un método setId  
+        binance.setId(id);  
         return binanceRepository.save(binance);  
     }  
 
     public void deleteBinance(Long id) {  
         binanceRepository.deleteById(id);  
+    }  
+
+    // Método para buscar Binance por usuario  
+    public Optional<Binance> findBinanceByUser(User user) {  
+        return binanceRepository.findByUser(user);  
+    }  
+
+    // Nuevo método para buscar Binance por ID de usuario  
+    public Optional<Binance> findBinanceByUserId(Long userId) {  
+        return binanceRepository.findByUserId(userId);  
     }  
 }

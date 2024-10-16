@@ -1,6 +1,7 @@
 package com.springboot.backend.andres.usersapp.usersbackend.services;  
 
-import com.springboot.backend.andres.usersapp.usersbackend.entities.MobilePayment;  
+import com.springboot.backend.andres.usersapp.usersbackend.entities.MobilePayment;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.MobilePaymentRepository;  
 import org.springframework.beans.factory.annotation.Autowired;  
 import org.springframework.stereotype.Service;  
@@ -25,14 +26,23 @@ public class MobilePaymentService {
         return mobilePaymentRepository.findById(id);  
     }  
 
-    public MobilePayment updateMobilePayment(Long id, MobilePayment mobilePaymentDetails) {  
-        MobilePayment mobilePayment = mobilePaymentRepository.findById(id).orElseThrow();  
-        mobilePayment.setCedula(mobilePaymentDetails.getCedula());  
-        mobilePayment.setNumeroTelefono(mobilePaymentDetails.getNumeroTelefono());  
+    public MobilePayment updateMobilePayment(Long id, MobilePayment mobilePayment) {  
+    	mobilePayment.setId(id);
         return mobilePaymentRepository.save(mobilePayment);  
     }  
 
     public void deleteMobilePayment(Long id) {  
         mobilePaymentRepository.deleteById(id);  
+    }  
+    
+    
+ // Método para buscar Binance por usuario  
+    public Optional<MobilePayment> findMobilePaymentByUser(User user) {  
+        return mobilePaymentRepository.findByUser(user);  
+    }  
+
+    // Nuevo método para buscar Binance por ID de usuario  
+    public Optional<MobilePayment> findMobilePaymentByUserId(Long userId) {  
+        return mobilePaymentRepository.findByUserId(userId);  
     }  
 }
