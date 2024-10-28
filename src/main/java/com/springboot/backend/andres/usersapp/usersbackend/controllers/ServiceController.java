@@ -1,5 +1,6 @@
 package com.springboot.backend.andres.usersapp.usersbackend.controllers;  
 
+import com.springboot.backend.andres.usersapp.usersbackend.entities.ServiceFilter;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;  
 import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;  
 import com.springboot.backend.andres.usersapp.usersbackend.services.JpaUserDetailsService;  
@@ -14,14 +15,21 @@ import java.util.List;
 import java.util.Optional;  
 
 @RestController  
-@RequestMapping("/api/service")  
+@RequestMapping("/api/service") 
+@CrossOrigin(origins = "http://localhost:4200") // Cambia esto por la URL de tu frontend  
 public class ServiceController {  
 
     @Autowired  
     private VendorServiceService vendorServiceService;   
     
     @Autowired  
-    private JpaUserDetailsService userDetailsService;  
+    private JpaUserDetailsService userDetailsService; 
+    
+    @PostMapping("/filter")  
+    public ResponseEntity<List<VendorService>> filterServices(@RequestBody ServiceFilter filter) {  
+        List<VendorService> filteredServices = vendorServiceService.filterServices(filter);  
+        return ResponseEntity.ok(filteredServices);  
+    }
 
     @PostMapping("/create")  
     public ResponseEntity<VendorService> createService(@RequestBody VendorService vendorService) {  

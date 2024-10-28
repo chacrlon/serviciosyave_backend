@@ -1,9 +1,11 @@
 package com.springboot.backend.andres.usersapp.usersbackend.services;  
 
 import java.util.List;  
-import java.util.Optional;  
+import java.util.Optional;
+import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;  
-import org.springframework.stereotype.Service;  
+import org.springframework.stereotype.Service;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.ServiceFilter;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;  
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorServiceRepository;  
 
@@ -11,7 +13,55 @@ import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorSe
 public class VendorServiceService {  
 
     @Autowired  
-    private VendorServiceRepository vendorServiceRepository;  
+    private VendorServiceRepository vendorServiceRepository;
+    
+    public List<VendorService> filterServices(ServiceFilter filter) {  
+        // Obtiene todos los servicios desde el repositorio  
+        List<VendorService> resultList = vendorServiceRepository.findAll();  
+
+        // Filtra por categoría y subcategoría  
+        if (filter.getCategoria() != null && filter.getSubcategoria() != null) {  
+            resultList = resultList.stream()  
+                .filter(service -> service.getCategoria().equals(filter.getCategoria()) &&  
+                                   service.getSubcategoria().equals(filter.getSubcategoria()))  
+                .collect(Collectors.toList());  
+        }  
+
+        // Filtra por rango de precio  
+        if (filter.getMinPrecio() != null || filter.getMaxPrecio() != null) {  
+            resultList = resultList.stream()  
+                .filter(service ->   
+                    (filter.getMinPrecio() == null || service.getPrecio() >= filter.getMinPrecio()) &&  
+                    (filter.getMaxPrecio() == null || service.getPrecio() <= filter.getMaxPrecio()))  
+                .collect(Collectors.toList());  
+        }  
+
+        // Filtra por destacado  
+        if (filter.getDestacado() != null) {  
+            resultList = resultList.stream()  
+                .filter(service -> filter.getDestacado().equals(service.getDestacado()))  
+                .collect(Collectors.toList());  
+        }  
+
+        // Filtra por cercanía utilizando la latitud y longitud del usuario  
+        if (filter.getLatitude() != null && filter.getLongitude() != null) {  
+            double distance = 10.0; // Puedes definir una distancia máxima, por ejemplo, 10 km  
+            List<VendorService> nearbyServices = vendorServiceRepository.findNearbyServices(  
+                filter.getLatitude(),  
+                filter.getLongitude(),  
+                distance  
+            );  
+
+            // Filtramos los servicios que están cerca  
+            resultList = resultList.stream()  
+                .filter(nearbyServices::contains)  
+                .collect(Collectors.toList());  
+        }  
+
+        // Filtra por remoto, texto libre, etc., puede añadirse aquí.  
+
+        return resultList;  
+    }
 
     public VendorService createService(VendorService service) {  
         return vendorServiceRepository.save(service);  

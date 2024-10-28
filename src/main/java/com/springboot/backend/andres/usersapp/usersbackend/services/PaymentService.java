@@ -1,30 +1,19 @@
 package com.springboot.backend.andres.usersapp.usersbackend.services;
 
-import java.util.List;
 import org.springframework.stereotype.Service;
-
-import com.springboot.backend.andres.usersapp.usersbackend.entities.PaymentMethod;
-import com.springboot.backend.andres.usersapp.usersbackend.entities.PaymentTransaction;
-import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
-import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;
-import com.springboot.backend.andres.usersapp.usersbackend.repositories.PaymentTransactionRepository;
-import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorServiceRepository;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Payment;
+import com.springboot.backend.andres.usersapp.usersbackend.repositories.PaymentRepository;
 import org.springframework.beans.factory.annotation.Autowired;  
 
 @Service
 public class PaymentService {
 
 	  @Autowired  
-	    private PaymentTransactionRepository paymentTransactionRepository;  
+	    private PaymentRepository paymentRepository;  
 
-	    public PaymentTransaction createPaymentTransaction(Double monto, String referencia, VendorService vendorService, User user, PaymentMethod paymentMethod) {  
-	        PaymentTransaction transaction = new PaymentTransaction();  
-	        transaction.setMonto(monto);  
-	        transaction.setReferencia(referencia);  
-	        transaction.setVendorService(vendorService);  
-	        transaction.setUser(user);  
-	        transaction.setPaymentMethod(paymentMethod);  
-	        return paymentTransactionRepository.save(transaction);  
+	  // Método para guardar la ubicación  
+	    public Payment createdPayment(Payment payment) {  
+	        return paymentRepository.save(payment);  
 	    }  
     
 }  
