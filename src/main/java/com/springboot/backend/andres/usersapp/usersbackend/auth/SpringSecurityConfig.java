@@ -59,9 +59,12 @@ public class SpringSecurityConfig {
              // Permitir acceso a todos los endpoints de Service  
                 .requestMatchers("/api/service/**").permitAll()  // <--- Añadir esta línea  
                 .requestMatchers("/api/currency/dolar/**").permitAll()
-                
+                .requestMatchers("/chat-socket/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/api/subcategories/**").permitAll()  // <--- Añadir esta línea // <--- Añadir esta línea 
+                .requestMatchers("/api/payment/**").permitAll()
+                .requestMatchers("/api/payment/**").permitAll()
+                .requestMatchers("/api/notifications/**").permitAll()
+                .requestMatchers("/notifications/**").permitAll()// <--- Añadir esta línea // <--- Añadir esta línea 
                 // Otras configuraciones para usuarios y administradores  
                 .requestMatchers(HttpMethod.GET, "/register/{id}").hasAnyRole("USER", "ADMIN")  
                 .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")  

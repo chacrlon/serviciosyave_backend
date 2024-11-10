@@ -2,7 +2,6 @@ package com.springboot.backend.andres.usersapp.usersbackend.services;
 
 import org.springframework.stereotype.Service;  
 import org.springframework.beans.factory.annotation.Autowired;
-
 import com.springboot.backend.andres.usersapp.usersbackend.controllers.NotificationController;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.Payment;  
 import com.springboot.backend.andres.usersapp.usersbackend.entities.PaymentDTO;  
@@ -12,7 +11,7 @@ import com.springboot.backend.andres.usersapp.usersbackend.repositories.PaymentR
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.UserRepository;  
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorServiceRepository; // Importa el repositorio de VendorService  
 import java.util.ArrayList;  
-import java.util.List;  
+import java.util.List; 
 
 @Service  
 public class PaymentService {  
@@ -24,7 +23,7 @@ public class PaymentService {
     private UserRepository userRepository;  
 
     @Autowired  
-    private VendorServiceRepository vendorServiceRepository; // Añadir el repositorio de VendorService  
+    private VendorServiceRepository vendorServiceRepository;  
 
     @Autowired  
     private EmailService emailService;  
@@ -32,10 +31,38 @@ public class PaymentService {
     @Autowired  
     private NotificationController notificationController;  
 
-    // Método para guardar la ubicación  
     public Payment createdPayment(Payment payment) {  
         return paymentRepository.save(payment);  
-    }    
+    }  
+    
+    public void approvePayment(Long paymentId) {  
+        Payment payment = paymentRepository.findById(paymentId)  
+            .orElseThrow(() -> new RuntimeException("Pago no encontrado"));  
+
+        payment.setEstatus("aprobado");  
+        paymentRepository.save(payment);  
+
+        Long vendorServiceId = payment.getVendorServiceId();  
+        VendorService vendorService = vendorServiceRepository.findById(vendorServiceId)  
+            .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));  
+
+        Long sellerId = vendorService.getUserId();  
+        User seller = userRepository.findById(sellerId)  
+            .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));  
+
+        User buyer = userRepository.findById(payment.getUserId())  
+            .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));  
+
+        String messageToSeller = "El usuario " + buyer.getUsername() + " ha comprado tu servicio " + vendorService.getNombre() + ".";  
+        String messageToBuyer = "Has comprado el servicio " + vendorService.getNombre() + " de " + seller.getUsername() + ".";  
+
+        emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);  
+        emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);  
+
+     // Crear notificaciones en lugar de enviar mensajes  
+        notificationController.notifyUser(seller.getId(), messageToSeller);  
+        notificationController.notifyUser(buyer.getId(), messageToBuyer);  
+    }  
 
     public List<PaymentDTO> getAllPayments() {  
         List<Payment> payments = paymentRepository.findAll();  
@@ -57,34 +84,7 @@ public class PaymentService {
         return paymentDTOs;  
     }  
     
-    public void approvePayment(Long paymentId) {  
-        Payment payment = paymentRepository.findById(paymentId)  
-            .orElseThrow(() -> new RuntimeException("Pago no encontrado"));  
-
-        // Cambiar el estado del pago a aprobado  
-        payment.setEstatus("aprobado");  
-        paymentRepository.save(payment);  
-
-        // Obtener el servicio del vendedor asociado al pago  
-        Long vendorServiceId = payment.getVendorServiceId();  
-        VendorService vendorService = vendorServiceRepository.findById(vendorServiceId)  
-            .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));  
-
-        // Obtener el ID del usuario asociado al servicio  
-        Long userId = vendorService.getUserId();  
-        String userEmail = userRepository.findById(userId)  
-            .map(User::getEmail) // Asumiendo que tienes un método getEmail en la clase User  
-            .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));  
-
-        // Mensaje de notificación  
-        String message = "El usuario " + payment.getUserId() + " ha solicitado tu servicio " + vendorService.getNombre() + ".";  
-        
-        // Enviar correo electrónico  
-       // emailService.sendEmail(userEmail, "Notificación de Servicio", message);  
-        
-        // Enviar notificación en tiempo real  
-        notificationController.notifyUser(userId, message);  
-    }  
+    
 
     public void rejectPayment(Long paymentId) {  
         Payment payment = paymentRepository.findById(paymentId).orElse(null);  

@@ -61,50 +61,53 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         return this.authenticationManager.authenticate(authenticationToken);
     }
 
-    @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,
-            Authentication authResult) throws IOException, ServletException {
-        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal(); // Cambia aquí
-        String username = userDetails.getUsername();
-        Long userId = userDetails.getUserId();
-        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();
-        boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));
+    @Override  
+    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain,  
+                                            Authentication authResult) throws IOException, ServletException {  
+        CustomUserDetails userDetails = (CustomUserDetails) authResult.getPrincipal();   
+        String username = userDetails.getUsername();   
+        Long userId = userDetails.getUserId();   
+        Collection<? extends GrantedAuthority> roles = userDetails.getAuthorities();   
+        boolean isAdmin = roles.stream().anyMatch(role -> role.getAuthority().equals("ROLE_ADMIN"));   
+
+        // Crea los claims  
+        Claims claims = Jwts  
+                .claims()  
+                .add("authorities", new ObjectMapper().writeValueAsString(roles))  
+                .add("username", username)  
+                .add("isAdmin", isAdmin)  
+                .add("userId", userId)  
+                .build();  
         
-        // Aquí puedes definir tu variable personalizada
-        String customInfo = "Informacion Personalizada"; // Reemplaza esto con la información que deseas
+        String jwt = Jwts.builder()  
+                .subject(username)  
+                .claims(claims)  
+                .signWith(SECRET_KEY)  
+                .issuedAt(new Date())  
+                .expiration(new Date(System.currentTimeMillis() + 3600000))  
+                .compact();  
 
-        // Crea los claims
-        Claims claims = Jwts
-                .claims()
-                .add("authorities", new ObjectMapper().writeValueAsString(roles))
-                .add("username", username)
-                .add("isAdmin", isAdmin)
-                .add("userId", userId)  // Utiliza el userId aquí     
-                .build();
+        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + jwt);  
 
-        String jwt = Jwts.builder()
-                .subject(username)
-                .claims(claims)
-                .signWith(SECRET_KEY)
-                .issuedAt(new Date())
-                .expiration(new Date(System.currentTimeMillis() + 3600000))
-                .compact();
+        // Crear cuerpo de respuesta  
+        Map<String, Object> body = new HashMap<>();  
+        body.put("token", jwt);  
+        body.put("username", username);  
+        body.put("message", String.format("Hola %s has iniciado sesión con éxito", username));  
 
-        response.addHeader(HEADER_AUTHORIZATION, PREFIX_TOKEN + jwt);
-        System.out.println(" EL USERNAME ES : " + username);
-        System.out.println(" EL ID DEL USUARIO ES : " + userId);
-        System.out.println(" EL TOKEN TIENE : " + jwt);
-        System.out.println(" EL CLAIMS TIENE : " + claims);
-        Map<String, String> body = new HashMap<>();
-        body.put("token", jwt);
-        body.put("username", username);
-        body.put("message", String.format("Hola %s has iniciado sesión con éxito", username));
+        // Agregar detalles del usuario (se serializa manualmente)  
+        Map<String, Object> userDetailsMap = new HashMap<>();  
+        userDetailsMap.put("userId", userId);  
+        userDetailsMap.put("username", username);  
+        userDetailsMap.put("roles", roles); // Aquí podrías convertir roles a una lista de strings si es necesario  
+        userDetailsMap.put("isAdmin", isAdmin);  
 
-        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
-        response.setContentType(CONTENT_TYPE);
-        response.setStatus(200);
+        body.put("userDetails", userDetailsMap); // Agrega los detalles creados  
+
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));  
+        response.setContentType(CONTENT_TYPE);  
+        response.setStatus(HttpServletResponse.SC_OK);  
     }
-
 
     @Override
     protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
@@ -120,3 +123,4 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     }
 
 }
+
