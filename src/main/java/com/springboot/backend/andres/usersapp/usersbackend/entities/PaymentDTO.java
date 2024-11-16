@@ -7,7 +7,7 @@ public class PaymentDTO {
     private String metodo_pago;  
     private String referencia;  
     private String estatus;  
-    private String username; // Agregar el username  
+    private String username; 
 	public Long getId() {
 		return id;
 	}
