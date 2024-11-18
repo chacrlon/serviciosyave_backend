@@ -1,10 +1,13 @@
 package com.springboot.backend.andres.usersapp.usersbackend.entities;  
 
 import jakarta.persistence.Column;
-import jakarta.persistence.Entity;  
+import jakarta.persistence.Entity;
+import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;  
 import jakarta.persistence.GenerationType;  
-import jakarta.persistence.Id;  
+import jakarta.persistence.Id;
+import jakarta.persistence.JoinColumn;
+import jakarta.persistence.ManyToOne;
 import jakarta.persistence.Table;  
 import lombok.Data;  
 
@@ -12,22 +15,29 @@ import lombok.Data;
 @Table(name = "vendorService")  
 @Data   
 public class VendorService {  
-
+	
     @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
     private Long id;  
     private String nombre;  
     private String descripcion;  
     private Double precio;  
-    private Boolean destacado; 
-    private String categoria;
-    private String subcategoria;
-    private Boolean remoto;
+    private Boolean destacado;   
+
+    @ManyToOne(fetch = FetchType.LAZY) // Relación con Category  
+    @JoinColumn(name = "category_id") // Nombre de la columna en la tabla vendorService  
+    private Category category;  
+
+    @ManyToOne(fetch = FetchType.LAZY) // Relación con Subcategory  
+    @JoinColumn(name = "subcategory_id") // Nombre de la columna en la tabla vendorService  
+    private Subcategory subcategory;  
+
+    private Boolean remoto;  
     private double latitude;  
-    private double longitude;
+    private double longitude;  
     
-    @Column(name = "users_id") 
-    private Long userId; // Guardamos solo el ID del usuario  
+    @Column(name = "users_id")   
+    private Long userId; // Guardamos solo el ID del usuario 
 
 	public Long getId() {
 		return id;
@@ -69,20 +79,20 @@ public class VendorService {
 		this.destacado = destacado;
 	}
 
-	public String getCategoria() {
-		return categoria;
+	public Category getCategory() {
+		return category;
 	}
 
-	public void setCategoria(String categoria) {
-		this.categoria = categoria;
+	public void setCategory(Category category) {
+		this.category = category;
 	}
 
-	public String getSubcategoria() {
-		return subcategoria;
+	public Subcategory getSubcategory() {
+		return subcategory;
 	}
 
-	public void setSubcategoria(String subcategoria) {
-		this.subcategoria = subcategoria;
+	public void setSubcategory(Subcategory subcategory) {
+		this.subcategory = subcategory;
 	}
 
 	public Boolean getRemoto() {
@@ -91,14 +101,6 @@ public class VendorService {
 
 	public void setRemoto(Boolean remoto) {
 		this.remoto = remoto;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
 	}
 
 	public double getLatitude() {
@@ -117,6 +119,13 @@ public class VendorService {
 		this.longitude = longitude;
 	}
 
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
 	
 
     

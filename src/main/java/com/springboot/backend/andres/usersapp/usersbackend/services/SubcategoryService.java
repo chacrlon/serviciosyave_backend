@@ -7,7 +7,8 @@ import com.springboot.backend.andres.usersapp.usersbackend.repositories.Category
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.SubcategoryRepository;
 import com.springboot.backend.andres.usersapp.usersbackend.exceptions.ResourceNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired; 
-import java.util.List;  
+import java.util.List;
+import java.util.Optional;  
 
 @Service  
 public class SubcategoryService {  
@@ -50,4 +51,12 @@ public class SubcategoryService {
         subcategoryRepository.delete(subcategory);  
     }  
     
+ // Método para obtener subcategorías por ID de categoría  
+    public List<Subcategory> getSubcategoriesByCategoryId(Long categoryId) {  
+        return subcategoryRepository.findByCategoryId(categoryId);  
+    }
+ // Método para obtener una subcategoría por ID  
+    public Optional<Subcategory> getSubcategoryById(Long id) {  
+        return subcategoryRepository.findById(id);  
+    }  
 }

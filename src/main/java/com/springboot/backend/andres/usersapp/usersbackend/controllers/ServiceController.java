@@ -1,9 +1,14 @@
 package com.springboot.backend.andres.usersapp.usersbackend.controllers;  
 
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Category;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.ServiceFilter;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Subcategory;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;  
-import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;  
-import com.springboot.backend.andres.usersapp.usersbackend.services.JpaUserDetailsService;  
+import com.springboot.backend.andres.usersapp.usersbackend.entities.VendorService;
+import com.springboot.backend.andres.usersapp.usersbackend.exceptions.ResourceNotFoundException;
+import com.springboot.backend.andres.usersapp.usersbackend.services.CategoryService;
+import com.springboot.backend.andres.usersapp.usersbackend.services.JpaUserDetailsService;
+import com.springboot.backend.andres.usersapp.usersbackend.services.SubcategoryService;
 import com.springboot.backend.andres.usersapp.usersbackend.services.VendorServiceService;  
 import org.springframework.beans.factory.annotation.Autowired;  
 import org.springframework.http.HttpStatus;  
@@ -16,20 +21,25 @@ import java.util.Optional;
 
 @RestController  
 @RequestMapping("/api/service") 
-@CrossOrigin(origins = "http://localhost:4200") // Cambia esto por la URL de tu frontend  
+@CrossOrigin(origins = "http://localhost:4200") 
 public class ServiceController {  
-
-    @Autowired  
+	@Autowired  
     private VendorServiceService vendorServiceService;   
     
     @Autowired  
-    private JpaUserDetailsService userDetailsService; 
+    private JpaUserDetailsService userDetailsService;   
     
+    @Autowired  
+    private CategoryService categoryService;  
+
+    @Autowired  
+    private SubcategoryService subcategoryService;  
+
     @PostMapping("/filter")  
     public ResponseEntity<List<VendorService>> filterServices(@RequestBody ServiceFilter filter) {  
         List<VendorService> filteredServices = vendorServiceService.filterServices(filter);  
         return ResponseEntity.ok(filteredServices);  
-    }
+    }  
 
     @PostMapping("/create")  
     public ResponseEntity<VendorService> createService(@RequestBody VendorService vendorService) {  
@@ -42,9 +52,22 @@ public class ServiceController {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).build();  
         }  
 
-        vendorService.setUserId(userId);  
+        // Establecer la categoría y subcategoría  
+        if (vendorService.getCategory() != null) {  
+            Category category = categoryService.getCateoryById(vendorService.getCategory().getId())  
+                .orElseThrow(() -> new ResourceNotFoundException("Category not found"));  
+            vendorService.setCategory(category);  
+        }  
+
+        if (vendorService.getSubcategory() != null) {  
+            Subcategory subcategory = subcategoryService.getSubcategoryById(vendorService.getSubcategory().getId())  
+                .orElseThrow(() -> new ResourceNotFoundException("Subcategory not found"));  
+            vendorService.setSubcategory(subcategory);  
+        }  
+
+        vendorService.setUserId(userId); // Establecer el ID del usuario  
         VendorService createdService = vendorServiceService.createService(vendorService);  
-        return ResponseEntity.status(HttpStatus.CREATED).body(createdService);  
+        return ResponseEntity.status(HttpStatus.CREATED).body(createdService);   
     }  
 
     @GetMapping("/{id}")  
@@ -60,32 +83,25 @@ public class ServiceController {
 
     @GetMapping("/user")  
     public ResponseEntity<List<VendorService>> getAllServicesByUser() {  
-        // Obtener la autenticación actual  
-    	
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
-        Long userId = (Long) authentication.getDetails(); // Obtener el userId desde los detalles  
+        Long userId = (Long) authentication.getDetails();  
 
-        System.out.println(" el user id del servicio es : "+userId);
-        // Obtener todos los servicios creados por el usuario autenticado  
         List<VendorService> services = vendorServiceService.getServicesByUserId(userId);  
-        
         return ResponseEntity.ok(services);  
-    }
+    }  
 
     @PutMapping("/{id}")  
     public ResponseEntity<VendorService> updateService(@PathVariable Long id, @RequestBody VendorService vendorServiceDetails) {  
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
         Long userId = (Long) authentication.getDetails();  
 
-        // Validar si el servicio a actualizar pertenece al usuario autenticado  
         VendorService existingService = vendorServiceService.getServiceById(id)  
             .orElseThrow();  
 
         if (!existingService.getUserId().equals(userId)) {  
-            return ResponseEntity.status(HttpStatus.FORBIDDEN).build(); // El usuario no tiene permiso para actualizar este servicio  
+            return ResponseEntity.status(HttpStatus.FORBIDDEN).build();  
         }  
 
-        // Actualizar el servicio  
         VendorService updatedService = vendorServiceService.updateService(id, vendorServiceDetails);  
         return ResponseEntity.ok(updatedService);  
     }  
@@ -94,7 +110,8 @@ public class ServiceController {
     public ResponseEntity<Void> deleteService(@PathVariable Long id) {  
         vendorServiceService.deleteService(id);  
         return ResponseEntity.noContent().build();  
-    }  
+    }
+    
     
     @GetMapping("/nearby")  
     public ResponseEntity<List<VendorService>> getNearbyServices(  

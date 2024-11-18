@@ -31,10 +31,13 @@ public class NotificationSseController {
         }  
     }  
 
-    public void sendNotification(String message) {  
+    public void sendNotification(Long id, String message, Long userId) {  
+        // Crear un objeto Notification para enviar   
+        String jsonMessage = String.format("{\"id\": %d, \"userId\": %d, \"message\": \"%s\", \"read\": false}", id, userId, message);  
+        System.out.println(jsonMessage);  
         for (PrintWriter client : clients) {  
-            client.write("data: " + message + "\n\n");  
+            client.write("data: " + jsonMessage + "\n\n");  
             client.flush();  
         }  
-    }  
+    } 
 }

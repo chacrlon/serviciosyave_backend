@@ -13,17 +13,21 @@ import com.springboot.backend.andres.usersapp.usersbackend.repositories.VendorSe
 public class VendorServiceService {  
 
     @Autowired  
-    private VendorServiceRepository vendorServiceRepository;
-    
+    private VendorServiceRepository vendorServiceRepository;  
+
     public List<VendorService> filterServices(ServiceFilter filter) {  
-        // Obtiene todos los servicios desde el repositorio  
         List<VendorService> resultList = vendorServiceRepository.findAll();  
 
         // Filtra por categoría y subcategoría  
-        if (filter.getCategoria() != null && filter.getSubcategoria() != null) {  
+        if (filter.getCategoryId() != null) {  
             resultList = resultList.stream()  
-                .filter(service -> service.getCategoria().equals(filter.getCategoria()) &&  
-                                   service.getSubcategoria().equals(filter.getSubcategoria()))  
+                .filter(service -> service.getCategory() != null && service.getCategory().getId().equals(filter.getCategoryId()))  
+                .collect(Collectors.toList());  
+        }  
+
+        if (filter.getSubcategoryId() != null) {  
+            resultList = resultList.stream()  
+                .filter(service -> service.getSubcategory() != null && service.getSubcategory().getId().equals(filter.getSubcategoryId()))  
                 .collect(Collectors.toList());  
         }  
 
@@ -58,10 +62,8 @@ public class VendorServiceService {
                 .collect(Collectors.toList());  
         }  
 
-        // Filtra por remoto, texto libre, etc., puede añadirse aquí.  
-
         return resultList;  
-    }
+    }  
 
     public VendorService createService(VendorService service) {  
         return vendorServiceRepository.save(service);  
@@ -76,16 +78,15 @@ public class VendorServiceService {
     }  
 
     public VendorService updateService(Long id, VendorService serviceDetails) {  
-    	
         VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();   
         
-     // Actualiza los campos modificables  
+        // Actualiza los campos modificables  
         serviceToUpdate.setNombre(serviceDetails.getNombre());  
         serviceToUpdate.setDescripcion(serviceDetails.getDescripcion());  
         serviceToUpdate.setPrecio(serviceDetails.getPrecio());  
         serviceToUpdate.setDestacado(serviceDetails.getDestacado());  
-        serviceToUpdate.setCategoria(serviceDetails.getCategoria());  
-        serviceToUpdate.setSubcategoria(serviceDetails.getSubcategoria());  
+        serviceToUpdate.setCategory(serviceDetails.getCategory());  
+        serviceToUpdate.setSubcategory(serviceDetails.getSubcategory());  
         serviceToUpdate.setRemoto(serviceDetails.getRemoto());  
         serviceToUpdate.setLatitude(serviceDetails.getLatitude());  
         serviceToUpdate.setLongitude(serviceDetails.getLongitude());    
@@ -96,14 +97,13 @@ public class VendorServiceService {
     public void deleteService(Long id) {  
         VendorService serviceToDelete = vendorServiceRepository.findById(id).orElseThrow();  
         vendorServiceRepository.delete(serviceToDelete);  
-    } 
+    }   
     
- // Método para obtener todos los servicios por el ID del usuario  
     public List<VendorService> getServicesByUserId(Long userId) {  
-        return vendorServiceRepository.findByUserId(userId); // Cambié a findByUserId  
-    }
+        return vendorServiceRepository.findByUserId(userId);  
+    }  
     
     public List<VendorService> getNearbyServices(double latitude, double longitude, double distance) {  
         return vendorServiceRepository.findNearbyServices(latitude, longitude, distance);  
-    }
+    }  
 }

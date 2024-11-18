@@ -7,6 +7,7 @@ import org.springframework.web.bind.annotation.*;
 
 import com.springboot.backend.andres.usersapp.usersbackend.entities.Binance;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.Category;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Subcategory;
 import com.springboot.backend.andres.usersapp.usersbackend.services.CategoryService;
 
 import java.util.ArrayList;
@@ -74,4 +75,13 @@ public class CategoryController {
         categoryService.deleteCategory(id);  
         return ResponseEntity.noContent().build();  
     }  
+    
+    @GetMapping("/{id}/subcategories")  
+    public ResponseEntity<List<Subcategory>> getSubcategoriesByCategoryId(@PathVariable Long id) {  
+        List<Subcategory> subcategories = categoryService.getSubcategoriesByCategoryId(id);  
+        if (subcategories.isEmpty()) {  
+            return ResponseEntity.noContent().build(); // Devuelve 204 si no hay subcategorías  
+        }  
+        return ResponseEntity.ok(subcategories); // Devuelve 200 con la lista de subcategorías  
+    }
 }  

@@ -1,31 +1,30 @@
 package com.springboot.backend.andres.usersapp.usersbackend.controllers;  
 
 import org.springframework.beans.factory.annotation.Autowired;  
-import org.springframework.web.bind.annotation.*;
-import com.springboot.backend.andres.usersapp.usersbackend.entities.Notification;
-import com.springboot.backend.andres.usersapp.usersbackend.repositories.NotificationRepository;
+import org.springframework.web.bind.annotation.*;  
+import com.springboot.backend.andres.usersapp.usersbackend.entities.Notification;  
+import com.springboot.backend.andres.usersapp.usersbackend.repositories.NotificationRepository;  
 import java.util.List;  
 
 @RestController  
 @RequestMapping("/api/notifications")  
 public class NotificationController {  
-	@Autowired  
-    private NotificationRepository notificationRepository; 
-	
-	@Autowired  
-    private NotificationSseController notificationSseController; 
+    @Autowired  
+    private NotificationRepository notificationRepository;   
+    
+    @Autowired  
+    private NotificationSseController notificationSseController;   
 
-	public void notifyUser(Long userId, String message) {  
-	    // Verificar si ya existe una notificación no leída con el mismo mensaje  
-	    List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(userId, message, false);  
-	    if (existingNotifications.isEmpty()) {  
-	        Notification notification = new Notification(userId, message);    
-	        
-	        // Enviar notificación en tiempo real  
-	        notificationSseController.sendNotification(message);  
-	        notificationRepository.save(notification);  
-	    }  
-	}  
+    public void notifyUser(Long userId, String message) {  
+        List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(userId, message, false);  
+        if (existingNotifications.isEmpty()) {  
+            Notification notification = new Notification(userId, message);  
+            notification = notificationRepository.save(notification); // Guarda la notificación  
+
+            // Enviar notificación en tiempo real con el ID  
+            notificationSseController.sendNotification(notification.getId(), message, userId);  
+        }  
+    } 
 
     // Obtener notificaciones de un usuario  
     @GetMapping("/{userId}")  
@@ -41,4 +40,3 @@ public class NotificationController {
         notificationRepository.save(notification);  
     }  
 }
-

@@ -19,6 +19,8 @@ public class CurrencyController {
     // URL del BCV para obtener estadísticas del consumidor  
     private final String bcvUrl = "https://www.bcv.org.ve";  
 
+    
+//No se recomienda en ambiente de produccion, se utiliza para deshabilitar la verificación de certificados SSL en una conexión HTTPS.
     static {  
         try {  
             TrustManager[] trustAllCerts = new TrustManager[]{  
