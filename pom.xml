@@ -90,7 +90,7 @@
         <dependency>  
             <groupId>org.springframework.boot</groupId>  
             <artifactId>spring-boot-starter-websocket</artifactId>  
-        </dependency>  
+  </dependency>  
         <dependency>  
             <groupId>org.webjars</groupId>  
             <artifactId>webjars-locator-core</artifactId>  

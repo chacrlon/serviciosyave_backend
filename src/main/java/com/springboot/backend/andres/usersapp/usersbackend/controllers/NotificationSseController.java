@@ -31,9 +31,9 @@ public class NotificationSseController {
         }  
     }  
 
-    public void sendNotification(Long id, String message, Long userId) {  
+    public void sendNotification(Long id, String message, Long userId, Long userId2) {  
         // Crear un objeto Notification para enviar   
-        String jsonMessage = String.format("{\"id\": %d, \"userId\": %d, \"message\": \"%s\", \"read\": false}", id, userId, message);  
+        String jsonMessage = String.format("{\"id\": %d, \"userId\": %d, \"message\": \"%s\", \"read\": false, \"userId2\": %d}", id, userId, message, userId2);  
         System.out.println(jsonMessage);  
         for (PrintWriter client : clients) {  
             client.write("data: " + jsonMessage + "\n\n");  

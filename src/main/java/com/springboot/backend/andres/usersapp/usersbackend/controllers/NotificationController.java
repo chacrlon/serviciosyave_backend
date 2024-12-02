@@ -15,16 +15,16 @@ public class NotificationController {
     @Autowired  
     private NotificationSseController notificationSseController;   
 
-    public void notifyUser(Long userId, String message) {  
-        List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(userId, message, false);  
+    public void notifyUser(Long sellerId, Long buyerId, String message) {  
+        List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
         if (existingNotifications.isEmpty()) {  
-            Notification notification = new Notification(userId, message);  
+            Notification notification = new Notification(sellerId, message, buyerId); // Incluye userId2  
             notification = notificationRepository.save(notification); // Guarda la notificación  
 
             // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, userId);  
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId); // Asegúrate de pasar buyerId aquí  
         }  
-    } 
+    }
 
     // Obtener notificaciones de un usuario  
     @GetMapping("/{userId}")  

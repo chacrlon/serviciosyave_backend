@@ -8,19 +8,21 @@ public class Notification{
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
     private Long id;  
 
-    private Long userId; // ID del usuario que recibe la notificación  
+    private Long userId; // ID del usuario que recibe la notificación 
     private String message; // Mensaje de la notificación  
     private boolean isRead; // Estado de lectura de la notificación  
-
+    private Long userId2; // ID del otro usuario que interactua contigo
+    
     // Constructor, getters y setters  
     public Notification() {  
     }
     
- // Constructor que acepta userId y message  
-    public Notification(Long userId, String message) {  
+ // Constructor que acepta userId, message y userId2  
+    public Notification(Long userId, String message, Long userId2) {  
         this.userId = userId;  
         this.message = message;  
         this.isRead = false; // Por defecto, la notificación no está leída  
+        this.userId2 = userId2; // Establece el ID del comprador  
     }  
 
 
@@ -54,6 +56,16 @@ public class Notification{
 
 	public void setRead(boolean isRead) {
 		this.isRead = isRead;
+	}
+
+	public Long getUserId2() {
+		return userId2;
+	}
+
+	public void setUserId2(Long userId2) {
+		this.userId2 = userId2;
 	}  
+	
+	
 	    
 }
