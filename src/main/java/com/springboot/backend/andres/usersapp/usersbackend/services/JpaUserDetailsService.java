@@ -25,35 +25,43 @@ public class JpaUserDetailsService implements UserDetailsService {
     @Autowired  
     private UserRepository repository;  
 
-    private Long userIdd; // Variable de instancia
-    private String hola; // Variable de instancia
-
     @Transactional(readOnly = true)  
     @Override  
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {  
-
+        System.out.println("Intentando cargar usuario por el nombre de usuario: " + username);  
+        
         Optional<User> optionalUser = repository.findByUsername(username);  
 
         if (optionalUser.isEmpty()) {  
+            System.out.println("No se encontró el usuario: " + username);  
             throw new UsernameNotFoundException(String.format("Username %s no existe en el sistema", username));  
         }  
 
         User user = optionalUser.get();  
+        System.out.println("Usuario encontrado: " + username);  
+        
+        // Validar si el email está verificado  
+        if (!user.isEmailVerified()) {  
+            System.out.println("El correo electrónico del usuario " + username + " no ha sido verificado.");  
+            throw new UsernameNotFoundException("El correo electrónico no ha sido verificado.");  
+        }  
 
-        userIdd = user.getId(); // Asigna el valor a la variable de instancia
-String hola = " holiwirivirivis ";
-        System.out.println("el userid es : " + userIdd);
         List<GrantedAuthority> authorities = user.getRoles()  
                 .stream()  
                 .map(role -> new SimpleGrantedAuthority(role.getName()))  
                 .collect(Collectors.toList());  
 
-        // Crear y retornar el CustomUserDetails  
-        return new CustomUserDetails(username,  
+        System.out.println("Autorizaciones concedidas para el usuario " + username + ": " + authorities);  
+        // Crear y retornar el CustomUserDetails incluyendo isEmailVerified  
+        CustomUserDetails userDetails = new CustomUserDetails(username,  
                 user.getPassword(),  
                 authorities,  
-                user.getId()); 
-    }  
+                user.getId(),  // ID del usuario  
+                user.isEmailVerified()); // Estado de verificación del email  
+        
+        System.out.println("Login exitoso para el usuario: " + username);  
+        return userDetails;  
+    }
 
     public Long getUserId() {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();

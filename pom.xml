@@ -9,7 +9,7 @@
         <version>3.2.5</version>  
         <relativePath/>  
     </parent>  
-    <groupId>com.springboot.backend.andres.usersapp</groupId>  
+    <groupId>serviciosyave</groupId>  
     <artifactId>serviciosyave</artifactId>  
     <version>0.0.1-SNAPSHOT</version>  
     <name>serviciosyave</name>  
@@ -105,11 +105,7 @@
             <artifactId>stomp-websocket</artifactId>  
             <version>2.3.3</version>  
         </dependency>  
-        <dependency>  
-            <groupId>com.bolsadeideas.springboot.backend.apirest</groupId>  
-            <artifactId>spring-boot-backend-apirest</artifactId>  
-            <version>0.0.1-SNAPSHOT</version>  
-        </dependency>  
+ 
     </dependencies>  
 
     <build>  
