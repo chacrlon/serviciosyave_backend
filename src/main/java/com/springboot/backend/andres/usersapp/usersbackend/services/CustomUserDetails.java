@@ -1,10 +1,10 @@
-package com.springboot.backend.andres.usersapp.usersbackend.services;
+package com.springboot.backend.andres.usersapp.usersbackend.services;  
 
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.userdetails.UserDetails;
+import org.springframework.security.core.GrantedAuthority;  
+import org.springframework.security.core.userdetails.UserDetails;  
 
-import java.util.Collection;
-import java.util.List;
+import java.util.Collection;  
+import java.util.List;  
 
 public class CustomUserDetails implements UserDetails {  
     private String username;  
@@ -12,14 +12,25 @@ public class CustomUserDetails implements UserDetails {
     private List<GrantedAuthority> authorities;  
     private Long userId; // Almacena el ID del usuario  
     private boolean emailVerified; // Almacena si el correo electrónico está verificado  
+    private String mensaje; // Nuevo atributo para almacenar el mensaje  
 
     // Constructor  
-    public CustomUserDetails(String username, String password, List<GrantedAuthority> authorities, Long userId, boolean emailVerified) {  
+    public CustomUserDetails(String username, String password, List<GrantedAuthority> authorities, Long userId, boolean emailVerified, String mensaje) {  
         this.username = username;  
         this.password = password;  
         this.authorities = authorities;  
         this.userId = userId;  
         this.emailVerified = emailVerified; // Almacena el estado de verificación  
+        this.mensaje = mensaje; // Inicializa el mensaje  
+    }  
+
+    // Métodos getters y setters para el mensaje  
+    public String getMensaje() {  
+        return mensaje;  
+    }  
+
+    public void setMensaje(String mensaje) {  
+        this.mensaje = mensaje;  
     }  
 
     // Implementa los métodos de UserDetails  

@@ -18,32 +18,46 @@ import org.springframework.transaction.annotation.Transactional;
 import com.springboot.backend.andres.usersapp.usersbackend.entities.User;  
 import com.springboot.backend.andres.usersapp.usersbackend.repositories.UserRepository;  
 
-
 @Service  
 public class JpaUserDetailsService implements UserDetailsService {  
 
     @Autowired  
     private UserRepository repository;  
 
+    private static ThreadLocal<String> threadLocalMensaje = ThreadLocal.withInitial(() -> ""); // Inicializa el mensaje por hilo  
+
+    public static void setMensaje(String nuevoMensaje) {  
+        threadLocalMensaje.set(nuevoMensaje);  
+    }  
+
+    public static String getMensaje() {  
+        return threadLocalMensaje.get();  
+    }    
+
     @Transactional(readOnly = true)  
     @Override  
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {  
-        System.out.println("Intentando cargar usuario por el nombre de usuario: " + username);  
-        
+        // Establecer un mensaje inicial si es necesario  
+        setMensaje("Intentando cargar usuario por el nombre de usuario: " + username);  
+        System.out.println(getMensaje()); // Imprimir mensaje inicial  
+
         Optional<User> optionalUser = repository.findByUsername(username);  
 
         if (optionalUser.isEmpty()) {  
-            System.out.println("No se encontró el usuario: " + username);  
-            throw new UsernameNotFoundException(String.format("Username %s no existe en el sistema", username));  
+            // Establecer mensaje de error  
+            setMensaje("No se encontró el usuario: " + username);  
+            System.out.println(getMensaje());  // Imprimir mensaje de error  
+            throw new UsernameNotFoundException(getMensaje());  
         }  
 
         User user = optionalUser.get();  
         System.out.println("Usuario encontrado: " + username);  
-        
+
         // Validar si el email está verificado  
         if (!user.isEmailVerified()) {  
-            System.out.println("El correo electrónico del usuario " + username + " no ha sido verificado.");  
-            throw new UsernameNotFoundException("El correo electrónico no ha sido verificado.");  
+            setMensaje("El correo electrónico del usuario " + username + " no ha sido verificado.");  
+            System.out.println(getMensaje()); // Imprimir mensaje de verificación  
+            throw new UsernameNotFoundException(getMensaje());  
         }  
 
         List<GrantedAuthority> authorities = user.getRoles()  
@@ -52,29 +66,29 @@ public class JpaUserDetailsService implements UserDetailsService {
                 .collect(Collectors.toList());  
 
         System.out.println("Autorizaciones concedidas para el usuario " + username + ": " + authorities);  
-        // Crear y retornar el CustomUserDetails incluyendo isEmailVerified  
+
         CustomUserDetails userDetails = new CustomUserDetails(username,  
                 user.getPassword(),  
                 authorities,  
-                user.getId(),  // ID del usuario  
-                user.isEmailVerified()); // Estado de verificación del email  
-        
+                user.getId(),  
+                user.isEmailVerified(),  
+                getMensaje()  // Aquí también puedes establecer el mensaje si es necesario  
+        );  
+
         System.out.println("Login exitoso para el usuario: " + username);  
-        return userDetails;  
-    }
+        return userDetails;   
+    }  
 
-    public Long getUserId() {
-        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
-        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {
-            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();
-            return userDetails.getUserId(); // Esto obtiene el ID del usuario autenticado
-        }
-        return null; // Retorna null si no hay un usuario autenticado
-    }
+    public Long getUserId() {  
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
+        if (authentication != null && authentication.getPrincipal() instanceof CustomUserDetails) {  
+            CustomUserDetails userDetails = (CustomUserDetails) authentication.getPrincipal();  
+            return userDetails.getUserId();   
+        }  
+        return null;   
+    }  
 
- // Nuevo método para buscar un usuario por ID  
     public User findById(Long id) {  
-        return repository.findById(id).orElse(null); // Asegúrate de que este método esté definido en tu UserRepository  
-    } 
-  
+        return repository.findById(id).orElse(null);  
+    }  
 }

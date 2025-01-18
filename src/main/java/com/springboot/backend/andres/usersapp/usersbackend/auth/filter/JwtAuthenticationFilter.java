@@ -12,6 +12,8 @@ import org.springframework.security.authentication.UsernamePasswordAuthenticatio
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -36,6 +38,7 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
     public JwtAuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
     }
+   
 
     @Override
     public Authentication attemptAuthentication(HttpServletRequest request, HttpServletResponse response)
@@ -109,18 +112,20 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setStatus(HttpServletResponse.SC_OK);  
     }
 
-    @Override
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
-            AuthenticationException failed) throws IOException, ServletException {
+    @Override  
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,  
+                                              AuthenticationException failed) throws IOException, ServletException {  
+        String mensaje = JpaUserDetailsService.getMensaje(); // Obtener el mensaje del hilo actual  
 
-        Map<String, String> body = new HashMap<>();
-        body.put("message", "Error en la autenticacion con username o password incorrecto!");
-        body.put("error", failed.getMessage());
+        // Crear cuerpo de respuesta  
+        Map<String, String> body = new HashMap<>();  
+        body.put("message", mensaje);  
+        body.put("error", failed.getMessage());  
 
-        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
-        response.setContentType(CONTENT_TYPE);
-        response.setStatus(401);
-    }
-
+        // Enviar respuesta  
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));  
+        response.setContentType(CONTENT_TYPE);  
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  
+    }  
 }
 

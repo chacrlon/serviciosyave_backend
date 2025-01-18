@@ -46,6 +46,17 @@ public class UserController {
     public List<User> list() {
         return service.findAll();
     }
+    
+    @GetMapping("/{userId}/email")  
+    public ResponseEntity<?> getUserEmail(@PathVariable Long userId) {  
+        Optional<User> userOptional = service.findById(userId);  
+        if (userOptional.isPresent()) {  
+            String email = userOptional.get().getEmail();  
+            return ResponseEntity.ok(Collections.singletonMap("email", email));  
+        }  
+        return ResponseEntity.status(HttpStatus.NOT_FOUND)  
+                .body(Collections.singletonMap("error", "Usuario no encontrado con el ID: " + userId));  
+    }
 
     @GetMapping("/page/{page}")
     public Page<User> listPageable(@PathVariable Integer page) {
