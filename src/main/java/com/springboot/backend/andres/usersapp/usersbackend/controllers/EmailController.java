@@ -1,12 +1,22 @@
 package com.springboot.backend.andres.usersapp.usersbackend.controllers;  
 
-import com.springboot.backend.andres.usersapp.usersbackend.services.EmailService;  
+import com.springboot.backend.andres.usersapp.usersbackend.auth.TokenJwtConfig;
+import com.springboot.backend.andres.usersapp.usersbackend.services.EmailService;
+
+import static com.springboot.backend.andres.usersapp.usersbackend.auth.TokenJwtConfig.SECRET_KEY;
+
+import java.util.Date;
 import java.util.HashMap;  
 import java.util.Map;  
 import org.springframework.beans.factory.annotation.Autowired;  
 import org.springframework.http.HttpStatus;  
 import org.springframework.http.ResponseEntity;  
-import org.springframework.web.bind.annotation.*;  
+import org.springframework.web.bind.annotation.*;
+
+import io.jsonwebtoken.Claims;  
+import io.jsonwebtoken.Jwts;  
+import io.jsonwebtoken.security.Keys;  
+import java.security.Key;
 
 @RestController  
 @RequestMapping("/api/email")  
@@ -28,7 +38,19 @@ public class EmailController {
             return ResponseEntity.badRequest().body(errorResponse);  
         }  
 
-        boolean isSent = emailService.sendEmail(toEmail, subject, text);  
+        // Generar un JWT para el receptor  
+        String jwt = Jwts.builder()  
+                .setSubject(toEmail) // O puedes usar un id de usuario si tienes uno  
+                .setIssuedAt(new Date())  
+                .setExpiration(new Date(System.currentTimeMillis() + 900000)) // 15 minutos  
+                .signWith(TokenJwtConfig.SECRET_KEY) // Usa tu clave secreta  
+                .compact();  
+        
+        // Crear el enlace de chat con el token  
+        String chatLink = "http://localhost:4200/chat/invite?token=" + jwt; // Cambia la ruta según tu diseño  
+
+        // Enviar el correo con el enlace de chat  
+        boolean isSent = emailService.sendEmail(toEmail, subject, "Haz clic aquí para unirte al chat: " + chatLink);  
         Map<String, String> response = new HashMap<>();  
         if (isSent) {  
             response.put("message", "Email enviado con éxito");  
@@ -37,5 +59,30 @@ public class EmailController {
             response.put("error", "Error al enviar el email");  
             return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR).body(response);  
         }  
-    }  
+    }    
+    
+    @PostMapping("/auth/token")  
+    public ResponseEntity<?> authenticateWithToken(@RequestBody Map<String, String> body) {  
+        String token = body.get("token");  
+        Claims claims;  
+        
+        // Generar la clave a partir del secreto  
+        Key key = Keys.hmacShaKeyFor(TokenJwtConfig.SECRET_KEY.getBytes()); // Asegúrate de que sea un tamaño adecuado (32 bytes para HMAC SHA-256)  
+
+        try {  
+            // Utilizar el objeto Key para la validación del token  
+            claims = Jwts.parser()  
+                    .setSigningKey(key)  // Usamos la clave generada  
+                    .parseClaimsJws(token)  // Analiza el JWT  
+                    .getBody();  
+        } catch (Exception e) {  
+            return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");  
+        }  
+        
+        String username = claims.getSubject();  
+        // Aquí podrías cargar al usuario desde la base de datos y devolver información adicional  
+        // Ejemplo: User user = userService.findByUsername(username);  
+        
+        return ResponseEntity.ok("Usuario autenticado: " + username);  
+    }
 }
