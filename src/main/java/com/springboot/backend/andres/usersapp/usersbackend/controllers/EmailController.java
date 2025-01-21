@@ -1,29 +1,36 @@
 package com.springboot.backend.andres.usersapp.usersbackend.controllers;  
 
 import com.springboot.backend.andres.usersapp.usersbackend.auth.TokenJwtConfig;
+import com.springboot.backend.andres.usersapp.usersbackend.entities.User;
 import com.springboot.backend.andres.usersapp.usersbackend.services.EmailService;
 
 import static com.springboot.backend.andres.usersapp.usersbackend.auth.TokenJwtConfig.SECRET_KEY;
 
 import java.util.Date;
 import java.util.HashMap;  
-import java.util.Map;  
-import org.springframework.beans.factory.annotation.Autowired;  
+import java.util.Map;
+
+import com.springboot.backend.andres.usersapp.usersbackend.services.UserService;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;  
-import org.springframework.http.ResponseEntity;  
+import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
 import io.jsonwebtoken.Claims;  
 import io.jsonwebtoken.Jwts;  
 import io.jsonwebtoken.security.Keys;  
 import java.security.Key;
+import java.util.Optional;
 
 @RestController  
 @RequestMapping("/api/email")  
 public class EmailController {  
 
     @Autowired  
-    private EmailService emailService;  
+    private EmailService emailService;
+
+    @Autowired
+    private UserService userService;
 
     @PostMapping("/send")  
     public ResponseEntity<Map<String, String>> sendEmail(@RequestBody Map<String, String> emailRequest) {  
@@ -67,22 +74,25 @@ public class EmailController {
         Claims claims;  
         
         // Generar la clave a partir del secreto  
-        Key key = Keys.hmacShaKeyFor(TokenJwtConfig.SECRET_KEY.getBytes()); // Asegúrate de que sea un tamaño adecuado (32 bytes para HMAC SHA-256)  
+        //Key key = Keys.hmacShaKeyFor(TokenJwtConfig.SECRET_KEY.getBytes()); // Asegúrate de que sea un tamaño adecuado (32 bytes para HMAC SHA-256)
+        Key key = SECRET_KEY; // Usa directamente la clave SECRET_KEY
 
-        try {  
-            // Utilizar el objeto Key para la validación del token  
-            claims = Jwts.parser()  
-                    .setSigningKey(key)  // Usamos la clave generada  
-                    .parseClaimsJws(token)  // Analiza el JWT  
-                    .getBody();  
+        try {
+            // Utilizar el objeto Key para la validación del token
+            claims = Jwts.parser()
+                    .setSigningKey(key) // Usamos la clave generada
+                    .build()            // Construimos el parser
+                    .parseClaimsJws(token) // Analiza el JWT
+                    .getBody();
         } catch (Exception e) {  
             return ResponseEntity.status(HttpStatus.UNAUTHORIZED).body("Token inválido o expirado");  
         }  
         
-        String username = claims.getSubject();  
+        String username = claims.getSubject();
         // Aquí podrías cargar al usuario desde la base de datos y devolver información adicional  
-        // Ejemplo: User user = userService.findByUsername(username);  
+        // Ejemplo:
+        Optional<User> user = userService.findByUserEmail(username);
         
-        return ResponseEntity.ok("Usuario autenticado: " + username);  
+        return ResponseEntity.ok(user);
     }
 }

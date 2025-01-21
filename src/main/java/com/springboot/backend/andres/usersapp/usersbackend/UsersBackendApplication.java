@@ -55,9 +55,9 @@ public class UsersBackendApplication implements CommandLineRunner {
 
     @Override  
     public void run(String... args) {  
-        Scanner scanner = new Scanner(System.in);  
-        System.out.print("Introduce un correo electrónico: ");  
-        String email = scanner.nextLine();  
+        // Scanner scanner = new Scanner(System.in);  
+        // System.out.print("Introduce un correo electrónico: ");  
+        // String email = scanner.nextLine();  
         // emailService.sendEmail(email);  
     }  
 }

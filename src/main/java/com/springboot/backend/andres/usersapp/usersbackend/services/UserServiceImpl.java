@@ -63,6 +63,12 @@ public class UserServiceImpl implements UserService{
         return repository.findById(id);
     }
 
+    @Transactional(readOnly = true)
+    @Override
+    public Optional<User> findByUserEmail(@NonNull String email) {
+        return repository.findByEmail(email);
+    }
+
     @Transactional
     @Override
     public User save(User user) {

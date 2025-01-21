@@ -19,6 +19,8 @@ public interface UserService {
 
     Optional<User> findById(@NonNull Long id);
 
+    Optional<User> findByUserEmail(@NonNull String email);
+
     User save(User user);
 
     Optional<User> update(UserRequest user, Long id);
