@@ -1,6 +1,8 @@
 package com.serviciosyave.auth.filter;
 
 import static com.serviciosyave.auth.TokenJwtConfig.*;
+
+import com.fasterxml.jackson.core.JsonParser;
 import com.serviciosyave.auth.SimpleGrantedAuthorityJsonCreator;
 
 import java.io.IOException;
@@ -71,14 +73,19 @@ public class JwtValidationFilter extends BasicAuthenticationFilter {
             String username = claims.getSubject();
             Long userId = claims.get("userId", Long.class);
             Object authoritiesClaims = claims.get("authorities");
+            Collection<? extends GrantedAuthority> roles = null;
+            Collection<? extends GrantedAuthority> rolEmpty = Collections.emptyList();
 
+            System.out.println("CHAT-SOCKET authoritiesClaims "+authoritiesClaims);
             System.out.println("CHAT-SOCKET token "+token);
 
-            Collection<? extends GrantedAuthority> roles = Arrays.asList(new ObjectMapper()
-                    .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
-                    .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class));
+            if(authoritiesClaims != null) {
+                roles = Arrays.asList(new ObjectMapper()
+                        .addMixIn(SimpleGrantedAuthority.class, SimpleGrantedAuthorityJsonCreator.class)
+                        .readValue(authoritiesClaims.toString().getBytes(), SimpleGrantedAuthority[].class));
+            }
 
-            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, roles);
+            UsernamePasswordAuthenticationToken authenticationToken = new UsernamePasswordAuthenticationToken(username, null, authoritiesClaims != null ? roles : rolEmpty);
 
             authenticationToken.setDetails(userId); // Almacena el userId
 
