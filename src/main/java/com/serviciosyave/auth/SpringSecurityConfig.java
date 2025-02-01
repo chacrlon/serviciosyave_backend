@@ -43,7 +43,7 @@ public class SpringSecurityConfig {
     @Bean  
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
         return http.authorizeHttpRequests(authz -> authz  
-                .requestMatchers(HttpMethod.POST, "/register/register").permitAll()  // Permitir acceso al registro  
+                .requestMatchers(HttpMethod.POST, "/register/**").permitAll()  // Permitir acceso al registro  
                 .requestMatchers("/register/**").permitAll() // Permitir acceso a todos los endpoints bajo /register  
                 .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/binance/").permitAll() // Permitir acceso a todos los registros de Binance  

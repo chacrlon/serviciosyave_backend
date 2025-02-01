@@ -75,24 +75,24 @@ public class RegisterController {
         return dateOfBirth != null && Period.between(dateOfBirth, today).getYears() >= 18;  
     }  
     
-    @GetMapping("/code/{id}") 
-    public String verifyUser(@PathVariable Long id,  
-                             @RequestBody String verificationCode) {  
-        Optional<User> optionalUser = service.findById(id); // Obtener el usuario por su ID  
+    @PostMapping("/code/{id}")   
+    public ResponseEntity<String> verifyUser(@PathVariable Long id, @RequestBody Map<String, String> body) {  
+        String verificationCode = body.get("isEmailVerified");  
+        Optional<User> optionalUser = service.findById(id);  
 
         if (optionalUser.isPresent()) {  
-            User user = optionalUser.get(); // Obtener el usuario del Optional  
-
-            // Verifica el código de verificación  
+            User user = optionalUser.get();
+            
+            //verifica el codigo
             if (user.getVerificationCode().equals(verificationCode)) {  
-                user.setIsEmailVerified(true); // Cambia el estado de verificación a true  
-                service.save(user); // Guarda los cambios en el usuario  
-                return "Email verificado con éxito.";  
+                user.setIsEmailVerified(true);  
+                service.save(user);  
+                return ResponseEntity.ok("Email verificado con éxito.");  
             } else {  
-                return "El código de verificación es incorrecto.";  
+                return ResponseEntity.badRequest().body("El código de verificación es incorrecto.");  
             }  
         } else {  
-            return "Usuario no encontrado.";  
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Usuario no encontrado.");  
         }  
     }
     
