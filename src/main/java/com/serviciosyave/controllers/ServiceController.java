@@ -34,6 +34,19 @@ public class ServiceController {
 
     @Autowired  
     private SubcategoryService subcategoryService;  
+    
+    
+    @PutMapping("/approve/provider/{id}")  
+    public ResponseEntity<VendorService> approveServiceByProvider(@PathVariable Long id) {  
+        VendorService updatedService = vendorServiceService.approveServiceByProvider(id);  
+        return ResponseEntity.ok(updatedService);  
+    }  
+
+    @PutMapping("/approve/client/{id}")  
+    public ResponseEntity<VendorService> approveServiceByClient(@PathVariable Long id) {  
+        VendorService updatedService = vendorServiceService.approveServiceByClient(id);  
+        return ResponseEntity.ok(updatedService);  
+    }  
 
     @PostMapping("/filter")  
     public ResponseEntity<List<VendorService>> filterServices(@RequestBody ServiceFilter filter) {  

@@ -14,6 +14,18 @@ public class VendorServiceService {
 
     @Autowired  
     private VendorServiceRepository vendorServiceRepository;  
+    
+    public VendorService approveServiceByProvider(Long id) {  
+        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();  
+        serviceToUpdate.setServicioAprobadoPorProveedor(true);  
+        return vendorServiceRepository.save(serviceToUpdate);  
+    }  
+
+    public VendorService approveServiceByClient(Long id) {  
+        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();  
+        serviceToUpdate.setServicioAprobadoPorCliente(true);  
+        return vendorServiceRepository.save(serviceToUpdate);  
+    }  
 
     public List<VendorService> filterServices(ServiceFilter filter) {  
         List<VendorService> resultList = vendorServiceRepository.findAll();  

@@ -37,15 +37,16 @@ public class EmailController {
         String toEmail = emailRequest.get("toEmail");  
         String subject = emailRequest.get("subject");  
         String text = emailRequest.get("text");
-
+        String userType = emailRequest.get("userType"); // Capturamos userType
+        
         String[] partes = text.split("/");
         int userId = Integer.parseInt(partes[partes.length - 1]);
         int receiverId= Integer.parseInt(partes[partes.length - 2]);
 
-        // Validar que no sean nulos
-        if (toEmail == null || subject == null || text == null) {  
+        // Validar que no sean nulos  
+        if (toEmail == null || subject == null || text == null || userType == null) {  
             Map<String, String> errorResponse = new HashMap<>();  
-            errorResponse.put("error", "Los campos toEmail, subject y text son requeridos.");  
+            errorResponse.put("error", "Los campos toEmail, subject, text y userType son requeridos.");  
             return ResponseEntity.badRequest().body(errorResponse);  
         }  
 
@@ -57,8 +58,8 @@ public class EmailController {
                 .signWith(TokenJwtConfig.SECRET_KEY) // Usa tu clave secreta  
                 .compact();  
         
-        // Crear el enlace de chat con el token  
-        String chatLink = "http://localhost:4200/chat/invite?userId="+userId+"&receiverId="+receiverId+"&token=" + jwt; // Cambia la ruta según tu diseño
+     // Crear el enlace de chat con el token y userType  
+        String chatLink = "http://localhost:4200/chat/invite?userId=" + userId + "&receiverId=" + receiverId + "&token=" + jwt + "&userType=" + userType;  
 
         // Enviar el correo con el enlace de chat  
         boolean isSent = emailService.sendEmail(toEmail, subject, "Haz clic aquí para unirte al chat: " + chatLink);  

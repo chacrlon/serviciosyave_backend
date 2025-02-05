@@ -24,12 +24,12 @@ public class VendorService {
     private Double precio;  
     private Boolean destacado;   
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relación con Category  
-    @JoinColumn(name = "category_id") // Nombre de la columna en la tabla vendorService  
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "category_id")
     private Category category;  
 
-    @ManyToOne(fetch = FetchType.LAZY) // Relación con Subcategory  
-    @JoinColumn(name = "subcategory_id") // Nombre de la columna en la tabla vendorService  
+    @ManyToOne(fetch = FetchType.LAZY)
+    @JoinColumn(name = "subcategory_id")
     private Subcategory subcategory;  
 
     private Boolean remoto;  
@@ -37,7 +37,10 @@ public class VendorService {
     private double longitude;  
     
     @Column(name = "users_id")   
-    private Long userId; // Guardamos solo el ID del usuario 
+    private Long userId;
+      
+    private Boolean servicioAprobadoPorProveedor = false; // Indica si el proveedor ha marcado que realizó el servicio  
+    private Boolean servicioAprobadoPorCliente = false; // Indica si el cliente ha confirmado que recibió el servicio 
 
 	public Long getId() {
 		return id;
@@ -126,6 +129,23 @@ public class VendorService {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
+
+	public Boolean getServicioAprobadoPorProveedor() {
+		return servicioAprobadoPorProveedor;
+	}
+
+	public void setServicioAprobadoPorProveedor(Boolean servicioAprobadoPorProveedor) {
+		this.servicioAprobadoPorProveedor = servicioAprobadoPorProveedor;
+	}
+
+	public Boolean getServicioAprobadoPorCliente() {
+		return servicioAprobadoPorCliente;
+	}
+
+	public void setServicioAprobadoPorCliente(Boolean servicioAprobadoPorCliente) {
+		this.servicioAprobadoPorCliente = servicioAprobadoPorCliente;
+	}
+	
 	
 
     

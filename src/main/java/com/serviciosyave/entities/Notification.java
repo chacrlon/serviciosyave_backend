@@ -8,24 +8,24 @@ public class Notification{
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
     private Long id;  
 
-    private Long userId; // ID del usuario que recibe la notificación   
-    private String message; // Mensaje de la notificación  
-    private boolean isRead; // Estado de lectura de la notificación  
-    private Long userId2; // ID del otro usuario que interactúa contigo  
-    private String userType; // Buyer o Seller  
+    private Long userId;
+    private String message;
+    private boolean isRead;
+    private Long userId2;
+    private String userType;
+    private Long vendorServiceId;
     
-    // Constructor, getters y setters  
     public Notification() {  
     }  
     
-    // Constructor que acepta userId, message, userId2 y userType  
-    public Notification(Long userId, String message, Long userId2, String userType) {  
+    public Notification(Long userId, String message, Long userId2, String userType, Long vendorServiceId) {  
         this.userId = userId;  
         this.message = message;  
         this.isRead = false; // Por defecto, la notificación no está leída  
-        this.userId2 = userId2; // Establece el ID del otro usuario  
-        this.userType = userType; // Establece el tipo de usuario (Buyer o Seller)  
-    }   
+        this.userId2 = userId2;  
+        this.userType = userType;  
+        this.vendorServiceId = vendorServiceId;
+    }  
 
 
 	public Long getId() {
@@ -74,6 +74,14 @@ public class Notification{
 
 	public void setUserType(String userType) {
 		this.userType = userType;
+	}
+
+	public Long getVendorServiceId() {
+		return vendorServiceId;
+	}
+
+	public void setVendorServiceId(Long vendorServiceId) {
+		this.vendorServiceId = vendorServiceId;
 	}  
 	
 	
