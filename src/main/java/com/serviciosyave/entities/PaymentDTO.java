@@ -1,57 +1,104 @@
 package com.serviciosyave.entities;  
 
 public class PaymentDTO {  
-	private Long id;  
-    private Double monto;  
-    private String divisa;  
-    private String metodo_pago;  
-    private String referencia;  
-    private String estatus;  
+    private Long id;
+    private Double monto;
+    private String divisa;
+    private String metodoPago;
+    private String referencia;
+    private String estatus;
     private String username; 
-	public Long getId() {
-		return id;
+    private Long vendorServiceId;
+    private String telefono;
+    private String numeroCuenta;
+    private String emailBinance;
+
+    public Long getId() {  
+		return id;  
+	}  
+	  
+	public void setId(Long id) {  
+		this.id = id;  
+	}  
+	  
+	public Double getMonto() {  
+		return monto;  
+	}  
+	  
+	public void setMonto(Double monto) {  
+		this.monto = monto;  
+	}  
+	  
+	public String getDivisa() {  
+		return divisa;  
+	}  
+	  
+	public void setDivisa(String divisa) {  
+		this.divisa = divisa;  
+	}  
+
+	  
+	public String getReferencia() {  
+		return referencia;  
+	}  
+	  
+	public void setReferencia(String referencia) {  
+		this.referencia = referencia;  
+	}  
+	  
+	public String getEstatus() {  
+		return estatus;  
+	}  
+	  
+	public void setEstatus(String estatus) {  
+		this.estatus = estatus;  
+	}  
+
+	public String getTelefono() {
+		return telefono;
 	}
-	public void setId(Long id) {
-		this.id = id;
+
+	public void setTelefono(String telefono) {
+		this.telefono = telefono;
 	}
-	public Double getMonto() {
-		return monto;
+
+	public String getNumeroCuenta() {
+		return numeroCuenta;
 	}
-	public void setMonto(Double monto) {
-		this.monto = monto;
+
+	public void setNumeroCuenta(String numeroCuenta) {
+		this.numeroCuenta = numeroCuenta;
 	}
-	public String getDivisa() {
-		return divisa;
+
+	public String getEmailBinance() {
+		return emailBinance;
 	}
-	public void setDivisa(String divisa) {
-		this.divisa = divisa;
+
+	public void setEmailBinance(String emailBinance) {
+		this.emailBinance = emailBinance;
 	}
-	public String getMetodo_pago() {
-		return metodo_pago;
+
+	public String getMetodoPago() {
+		return metodoPago;
 	}
-	public void setMetodo_pago(String metodo_pago) {
-		this.metodo_pago = metodo_pago;
+
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
 	}
-	public String getReferencia() {
-		return referencia;
+
+	public Long getVendorServiceId() {
+		return vendorServiceId;
 	}
-	public void setReferencia(String referencia) {
-		this.referencia = referencia;
+
+	public void setVendorServiceId(Long vendorServiceId) {
+		this.vendorServiceId = vendorServiceId;
 	}
-	public String getEstatus() {
-		return estatus;
-	}
-	public void setEstatus(String estatus) {
-		this.estatus = estatus;
-	}
+
 	public String getUsername() {
 		return username;
 	}
+
 	public void setUsername(String username) {
 		this.username = username;
-	}
-    
-    
-    
-    
+	}  
 }

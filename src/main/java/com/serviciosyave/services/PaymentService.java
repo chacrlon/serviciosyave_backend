@@ -1,17 +1,20 @@
-package com.serviciosyave.services;
+package com.serviciosyave.services;  
 
-import org.springframework.stereotype.Service;
-import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.stereotype.Service;  
+import org.springframework.beans.factory.annotation.Autowired;  
 import com.serviciosyave.controllers.NotificationController;
+import com.serviciosyave.entities.BinancePayment;
 import com.serviciosyave.entities.Payment;
-import com.serviciosyave.entities.PaymentDTO;
-import com.serviciosyave.entities.User;
+import com.serviciosyave.entities.PaymentDTO;  
+import com.serviciosyave.entities.User;  
 import com.serviciosyave.entities.VendorService;
-import com.serviciosyave.repositories.PaymentRepository;
-import com.serviciosyave.repositories.UserRepository;
-import com.serviciosyave.repositories.VendorServiceRepository;
+import com.serviciosyave.entities.bankTransferPayment;
+import com.serviciosyave.entities.mobilePaymentPayment;
+import com.serviciosyave.repositories.PaymentRepository;  
+import com.serviciosyave.repositories.UserRepository;  
+import com.serviciosyave.repositories.VendorServiceRepository;  
 import java.util.ArrayList;  
-import java.util.List;
+import java.util.List;  
 
 @Service  
 public class PaymentService {  
@@ -59,34 +62,44 @@ public class PaymentService {
         emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);  
         emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);  
 
-     // Crear notificaciones en lugar de enviar mensajes  
-        notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId); 
+        // Crear notificaciones en lugar de enviar mensajes  
+        notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId);   
         notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId);  
- 
     }  
-
+    
+    
     public List<PaymentDTO> getAllPayments() {  
         List<Payment> payments = paymentRepository.findAll();  
         List<PaymentDTO> paymentDTOs = new ArrayList<>();  
-        
+
         for (Payment payment : payments) {  
             User user = userRepository.findById(payment.getUserId()).orElse(null);  
             PaymentDTO paymentDTO = new PaymentDTO();  
             paymentDTO.setId(payment.getId());  
             paymentDTO.setMonto(payment.getMonto());  
             paymentDTO.setDivisa(payment.getDivisa());  
-            paymentDTO.setMetodo_pago(payment.getMetodo_pago());  
+            paymentDTO.setMetodoPago(payment.getMetodoPago());  
             paymentDTO.setReferencia(payment.getReferencia());  
             paymentDTO.setEstatus(payment.getEstatus());  
             paymentDTO.setUsername(user != null ? user.getUsername() : "Desconocido");  
+
+            if (payment instanceof mobilePaymentPayment) {  
+                mobilePaymentPayment mobilePayment = (mobilePaymentPayment) payment;  
+                paymentDTO.setTelefono(mobilePayment.getTelefono());  // Si PaymentDTO tiene este campo  
+            } else if (payment instanceof bankTransferPayment) {  
+                bankTransferPayment bankTransferPayment = (bankTransferPayment) payment;  
+                paymentDTO.setNumeroCuenta(bankTransferPayment.getNumeroCuenta());  // Idem  
+            } else if (payment instanceof BinancePayment) {  
+                BinancePayment binancePayment = (BinancePayment) payment;  
+                paymentDTO.setEmailBinance(binancePayment.getEmailBinance());  // Idem  
+            }  
+
             paymentDTOs.add(paymentDTO);  
         }  
-        
+
         return paymentDTOs;  
     }  
     
-    
-
     public void rejectPayment(Long paymentId) {  
         Payment payment = paymentRepository.findById(paymentId).orElse(null);  
         if (payment != null) {  

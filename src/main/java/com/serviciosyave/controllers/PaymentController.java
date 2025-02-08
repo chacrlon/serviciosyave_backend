@@ -1,7 +1,10 @@
 package com.serviciosyave.controllers;
 
+import com.serviciosyave.entities.BinancePayment;
 import com.serviciosyave.entities.Payment;
 import com.serviciosyave.entities.PaymentDTO;
+import com.serviciosyave.entities.bankTransferPayment;
+import com.serviciosyave.entities.mobilePaymentPayment;
 import com.serviciosyave.services.PaymentService;
 
 import java.util.List;
@@ -22,14 +25,48 @@ public class PaymentController {
     private PaymentService paymentService;   
 
     @PostMapping("/create")  
-    public ResponseEntity<Payment> createPayment(@RequestBody Payment payment) {  
+    public ResponseEntity<Payment> createPayment(@RequestBody PaymentDTO paymentDTO) {  
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
-        Long userId = (Long) authentication.getDetails();   
+        Long userId = (Long) authentication.getDetails();  
 
+        Payment payment;  
+
+        switch (paymentDTO.getMetodoPago()) {  
+        case "pagoMovil":  
+            mobilePaymentPayment mobilePayment = new mobilePaymentPayment();  
+            mobilePayment.setTelefono(paymentDTO.getTelefono());  
+            payment = mobilePayment;  
+            payment.setTipoPago("MOBILE"); // Asigna el valor aquí  
+            break;  
+        case "transferenciaBancaria":  
+            bankTransferPayment bankTransfer = new bankTransferPayment();  
+            bankTransfer.setNumeroCuenta(paymentDTO.getNumeroCuenta());  
+            payment = bankTransfer;  
+            payment.setTipoPago("BANK_TRANSFER"); // Asigna el valor aquí  
+            break;  
+        case "binance":  
+            BinancePayment binancePayment = new BinancePayment();  
+            binancePayment.setEmailBinance(paymentDTO.getEmailBinance());  
+            payment = binancePayment;  
+            payment.setTipoPago("BINANCE"); // Asigna el valor aquí  
+            break;  
+        default:  
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  
+    }
+
+        // Asignar campos comunes  
+        payment.setMonto(paymentDTO.getMonto());  
+        payment.setDivisa(paymentDTO.getDivisa());  
+        payment.setMetodoPago(paymentDTO.getMetodoPago());  
+        payment.setReferencia(paymentDTO.getReferencia());  
+        payment.setEstatus("procesando");  
+        payment.setVendorServiceId(paymentDTO.getVendorServiceId());  
         payment.setUserId(userId);  
+
+        // Guardar el pago en la base de datos  
         Payment createdPayment = paymentService.createdPayment(payment);  
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);  
-    }  
+    }
     
     @GetMapping("/all")  
     public ResponseEntity<List<PaymentDTO>> getAllPayments() {  

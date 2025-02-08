@@ -2,89 +2,100 @@ package com.serviciosyave.entities;
 
 import jakarta.persistence.*;  
 
-@Entity
-public class Payment {
-	@Id  
+@Entity  
+@Inheritance(strategy = InheritanceType.SINGLE_TABLE)
+@DiscriminatorColumn(name = "dtype")
+public class Payment {  
+    @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
     private Long id;  
-	private Double monto;
-	private String divisa; //bolivares, usdt para binance y usd para paypal
-	private String metodo_pago; //Identificar si fue pago movil, binance o transferencia
-	private String referencia; 
-	private String estatus; //procesando, aprobado y rechazado
+    private Double monto;  
+    private String divisa;
+    private String metodoPago;
+    private String referencia;   
+    private String estatus;
+    private String TipoPago;
 
-	@Column(name = "vendor_service_id") // Guardamos solo el ID del servicio 
+    @Column(name = "vendor_service_id") 
     private Long vendorServiceId;  
 
-    @Column(name = "users_id") 
-    private Long userId; // Guardamos solo el ID del usuario  
+    @Column(name = "users_id")   
+    private Long userId; 
 
-	public Long getId() {
-		return id;
+    // Getters y Setters  
+    public Long getId() {  
+        return id;  
+    }  
+
+    public void setId(Long id) {  
+        this.id = id;  
+    }  
+
+    public Double getMonto() {  
+        return monto;  
+    }  
+
+    public void setMonto(Double monto) {  
+        this.monto = monto;  
+    }  
+
+    public String getDivisa() {  
+        return divisa;  
+    }  
+
+    public void setDivisa(String divisa) {  
+        this.divisa = divisa;  
+    }  
+ 
+
+    public String getMetodoPago() {
+		return metodoPago;
 	}
 
-	public void setId(Long id) {
-		this.id = id;
+	public void setMetodoPago(String metodoPago) {
+		this.metodoPago = metodoPago;
 	}
 
-	public Double getMonto() {
-		return monto;
+	public String getReferencia() {  
+        return referencia;  
+    }  
+
+    public void setReferencia(String referencia) {  
+        this.referencia = referencia;  
+    }  
+
+    public Long getVendorServiceId() {  
+        return vendorServiceId;  
+    }  
+
+    public void setVendorServiceId(Long vendorServiceId) {  
+        this.vendorServiceId = vendorServiceId;  
+    }  
+
+    public Long getUserId() {  
+        return userId;  
+    }  
+
+    public void setUserId(Long userId) {  
+        this.userId = userId;  
+    }  
+
+    public String getEstatus() {  
+        return estatus;  
+    }  
+
+    public void setEstatus(String estatus) {  
+        this.estatus = estatus;  
+    }
+
+	public String getTipoPago() {
+		return TipoPago;
 	}
 
-	public void setMonto(Double monto) {
-		this.monto = monto;
-	}
-
-	public String getDivisa() {
-		return divisa;
-	}
-
-	public void setDivisa(String divisa) {
-		this.divisa = divisa;
-	}
-
-	public String getMetodo_pago() {
-		return metodo_pago;
-	}
-
-	public void setMetodo_pago(String metodo_pago) {
-		this.metodo_pago = metodo_pago;
-	}
-
-	public String getReferencia() {
-		return referencia;
-	}
-
-	public void setReferencia(String referencia) {
-		this.referencia = referencia;
-	}
-
-	public Long getVendorServiceId() {
-		return vendorServiceId;
-	}
-
-	public void setVendorServiceId(Long vendorServiceId) {
-		this.vendorServiceId = vendorServiceId;
-	}
-
-	public Long getUserId() {
-		return userId;
-	}
-
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-
-	public String getEstatus() {
-		return estatus;
-	}
-
-	public void setEstatus(String estatus) {
-		this.estatus = estatus;
-	}
-	
-	
+	public void setTipoPago(String tipoPago) {
+		TipoPago = tipoPago;
+	} 
     
     
-	
+
 }
