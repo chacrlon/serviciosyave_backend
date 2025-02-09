@@ -14,19 +14,25 @@ public class Notification{
     private Long userId2;
     private String userType;
     private Long vendorServiceId;
+    private String resultadoProveedor; 
+    private String resultadoConsumidor; 
+    private String estatus; 
     
     public Notification() {  
     }  
     
-    public Notification(Long userId, String message, Long userId2, String userType, Long vendorServiceId) {  
+    public Notification(Long userId, String message, Long userId2, String userType, 
+    	Long vendorServiceId,String resultadoProveedor, String resultadoConsumidor, String estatus) {  
         this.userId = userId;  
         this.message = message;  
-        this.isRead = false; // Por defecto, la notificación no está leída  
+        this.isRead = false;
         this.userId2 = userId2;  
         this.userType = userType;  
         this.vendorServiceId = vendorServiceId;
+		this.resultadoProveedor = resultadoProveedor;
+		this.resultadoConsumidor = resultadoConsumidor;
+		this.estatus = resultadoConsumidor;
     }  
-
 
 	public Long getId() {
 		return id;
@@ -82,8 +88,31 @@ public class Notification{
 
 	public void setVendorServiceId(Long vendorServiceId) {
 		this.vendorServiceId = vendorServiceId;
-	}  
-	
+	}
+
+	public String getResultadoProveedor() {
+		return resultadoProveedor;
+	}
+
+	public void setResultadoProveedor(String resultadoProveedor) {
+		this.resultadoProveedor = resultadoProveedor;
+	}
+
+	public String getResultadoConsumidor() {
+		return resultadoConsumidor;
+	}
+
+	public void setResultadoConsumidor(String resultadoConsumidor) {
+		this.resultadoConsumidor = resultadoConsumidor;
+	}
+
+	public String getEstatus() {
+		return estatus;
+	}
+
+	public void setEstatus(String estatus) {
+		this.estatus = estatus;
+	}
 	
 	    
 }
