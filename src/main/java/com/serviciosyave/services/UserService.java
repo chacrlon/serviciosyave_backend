@@ -8,6 +8,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.lang.NonNull;
 
 import com.serviciosyave.entities.User;
+import com.serviciosyave.entities.UserStatus;
 import com.serviciosyave.entities.VendorService;
 import com.serviciosyave.models.UserRequest;
 
@@ -27,6 +28,7 @@ public interface UserService {
 
     void deleteById(Long id);
     
- // En UserService.java  
     List<VendorService> findServicesByUserId(Long userId);
+    
+    Optional<User> updateUserStatus(Long id, UserStatus status); 
 }

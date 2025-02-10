@@ -65,6 +65,7 @@ public class SpringSecurityConfig {
                 .requestMatchers("/api/categories/**").permitAll()
                 .requestMatchers("/api/payment/**").permitAll()
                 .requestMatchers("/api/payment/**").permitAll()
+                .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
                 .requestMatchers("/notifications/**").permitAll()// <--- Añadir esta línea // <--- Añadir esta línea 
                 // Otras configuraciones para usuarios y administradores  

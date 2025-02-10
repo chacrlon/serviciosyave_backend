@@ -4,35 +4,37 @@ import jakarta.persistence.*;
 
 @Entity   
 public class Notification{  
-	@Id  
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  
-    private Long id;  
+	  @Id  
+	    @GeneratedValue(strategy = GenerationType.IDENTITY)  
+	    private Long id;  
 
-    private Long userId;
-    private String message;
-    private boolean isRead;
-    private Long userId2;
-    private String userType;
-    private Long vendorServiceId;
-    private String resultadoProveedor; 
-    private String resultadoConsumidor; 
-    private String estatus; 
-    
-    public Notification() {  
-    }  
-    
-    public Notification(Long userId, String message, Long userId2, String userType, 
-    	Long vendorServiceId,String resultadoProveedor, String resultadoConsumidor, String estatus) {  
-        this.userId = userId;  
-        this.message = message;  
-        this.isRead = false;
-        this.userId2 = userId2;  
-        this.userType = userType;  
-        this.vendorServiceId = vendorServiceId;
-		this.resultadoProveedor = resultadoProveedor;
-		this.resultadoConsumidor = resultadoConsumidor;
-		this.estatus = resultadoConsumidor;
-    }  
+	    private Long userId;  
+	    private String message;  
+	    private boolean isRead;  
+	    private Long userId2;  
+	    private String userType;  
+	    private Long vendorServiceId;  
+	    private String resultadoProveedor;   
+	    private String resultadoConsumidor;   
+	    private String estatus;   
+	    private Long id2;  
+	    
+	    public Notification() {  
+	    }  
+	    
+	    public Notification(Long userId, String message, Long userId2, String userType,   
+	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2) {  
+	        this.userId = userId;  
+	        this.message = message;  
+	        this.isRead = false; // Por defecto, la notificación no está leída  
+	        this.userId2 = userId2;  
+	        this.userType = userType;  
+	        this.vendorServiceId = vendorServiceId;  
+	        this.resultadoProveedor = resultadoProveedor;  
+	        this.resultadoConsumidor = resultadoConsumidor;  
+	        this.estatus = estatus; // Correcto: asignado desde el argumento estatus  
+	        this.id2 = id2; // Guardar el id de la otra notificación  
+	    }  
 
 	public Long getId() {
 		return id;
@@ -113,6 +115,16 @@ public class Notification{
 	public void setEstatus(String estatus) {
 		this.estatus = estatus;
 	}
+
+	public Long getId2() {
+		return id2;
+	}
+
+	public void setId2(Long id2) {
+		this.id2 = id2;
+	}
+	
+	
 	
 	    
 }

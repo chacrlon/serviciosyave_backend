@@ -4,12 +4,14 @@ import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;  
 import com.serviciosyave.controllers.NotificationController;
 import com.serviciosyave.entities.BinancePayment;
+import com.serviciosyave.entities.Notification;
 import com.serviciosyave.entities.Payment;
 import com.serviciosyave.entities.PaymentDTO;  
 import com.serviciosyave.entities.User;  
 import com.serviciosyave.entities.VendorService;
 import com.serviciosyave.entities.bankTransferPayment;
 import com.serviciosyave.entities.mobilePaymentPayment;
+import com.serviciosyave.repositories.NotificationRepository;
 import com.serviciosyave.repositories.PaymentRepository;  
 import com.serviciosyave.repositories.UserRepository;  
 import com.serviciosyave.repositories.VendorServiceRepository;  
@@ -26,7 +28,10 @@ public class PaymentService {
     private UserRepository userRepository;  
 
     @Autowired  
-    private VendorServiceRepository vendorServiceRepository;  
+    private VendorServiceRepository vendorServiceRepository; 
+    
+    @Autowired  
+    private NotificationRepository notificationRepository; 
 
     @Autowired  
     private EmailService emailService;  
@@ -62,10 +67,29 @@ public class PaymentService {
         emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);  
         emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);  
 
-        // Crear notificaciones en lugar de enviar mensajes  
-        notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId);   
-        notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId);  
-    }  
+        // Crear notificaciones y capturar los IDs  
+        Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId);   
+        Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId);   
+
+        // Aquí puedes almacenar los IDs en la notificación si es necesario  
+        // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado  
+        // Puedes crear una lógica adicional para actualizar las notificaciones con el id2  
+        if (sellerNotificationId != null && buyerNotificationId != null) {  
+            // Actualizar la notificación del vendedor con el ID de la notificación del comprador  
+            Notification sellerNotification = notificationRepository.findById(sellerNotificationId).orElse(null);  
+            if (sellerNotification != null) {  
+                sellerNotification.setId2(buyerNotificationId);  
+                notificationRepository.save(sellerNotification);  
+            }  
+
+            // Actualizar la notificación del comprador con el ID de la notificación del vendedor  
+            Notification buyerNotification = notificationRepository.findById(buyerNotificationId).orElse(null);  
+            if (buyerNotification != null) {  
+                buyerNotification.setId2(sellerNotificationId);  
+                notificationRepository.save(buyerNotification);  
+            }  
+        }  
+    }
     
     
     public List<PaymentDTO> getAllPayments() {  

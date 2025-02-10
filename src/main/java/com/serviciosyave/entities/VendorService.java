@@ -38,10 +38,7 @@ public class VendorService {
     
     @Column(name = "users_id")   
     private Long userId;
-      
-    private Boolean servicioAprobadoPorProveedor = false; // Indica si el proveedor ha marcado que realizó el servicio  
-    private Boolean servicioAprobadoPorCliente = false; // Indica si el cliente ha confirmado que recibió el servicio 
-
+   
 	public Long getId() {
 		return id;
 	}
@@ -128,22 +125,6 @@ public class VendorService {
 
 	public void setUserId(Long userId) {
 		this.userId = userId;
-	}
-
-	public Boolean getServicioAprobadoPorProveedor() {
-		return servicioAprobadoPorProveedor;
-	}
-
-	public void setServicioAprobadoPorProveedor(Boolean servicioAprobadoPorProveedor) {
-		this.servicioAprobadoPorProveedor = servicioAprobadoPorProveedor;
-	}
-
-	public Boolean getServicioAprobadoPorCliente() {
-		return servicioAprobadoPorCliente;
-	}
-
-	public void setServicioAprobadoPorCliente(Boolean servicioAprobadoPorCliente) {
-		this.servicioAprobadoPorCliente = servicioAprobadoPorCliente;
 	}
 	
 	

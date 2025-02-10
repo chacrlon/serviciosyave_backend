@@ -4,8 +4,10 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 import com.serviciosyave.entities.Notification;
+import com.serviciosyave.entities.UserStatus;
 import com.serviciosyave.repositories.NotificationRepository;
 import com.serviciosyave.services.NotificationService;
+import com.serviciosyave.services.UserService;
 
 import java.util.List;
 
@@ -20,45 +22,65 @@ public class NotificationController {
     private NotificationSseController notificationSseController; 
     
     @Autowired  
-    private NotificationService notificationService; 
-
-    public void notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId) {  
+    private NotificationService notificationService;
+    
+    @Autowired  
+    private UserService userService;
+    
+    public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId) {  
         List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
         if (existingNotifications.isEmpty()) {  
-            Notification notification = new Notification(sellerId, message, buyerId, userType, vendorServiceId, userType, userType, userType);  
+            Notification notification = new Notification(  
+                sellerId,   
+                message,   
+                buyerId,   
+                userType,   
+                vendorServiceId,   
+                null, // Puedes pasar null o algún valor adecuado  
+                null, // Puedes pasar null o algún valor adecuado  
+                userType, // O lo que sea correcto para el estatus  
+                null // Puedes pasar null o algún valor adecuado para id2  
+            );  
             notification = notificationRepository.save(notification); // Guarda la notificación  
 
             // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId); // Asegúrate de pasar buyerId aquí  
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId);  
+
+            return notification.getId(); // Devuelve el ID de la notificación creada  
         }  
+        return null; // Retorna nulo si ya existe la notificación  
     }
     
-    
-    @PutMapping("/approve/provider/{id}")  
-    public ResponseEntity<Notification> approveServiceByProvider(@PathVariable Long id) {  
-        Notification updatedNotification = notificationService.approveServiceByProvider(id);  
-        return ResponseEntity.ok(updatedNotification);  
-    }  
-
-    @PutMapping("/approve/client/{id}")  
-    public ResponseEntity<Notification> approveServiceByClient(@PathVariable Long id) {  
-        Notification updatedNotification = notificationService.approveServiceByClient(id);  
-        return ResponseEntity.ok(updatedNotification);  
+    @PutMapping("/approve/provider/{id}/{id2}")  
+    public ResponseEntity<List<Notification>> approveServiceByProvider(@PathVariable Long id, @PathVariable Long id2) {  
+        List<Notification> updatedNotifications = notificationService.approveServiceByProvider(id, id2);  
+        return ResponseEntity.ok(updatedNotifications);  
     }  
     
- // Endpoint para rechazar el servicio por el proveedor  
-    @PutMapping("/reject/provider/{id}")  
-    public ResponseEntity<Notification> rejectServiceByProvider(@PathVariable Long id) {  
-        Notification updatedNotification = notificationService.rejectServiceByProvider(id);  
-        return ResponseEntity.ok(updatedNotification);  
+
+    @PutMapping("/approve/client/{id}/{id2}")  
+    public ResponseEntity<List<Notification>> approveServiceByClient(@PathVariable Long id, @PathVariable Long id2) {  
+        List<Notification> updatedNotifications = notificationService.approveServiceByClient(id, id2);  
+        // Cambiar el estado del comprador a NO_OCUPADO  
+        userService.updateUserStatus(id, UserStatus.NO_OCUPADO);  
+        return ResponseEntity.ok(updatedNotifications);  
     }  
 
-    // Endpoint para rechazar el servicio por el cliente  
-    @PutMapping("/reject/client/{id}")  
-    public ResponseEntity<Notification> rejectServiceByClient(@PathVariable Long id) {  
-        Notification updatedNotification = notificationService.rejectServiceByClient(id);  
-        return ResponseEntity.ok(updatedNotification);  
-    }   
+    @PutMapping("/reject/provider/{id}/{id2}")  
+    public ResponseEntity<List<Notification>> rejectServiceByProvider(@PathVariable Long id, @PathVariable Long id2) {  
+        List<Notification> updatedNotifications = notificationService.rejectServiceByProvider(id, id2);  
+        // Cambiar el estado del vendedor a NO_OCUPADO  
+        userService.updateUserStatus(id, UserStatus.NO_OCUPADO);  
+        return ResponseEntity.ok(updatedNotifications);  
+    }  
+
+    @PutMapping("/reject/client/{id}/{id2}")  
+    public ResponseEntity<List<Notification>> rejectServiceByClient(@PathVariable Long id, @PathVariable Long id2) {  
+        List<Notification> updatedNotifications = notificationService.rejectServiceByClient(id, id2);  
+        // Cambiar el estado del comprador a NO_OCUPADO  
+        userService.updateUserStatus(id, UserStatus.NO_OCUPADO);  
+        return ResponseEntity.ok(updatedNotifications);  
+    }
 
     
     

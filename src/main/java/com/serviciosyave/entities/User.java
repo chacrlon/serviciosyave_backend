@@ -2,6 +2,8 @@ package com.serviciosyave.entities;
 
 import jakarta.persistence.CascadeType;
 import jakarta.persistence.Entity;
+import jakarta.persistence.EnumType;
+import jakarta.persistence.Enumerated;
 import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import static jakarta.persistence.GenerationType.*;
@@ -57,6 +59,9 @@ public class User implements IUser {
 
     @NotBlank
     private String password;
+    
+    @Enumerated(EnumType.STRING) // Debes asegurarte de que el enum se almacene como cadena en la base de datos  
+    private UserStatus status;  // "OCUPADO" o "NO_OCUPADO" 
 
     @JsonIgnoreProperties({"handler", "hibernateLazyInitializer"})
     @ManyToMany(fetch = FetchType.LAZY)
@@ -81,10 +86,12 @@ public class User implements IUser {
     @OneToOne(cascade = CascadeType.ALL)  
     @JoinColumn(name = "ubicacion_id", referencedColumnName = "id")  
     private Ubication ubicacion;
-
-    public User() {
-        this.roles = new ArrayList<>();
-    }
+    
+ // Constructor por defecto  
+    public User() {  
+        this.roles = new ArrayList<>();  
+        this.status = UserStatus.NO_OCUPADO;  // Asigna el valor por defecto  
+    }  
 
     public Long getId() {
 		return id;
@@ -192,6 +199,16 @@ public class User implements IUser {
 	public void setEmailVerified(boolean isEmailVerified) {
 		this.isEmailVerified = isEmailVerified;
 	}
+
+	public UserStatus getStatus() {
+		return status;
+	}
+
+	public void setStatus(UserStatus status) {
+		this.status = status;
+	}
+	
+	
  
     
 }

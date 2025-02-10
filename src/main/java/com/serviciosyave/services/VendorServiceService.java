@@ -1,12 +1,16 @@
 package com.serviciosyave.services;
 
+import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.serviciosyave.entities.ServiceFilter;
+import com.serviciosyave.entities.User;
+import com.serviciosyave.entities.UserStatus;
 import com.serviciosyave.entities.VendorService;
+import com.serviciosyave.repositories.UserRepository;
 import com.serviciosyave.repositories.VendorServiceRepository;
 
 @Service  
@@ -15,20 +19,35 @@ public class VendorServiceService {
     @Autowired  
     private VendorServiceRepository vendorServiceRepository;  
     
-    public VendorService approveServiceByProvider(Long id) {  
-        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();  
-        serviceToUpdate.setServicioAprobadoPorProveedor(true);  
-        return vendorServiceRepository.save(serviceToUpdate);  
-    }  
+    @Autowired  
+    private UserRepository userRepository; 
 
-    public VendorService approveServiceByClient(Long id) {  
-        VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();  
-        serviceToUpdate.setServicioAprobadoPorCliente(true);  
-        return vendorServiceRepository.save(serviceToUpdate);  
-    }  
+    
+    public List<VendorService> getAllAvailableServices() {  
+        // Obtén todos los usuarios que no están ocupados  
+        List<User> availableUsers = userRepository.findByStatus(UserStatus.NO_OCUPADO);  
+        
+        // Recopila todos los servicios de estos usuarios  
+        List<VendorService> availableServices = new ArrayList<>();  
+        for (User user : availableUsers) {  
+            availableServices.addAll(user.getVendorServices());  
+        }  
+        
+        return availableServices;  
+    } 
 
     public List<VendorService> filterServices(ServiceFilter filter) {  
-        List<VendorService> resultList = vendorServiceRepository.findAll();  
+        // Obtén todos los usuarios que no están ocupados  
+        List<User> availableUsers = userRepository.findByStatus(UserStatus.NO_OCUPADO);  
+        
+        // Recopila todos los servicios de estos usuarios  
+        List<VendorService> availableServices = new ArrayList<>();  
+        for (User user : availableUsers) {  
+            availableServices.addAll(user.getVendorServices());  
+        }  
+
+        // Inicializa la lista de resultados con los servicios disponibles  
+        List<VendorService> resultList = availableServices;  
 
         // Filtra por categoría y subcategoría  
         if (filter.getCategoryId() != null) {  

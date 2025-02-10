@@ -1,12 +1,8 @@
 package com.serviciosyave.services;
 
-import java.time.LocalDate;
-import java.time.format.DateTimeFormatter;
-import java.time.format.DateTimeParseException;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -18,6 +14,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import com.serviciosyave.entities.Role;
 import com.serviciosyave.entities.User;
+import com.serviciosyave.entities.UserStatus;
 import com.serviciosyave.entities.VendorService;
 import com.serviciosyave.models.IUser;
 import com.serviciosyave.models.UserRequest;
@@ -34,9 +31,7 @@ public class UserServiceImpl implements UserService{
     private PasswordEncoder passwordEncoder;
     // En UserServiceImpl.java  
     @Autowired  
-    private VendorServiceRepository vendorServiceRepository; // Asegúrate de tener un repositorio para VendorService  
-
-    
+    private VendorServiceRepository vendorServiceRepository; 
     
     public UserServiceImpl(UserRepository repository, PasswordEncoder passwordEncoder, RoleRepository roleRepository, EmailService emailService) {
         this.emailService = emailService;
@@ -113,7 +108,18 @@ public class UserServiceImpl implements UserService{
         return roles;
     }
   
-    
+    //Actualizar el valor enum del usuario
+    @Override  
+    @Transactional  
+    public Optional<User> updateUserStatus(Long id, UserStatus status) {  
+        Optional<User> userOptional = repository.findById(id);  
+        if (userOptional.isPresent()) {  
+            User userDb = userOptional.get();  
+            userDb.setStatus(status);  
+            return Optional.of(repository.save(userDb));  
+        }  
+        return Optional.empty();  
+    }
 
     @Override  
     @Transactional(readOnly = true)  
