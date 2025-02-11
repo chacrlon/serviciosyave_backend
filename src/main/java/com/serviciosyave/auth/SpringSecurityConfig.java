@@ -53,6 +53,7 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.POST, "/api/banktransfer/create").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/banktransfer/").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/payment/all").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/sellers/**").permitAll()
 
                 // Permitir acceso a todos los endpoints de Mobile Payment  
                 .requestMatchers(HttpMethod.POST, "/api/mobilepayment/create").permitAll()  

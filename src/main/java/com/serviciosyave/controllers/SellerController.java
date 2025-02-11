@@ -1,14 +1,14 @@
 package com.serviciosyave.controllers;
-
-import java.io.IOException;
-
-import org.springframework.beans.factory.annotation.Autowired;  
-import org.springframework.http.ResponseEntity;  
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;  
-import org.springframework.web.multipart.MultipartFile;
 
 import com.serviciosyave.entities.Seller;
-import com.serviciosyave.services.SellerService;  
+import com.serviciosyave.services.SellerService;
+
+import jakarta.validation.Valid;  
 
 @RestController  
 @RequestMapping("/api/sellers")  
@@ -17,23 +17,11 @@ public class SellerController {
     @Autowired  
     private SellerService sellerService;  
 
-    @PostMapping("/register") // Tengo que ver en  cual ruta se puede almacenar. 
-    public ResponseEntity<Seller> registerSeller(@RequestParam String name,  
-                                                  @RequestParam String email,  
-                                                  @RequestParam int yearsOfExperience,  
-                                                  @RequestParam String serviceDescription,  
-                                                  @RequestParam MultipartFile profilePicture) {  
-        Seller seller = new Seller();  
-        seller.setName(name);  
-        seller.setEmail(email);  
-        seller.setYearsOfExperience(yearsOfExperience);  
-        seller.setServiceDescription(serviceDescription);  
-
-        try {  
-            Seller savedSeller = sellerService.registerSeller(seller, profilePicture);  
-            return ResponseEntity.ok(savedSeller);  
-        } catch (IOException e) {  
-            return ResponseEntity.status(500).body(null);  
-        }  
-    }  
-}
+    @PostMapping("/register") 
+    public ResponseEntity<?> register(@Valid @RequestBody Seller seller, BindingResult result) {  
+       // Guardar usuario en la base de datos  
+        Seller savedSeller = sellerService.saveSeller(seller);   
+        return ResponseEntity.status(HttpStatus.CREATED).body(savedSeller);  
+    } 
+    	
+    }
