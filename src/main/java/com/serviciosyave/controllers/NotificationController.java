@@ -7,6 +7,7 @@ import com.serviciosyave.entities.Notification;
 import com.serviciosyave.entities.UserStatus;
 import com.serviciosyave.repositories.NotificationRepository;
 import com.serviciosyave.services.NotificationService;
+import com.serviciosyave.services.PaymentToSellerService;
 import com.serviciosyave.services.UserService;
 
 import java.util.List;
@@ -27,21 +28,24 @@ public class NotificationController {
     @Autowired  
     private UserService userService;
     
+    @Autowired
+    private PaymentToSellerService paymentToSellerService;
+    
     public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId) {  
         List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
         if (existingNotifications.isEmpty()) {  
-            Notification notification = new Notification(  
+            Notification notification = new Notification(  	
                 sellerId,   
                 message,   
                 buyerId,   
                 userType,   
                 vendorServiceId,   
-                null, // Puedes pasar null o algún valor adecuado  
-                null, // Puedes pasar null o algún valor adecuado  
-                userType, // O lo que sea correcto para el estatus  
-                null // Puedes pasar null o algún valor adecuado para id2  
+                null,
+                null, 
+                userType, 
+                null  
             );  
-            notification = notificationRepository.save(notification); // Guarda la notificación  
+            notification = notificationRepository.save(notification);
 
             // Enviar notificación en tiempo real con el ID  
             notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId);  
@@ -58,13 +62,21 @@ public class NotificationController {
     }  
     
 
-    @PutMapping("/approve/client/{id}/{id2}")  
-    public ResponseEntity<List<Notification>> approveServiceByClient(@PathVariable Long id, @PathVariable Long id2) {  
-        List<Notification> updatedNotifications = notificationService.approveServiceByClient(id, id2);  
-        // Cambiar el estado del comprador a NO_OCUPADO  
-        userService.updateUserStatus(id, UserStatus.NO_OCUPADO);  
-        return ResponseEntity.ok(updatedNotifications);  
-    }  
+    @PutMapping("/approve/client/{id}/{id2}")
+    public ResponseEntity<List<Notification>> approveServiceByClient(
+            @PathVariable Long id, 
+            @PathVariable Long id2) {
+        
+        List<Notification> updatedNotifications = notificationService.approveServiceByClient(id, id2);
+        
+        // Procesar pago
+        paymentToSellerService.processPayment(id); 
+        
+        // Cambiar estado del usuario
+        userService.updateUserStatus(id, UserStatus.NO_OCUPADO);
+        
+        return ResponseEntity.ok(updatedNotifications);
+    } 
 
     @PutMapping("/reject/provider/{id}/{id2}")  
     public ResponseEntity<List<Notification>> rejectServiceByProvider(@PathVariable Long id, @PathVariable Long id2) {  

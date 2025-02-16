@@ -19,7 +19,7 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import com.serviciosyave.entities.User;  
 
 @RestController  
-@RequestMapping("/api/binance")  
+@RequestMapping("/api/binance")
 public class BinanceController {  
 
     @Autowired  

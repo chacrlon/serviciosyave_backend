@@ -6,12 +6,11 @@ import jakarta.persistence.*;
 public class MobilePayment{  
     @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
-    private Long id; // Identificador único  
+    private Long id; 
 
-    private String cedula; // Cédula del usuario  
-    private String numeroTelefono; // Número de teléfono del usuario  
+    private String cedula; 
+    private String numeroTelefono; 
     private String banco;
-    // No es necesario incluir monto, referencia y estado aquí, ya que se manejarán en PaymentTransaction  
 
     @ManyToOne  
     private VendorService vendorService; // Relación con el servicio del vendedor  

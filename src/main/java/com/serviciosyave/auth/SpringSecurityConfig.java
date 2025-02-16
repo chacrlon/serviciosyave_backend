@@ -43,17 +43,21 @@ public class SpringSecurityConfig {
     @Bean  
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {  
         return http.authorizeHttpRequests(authz -> authz  
-                .requestMatchers(HttpMethod.POST, "/register/**").permitAll()  // Permitir acceso al registro  
-                .requestMatchers("/register/**").permitAll() // Permitir acceso a todos los endpoints bajo /register  
+                .requestMatchers(HttpMethod.POST, "/register/**").permitAll()
+                .requestMatchers("/register/**").permitAll() 
                 .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}").permitAll()  
-                .requestMatchers(HttpMethod.GET, "/api/binance/").permitAll() // Permitir acceso a todos los registros de Binance  
-                .requestMatchers(HttpMethod.POST, "/api/binance/create").permitAll() // Permitir acceso a todos los registros de Binance  
-
+                .requestMatchers(HttpMethod.GET, "/api/binance/").permitAll()  
+                .requestMatchers(HttpMethod.POST, "/api/binance/create").permitAll() 
+                .requestMatchers(HttpMethod.PUT, "/api/sellers/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/usuarios/**").permitAll()
+                .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").permitAll()
+                .requestMatchers(HttpMethod.GET, "/api/usuarios/**").permitAll()
+                
                 // Permitir acceso a todos los endpoints de Bank Transfer  
                 .requestMatchers(HttpMethod.POST, "/api/banktransfer/create").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/banktransfer/").permitAll()  
                 .requestMatchers(HttpMethod.GET, "/api/payment/all").permitAll()
-                .requestMatchers(HttpMethod.POST, "/api/sellers/**").permitAll()
+                .requestMatchers(HttpMethod.POST, "/api/sellers/**").permitAll()      
 
                 // Permitir acceso a todos los endpoints de Mobile Payment  
                 .requestMatchers(HttpMethod.POST, "/api/mobilepayment/create").permitAll()  
@@ -68,7 +72,8 @@ public class SpringSecurityConfig {
                 .requestMatchers("/api/payment/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
-                .requestMatchers("/notifications/**").permitAll()// <--- Añadir esta línea // <--- Añadir esta línea 
+                .requestMatchers("/notifications/**").permitAll()
+                
                 // Otras configuraciones para usuarios y administradores  
                 .requestMatchers(HttpMethod.GET, "/register/{id}").hasAnyRole("USER", "ADMIN")  
                 .requestMatchers(HttpMethod.POST, "/api/users").hasRole("ADMIN")  

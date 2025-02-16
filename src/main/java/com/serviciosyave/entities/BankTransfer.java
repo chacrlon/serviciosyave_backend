@@ -6,13 +6,12 @@ import jakarta.persistence.*;
 public class BankTransfer{  
     @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
-    private Long id; // Identificador único  
+    private Long id;
 
-    private String cuentaBancaria; // Número de cuenta bancaria  
-    private String nombreTitular; // Nombre del titular de la cuenta  
-    private String rif; // RIF del titular  
-
-    // No es necesario incluir monto, referencia y estado aquí, ya que se manejarán en PaymentTransaction  
+    private String cuentaBancaria;
+    private String nombreTitular; 
+    private String rif; 
+ 
 
     @ManyToOne  
     private VendorService vendorService; // Relación con el servicio del vendedor  

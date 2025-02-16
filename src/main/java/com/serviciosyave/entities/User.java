@@ -1,6 +1,7 @@
 package com.serviciosyave.entities;
 
 import jakarta.persistence.CascadeType;
+import jakarta.persistence.Column;
 import jakarta.persistence.Entity;
 import jakarta.persistence.EnumType;
 import jakarta.persistence.Enumerated;
@@ -8,6 +9,7 @@ import jakarta.persistence.FetchType;
 import jakarta.persistence.GeneratedValue;
 import static jakarta.persistence.GenerationType.*;
 
+import java.math.BigDecimal;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -38,6 +40,9 @@ public class User implements IUser {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
+    
+    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
+    private BigDecimal userMoney = BigDecimal.ZERO;
 
     @NotBlank
     private String name;
@@ -206,6 +211,14 @@ public class User implements IUser {
 
 	public void setStatus(UserStatus status) {
 		this.status = status;
+	}
+
+	public BigDecimal getUserMoney() {
+		return userMoney;
+	}
+
+	public void setUserMoney(BigDecimal userMoney) {
+		this.userMoney = userMoney;
 	}
 	
 	

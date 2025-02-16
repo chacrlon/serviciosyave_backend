@@ -1,19 +1,9 @@
-package com.serviciosyave.services;
+package com.serviciosyave.services;  
 
 import org.springframework.beans.factory.annotation.Autowired;  
-import org.springframework.stereotype.Service;  
-import org.springframework.web.multipart.MultipartFile;
-
+import org.springframework.stereotype.Service;
 import com.serviciosyave.entities.Seller;
-import com.serviciosyave.entities.VendorService;
-import com.serviciosyave.repositories.SellerRepository;
-
-import java.io.File;  
-import java.io.IOException;  
-import java.nio.file.Paths;
-import java.sql.Date;
-import java.util.Optional;
-import java.util.UUID;  
+import com.serviciosyave.repositories.SellerRepository;  
 
 @Service  
 public class SellerService {  
@@ -21,9 +11,13 @@ public class SellerService {
     @Autowired  
     private SellerRepository sellerRepository;  
 
-public Seller saveSeller(Seller seller) {
-	return sellerRepository.save(seller);
-	
-}
+    public Seller saveSeller(Seller seller) {  
+        return sellerRepository.save(seller);  
+    }  
 
+    public Seller updateSeller(Long id, Seller seller) {  
+        seller.setId(id);  
+        return sellerRepository.save(seller);  
+    }
 }
+    
