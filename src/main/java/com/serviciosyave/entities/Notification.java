@@ -12,25 +12,34 @@ public class Notification{
     private String message; // Mensaje de la notificación  
     private boolean isRead; // Estado de lectura de la notificación  
     private Long userId2; // ID del otro usuario que interactua contigo
-    
-    // Constructor, getters y setters  
+	private Long vendorServiceId;
+
+	// Constructor, getters y setters
     public Notification() {  
     }
     
  // Constructor que acepta userId, message y userId2  
-    public Notification(Long userId, String message, Long userId2) {  
+    public Notification(Long userId, String message, Long userId2, Long vendorServiceId) {
         this.userId = userId;  
         this.message = message;  
-        this.isRead = false; // Por defecto, la notificación no está leída  
-        this.userId2 = userId2; // Establece el ID del comprador  
-    }  
-
+        this.isRead = false; // Por defecto, la notificación no está leída
+        this.userId2 = userId2; // Establece el ID del comprador
+		this.vendorServiceId = vendorServiceId;
+    }
 
 	public Long getId() {
 		return id;
 	}
 
 	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public Long getVendorServiceId() {
+		return id;
+	}
+
+	public void setVendorServiceId(Long id) {
 		this.id = id;
 	}
 

@@ -38,7 +38,7 @@ public class IneedController {
 
             // Crear y enviar la notificación al cliente  
             String message = "El profesional ha aceptado tu oferta para: " + necesidad.getTitulo();  
-            notificationController.notifyUser(necesidad.getUserId(), request.getProfessionalUserId(), message); // Aquí se envía la notificación  
+            notificationController.notifyUser(necesidad.getUserId(), request.getProfessionalUserId(), message, updatedNecesidad.getId()); // Aquí se envía la notificación
 
             return ResponseEntity.ok(updatedNecesidad);  
         } else {  

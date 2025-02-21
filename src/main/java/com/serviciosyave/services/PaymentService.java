@@ -60,8 +60,8 @@ public class PaymentService {
         emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);  
 
      // Crear notificaciones en lugar de enviar mensajes  
-        notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller);    
-        notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer);  
+        notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, vendorService.getId());
+        notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, vendorService.getId());
     }  
 
     public List<PaymentDTO> getAllPayments() {  
