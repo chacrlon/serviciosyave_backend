@@ -119,11 +119,6 @@
             <version>2.3.3</version>
         </dependency>
 
-        <dependency>
-        	<groupId>com.shopme</groupId>
-        	<artifactId>ShopmeBackEnd</artifactId>
-        	<version>0.0.1-SNAPSHOT</version>
-        </dependency>
     </dependencies>
 
     <build>
