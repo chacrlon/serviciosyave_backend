@@ -48,7 +48,7 @@ public class NotificationController {
             notification = notificationRepository.save(notification);
 
             // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId);  
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId);  
 
             return notification.getId(); // Devuelve el ID de la notificación creada  
         }  

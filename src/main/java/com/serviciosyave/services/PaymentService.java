@@ -123,7 +123,12 @@ public class PaymentService {
 
         return paymentDTOs;  
     }  
-    
+
+    public List<Payment> findByVendorServiceIdAndUserId(Long vendorServiceId, Long userId) {
+        List<Payment> payment = paymentRepository.findByVendorServiceIdAndUserId(vendorServiceId, userId);
+        return payment;
+    }
+
     public void rejectPayment(Long paymentId) {  
         Payment payment = paymentRepository.findById(paymentId).orElse(null);  
         if (payment != null) {  

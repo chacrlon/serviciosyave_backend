@@ -19,8 +19,8 @@ public class Payment {
     @Column(name = "vendor_service_id") 
     private Long vendorServiceId;  
 
-    @Column(name = "users_id")   
-    private Long userId; 
+    @Column(name = "user_id")
+    private Long userId;
 
     // Getters y Setters  
     public Long getId() {  
