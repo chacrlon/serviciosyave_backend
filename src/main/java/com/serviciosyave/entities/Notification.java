@@ -36,11 +36,11 @@ public class Notification{
 	}
 
 	public Long getVendorServiceId() {
-		return id;
+		return vendorServiceId;
 	}
 
 	public void setVendorServiceId(Long id) {
-		this.id = id;
+		this.vendorServiceId = id;
 	}
 
 	public Long getUserId() {

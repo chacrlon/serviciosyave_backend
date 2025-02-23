@@ -17,4 +17,8 @@ public class ClaimsService {
         return claimsRepository.save(claims);
     }
 
+    public Optional<Claims> getClaim(Long id) {
+        return claimsRepository.findById(id);
+    }
+
 }

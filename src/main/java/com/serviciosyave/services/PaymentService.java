@@ -62,13 +62,13 @@ public class PaymentService {
      // Crear notificaciones en lugar de enviar mensajes  
         notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, vendorService.getId());
         notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, vendorService.getId());
-    }  
+    }
 
-    public List<PaymentDTO> getAllPayments() {  
-        List<Payment> payments = paymentRepository.findAll();  
-        List<PaymentDTO> paymentDTOs = new ArrayList<>();  
-        
-        for (Payment payment : payments) {  
+    public List<PaymentDTO> getAllPayments() {
+        List<Payment> payments = paymentRepository.findAll();
+        List<PaymentDTO> paymentDTOs = new ArrayList<>();
+
+        for (Payment payment : payments) {
             User user = userRepository.findById(payment.getUserId()).orElse(null);  
             PaymentDTO paymentDTO = new PaymentDTO();  
             paymentDTO.setId(payment.getId());  
@@ -84,7 +84,10 @@ public class PaymentService {
         return paymentDTOs;  
     }  
     
-    
+    public List<Payment> findByVendorServiceIdAndUserId(Long vendorServiceId, Long userId) {
+        List<Payment> payment = paymentRepository.findByVendorServiceIdAndUserId(vendorServiceId, userId);
+        return payment;
+    }
 
     public void rejectPayment(Long paymentId) {  
         Payment payment = paymentRepository.findById(paymentId).orElse(null);  
