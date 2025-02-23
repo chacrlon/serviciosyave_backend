@@ -30,5 +30,10 @@ public interface UserService {
     
     List<VendorService> findServicesByUserId(Long userId);
     
-    Optional<User> updateUserStatus(Long id, UserStatus status); 
+    Optional<User> updateUserStatus(Long id, UserStatus status);
+
+
+    //esto se creo exclusivamente para NegotiationService
+    User getUserById(Long id);
+
 }

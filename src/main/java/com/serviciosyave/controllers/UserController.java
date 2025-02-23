@@ -6,21 +6,17 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
+import com.serviciosyave.entities.PaymentMethodSelected;
+import com.serviciosyave.repositories.UserRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.PageRequest;
 import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.validation.BindingResult;
-import org.springframework.web.bind.annotation.CrossOrigin;
-import org.springframework.web.bind.annotation.DeleteMapping;
-import org.springframework.web.bind.annotation.GetMapping;
-import org.springframework.web.bind.annotation.PathVariable;
-import org.springframework.web.bind.annotation.PostMapping;
-import org.springframework.web.bind.annotation.RequestBody;
-import org.springframework.web.bind.annotation.RequestMapping;
-import org.springframework.web.bind.annotation.RestController;
+import org.springframework.web.bind.annotation.*;
 
 import com.serviciosyave.entities.User;
 import com.serviciosyave.entities.UserStatus;
@@ -30,9 +26,7 @@ import com.serviciosyave.services.UserService;
 
 import jakarta.validation.Valid;
 
-import org.springframework.web.bind.annotation.PutMapping;
-
-@CrossOrigin(origins={"http://localhost:4200"})
+@CrossOrigin(origins = {"http://localhost:4200"}) // Configuración de CORS a nivel de clase
 @RestController
 @RequestMapping("/api/users")
 public class UserController {
@@ -40,11 +34,40 @@ public class UserController {
 	@Autowired
     private UserService service;
 
+    @Autowired
+    private UserRepository userRepository; // Añadir esta línea
+
     @GetMapping
     public List<User> list() {
         return service.findAll();
     }
-    
+
+    @PatchMapping("/payment-method") // Cambiado a @PatchMapping directo
+    public ResponseEntity<?> updatePaymentMethod(@RequestBody Map<String, String> request) {
+        String paymentMethod = request.get("paymentMethod");
+
+        // Obtener el nombre de usuario del contexto de seguridad
+        String username = SecurityContextHolder.getContext().getAuthentication().getName();
+
+        // Buscar al usuario por nombre de usuario
+        Optional<User> userOptional = userRepository.findByUsername(username);
+
+        // Verificar si el usuario está presente
+        if (userOptional.isPresent()) {
+            User user = userOptional.get();
+            try {
+                user.setPaymentMethodSelected(PaymentMethodSelected.valueOf(paymentMethod));
+                userRepository.save(user);
+                return ResponseEntity.ok().build();
+            } catch (IllegalArgumentException e) {
+                return ResponseEntity.badRequest().body("Método de pago inválido");
+            }
+        } else {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND)
+                    .body(Collections.singletonMap("error", "Usuario no encontrado."));
+        }
+    }
+
     @GetMapping("/{userId}/email")  
     public ResponseEntity<?> getUserEmail(@PathVariable Long userId) {  
         Optional<User> userOptional = service.findById(userId);  

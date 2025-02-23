@@ -1,5 +1,7 @@
 package com.serviciosyave.controllers;   
 
+import com.serviciosyave.Enum.NegotiationStatus;
+import com.serviciosyave.repositories.NegotiateRepository;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;  
 import org.springframework.http.ResponseEntity;  
@@ -19,32 +21,7 @@ public class IneedController {
  
     public IneedController(IneedService ineedService) {  
         this.ineedService = ineedService;  
-    }  
-    
-    @Autowired  
-    private IneedRepository ineedRepository; 
-    
-    @Autowired  
-    private NotificationController notificationController;
-
-    @PostMapping("/aceptar")  
-    public ResponseEntity<Ineed> aceptarOferta(@RequestBody AcceptOfferRequest request) {  
-        Optional<Ineed> necesidadOpt = ineedRepository.findById(request.getNecesidadId());  
-
-        if (necesidadOpt.isPresent()) {  
-            Ineed necesidad = necesidadOpt.get();  
-            necesidad.setProfessionalUserId(request.getProfessionalUserId());  
-            Ineed updatedNecesidad = ineedRepository.save(necesidad);  
-
-            // Crear y enviar la notificación al cliente  
-            String message = "El profesional ha aceptado tu oferta para: " + necesidad.getTitulo();  
-            notificationController.notifyUser(necesidad.getUserId(), request.getProfessionalUserId(), message, message, null); // Aquí se envía la notificación  
-
-            return ResponseEntity.ok(updatedNecesidad);  
-        } else {  
-            return ResponseEntity.notFound().build();  
-        }  
-    }    
+    }
 
     @PostMapping  
     public ResponseEntity<Ineed> crearNecesidad(@RequestBody Ineed ineed) {  

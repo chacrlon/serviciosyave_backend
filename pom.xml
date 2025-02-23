@@ -120,10 +120,11 @@
         </dependency>
 
         <dependency>
-        	<groupId>com.shopme</groupId>
-        	<artifactId>ShopmeBackEnd</artifactId>
-        	<version>0.0.1-SNAPSHOT</version>
+            <groupId>org.json</groupId>
+            <artifactId>json</artifactId>
+            <version>20210307</version> <!-- Versión anterior confirmada -->
         </dependency>
+
     </dependencies>
 
     <build>
