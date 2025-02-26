@@ -23,7 +23,7 @@ public class Claims {
 	private String roomId;
 
 	@Column(nullable = false)
-	private ClaimStatus status = ClaimStatus.PENDING;
+	private int status = ClaimStatus.PENDING.ordinal();
 
 	@Lob
 	@Column(name = "voucher_user", columnDefinition = "MEDIUMBLOB")
@@ -104,6 +104,14 @@ public class Claims {
 		this.voucherReceiver = voucherReceiver;
 	}
 
+	public int getStatus() {
+		return status;
+	}
+
+	public void setStatus(int status) {
+		this.status = status;
+	}
+
 	@Override
 	public String toString() {
 		return "Claims{" +
@@ -115,6 +123,6 @@ public class Claims {
 	}
 
 	public enum ClaimStatus {
-		ACTIVE, PENDING, RESOLVED
+		RESOLVED, PENDING
 	}
 }

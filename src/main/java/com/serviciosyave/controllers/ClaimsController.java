@@ -133,4 +133,33 @@ public class ClaimsController {
                     .body(Map.of("error", "An unexpected error occurred"));
         }
     }
+
+    @PostMapping("/voucherStatus")
+    public ResponseEntity<Map<String, Object>> voucherStatus(@RequestBody Map<String, String> payloadRequest) {
+
+        try {
+            Map<String, Object> response = new HashMap<>();
+
+            Long longClaimId = Long.valueOf(payloadRequest.get("claimId"));
+            Optional<Claims> claim = claimsService.getClaim(longClaimId);
+                             claim.get().setStatus(this.getEnumStatus(Integer.parseInt(payloadRequest.get("status"))));
+            Claims latestClaim = claimsService.save(claim.get());
+
+            response.put("claim", latestClaim);
+
+            return ResponseEntity.ok(response);
+        } catch (Exception e) {
+            e.printStackTrace();
+            return ResponseEntity.status(HttpStatus.INTERNAL_SERVER_ERROR)
+                    .body(Map.of("error", "An unexpected error occurred"));
+        }
+    }
+
+    public enum ClaimStatus {
+        RESOLVED, PENDING
+    }
+
+    private int getEnumStatus(int status) {
+        return ClaimStatus.values()[status].ordinal();
+    }
 }
