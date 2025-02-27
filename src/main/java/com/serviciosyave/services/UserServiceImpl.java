@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
 import org.springframework.data.domain.Pageable;
@@ -125,5 +126,14 @@ public class UserServiceImpl implements UserService{
     @Transactional(readOnly = true)  
     public List<VendorService> findServicesByUserId(Long userId) {  
         return vendorServiceRepository.findByUserId(userId); // Cambié a findByUserId  
+    }
+
+
+    //Eso se creo exclusivamente para NegotiationService
+    @Override
+    @Transactional(readOnly = true)
+    public User getUserById(Long id) {
+        return repository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado con ID: " + id));
     }
 }

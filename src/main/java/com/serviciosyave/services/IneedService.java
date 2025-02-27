@@ -1,5 +1,6 @@
 package com.serviciosyave.services;  
 
+import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.serviciosyave.entities.Ineed;
@@ -10,7 +11,17 @@ import java.util.List;
 public class IneedService {  
 
 	@Autowired 
-	private final IneedRepository ineedRepository;  
+	private final IneedRepository ineedRepository;
+
+    public Ineed findById(Long id) {
+        return ineedRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Ineed no encontrado con ID: " + id));
+    }
+
+    public Ineed getIneedById(Long id) {
+        return ineedRepository.findById(id)
+                .orElseThrow(() -> new EntityNotFoundException("Ineed no encontrado con ID: " + id));
+    }
  
     public IneedService(IneedRepository ineedRepository) {  
         this.ineedRepository = ineedRepository;  

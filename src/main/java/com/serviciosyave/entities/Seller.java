@@ -1,35 +1,50 @@
 package com.serviciosyave.entities;
 
-import jakarta.persistence.Entity;
-import jakarta.persistence.GeneratedValue;
-import jakarta.persistence.GenerationType;
-import jakarta.persistence.Id;
-import jakarta.persistence.Table;
-import jakarta.persistence.Temporal;
-import jakarta.persistence.TemporalType;
+import jakarta.persistence.*;
+import java.util.Date;
+import java.util.List;
 
-import java.util.Date;  
+@Entity
+@Table(name = "sellers")
+public class Seller {
 
-@Entity  
-@Table(name = "sellers")  
-public class Seller {  
+	@Id
+	@GeneratedValue(strategy = GenerationType.IDENTITY)
+	private Long id;
 
-    @Id  
-    @GeneratedValue(strategy = GenerationType.IDENTITY)  
-    private Long id;  
+	private String fullName; // Nombre completo
+	private String idNumber; // Cédula
+	private String gender; // Género
 
-    private String name;  
+	private String profession; // Profesión/Ocupación
+	private int yearsOfExperience; // Años de experiencia
+	private String skillsDescription; // Descripción de habilidades
 
-    private String email;  
+	private String profilePicture; // Foto de perfil (ruta o URL)
 
-    private int yearsOfExperience;  
+	@ElementCollection // Para manejar una lista de imágenes
+	private List<String> galleryImages; // Galería de imágenes (rutas o URLs)
 
-    private String serviceDescription;  
+	private String email; // Correo electrónico
 
-    private String profilePicture;   
+	@Temporal(TemporalType.TIMESTAMP)
+	private Date createdAt; // Fecha de creación
 
-    @Temporal(TemporalType.TIMESTAMP)  
-    private Date createdAt;
+	private String serviceName; // Nombre del servicio
+	private String certifications; // Certificaciones
+	private String extras; // Información adicional
+
+	@Column(name = "users_id")
+	private Long userId;
+
+	public Long getUserId() {
+		return userId;
+	}
+
+	public void setUserId(Long userId) {
+		this.userId = userId;
+	}
+// Getters y Setters
 
 	public Long getId() {
 		return id;
@@ -39,20 +54,36 @@ public class Seller {
 		this.id = id;
 	}
 
-	public String getName() {
-		return name;
+	public String getFullName() {
+		return fullName;
 	}
 
-	public void setName(String name) {
-		this.name = name;
+	public void setFullName(String fullName) {
+		this.fullName = fullName;
 	}
 
-	public String getEmail() {
-		return email;
+	public String getIdNumber() {
+		return idNumber;
 	}
 
-	public void setEmail(String email) {
-		this.email = email;
+	public void setIdNumber(String idNumber) {
+		this.idNumber = idNumber;
+	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getProfession() {
+		return profession;
+	}
+
+	public void setProfession(String profession) {
+		this.profession = profession;
 	}
 
 	public int getYearsOfExperience() {
@@ -63,12 +94,12 @@ public class Seller {
 		this.yearsOfExperience = yearsOfExperience;
 	}
 
-	public String getServiceDescription() {
-		return serviceDescription;
+	public String getSkillsDescription() {
+		return skillsDescription;
 	}
 
-	public void setServiceDescription(String serviceDescription) {
-		this.serviceDescription = serviceDescription;
+	public void setSkillsDescription(String skillsDescription) {
+		this.skillsDescription = skillsDescription;
 	}
 
 	public String getProfilePicture() {
@@ -79,13 +110,51 @@ public class Seller {
 		this.profilePicture = profilePicture;
 	}
 
+	public List<String> getGalleryImages() {
+		return galleryImages;
+	}
+
+	public void setGalleryImages(List<String> galleryImages) {
+		this.galleryImages = galleryImages;
+	}
+
+	public String getEmail() {
+		return email;
+	}
+
+	public void setEmail(String email) {
+		this.email = email;
+	}
+
 	public Date getCreatedAt() {
 		return createdAt;
 	}
 
 	public void setCreatedAt(Date createdAt) {
 		this.createdAt = createdAt;
-	}  
+	}
 
-     
+	public String getServiceName() {
+		return serviceName;
+	}
+
+	public void setServiceName(String serviceName) {
+		this.serviceName = serviceName;
+	}
+
+	public String getCertifications() {
+		return certifications;
+	}
+
+	public void setCertifications(String certifications) {
+		this.certifications = certifications;
+	}
+
+	public String getExtras() {
+		return extras;
+	}
+
+	public void setExtras(String extras) {
+		this.extras = extras;
+	}
 }

@@ -40,8 +40,11 @@ public class User implements IUser {
     @Id
     @GeneratedValue(strategy = IDENTITY)
     private Long id;
-    
-    @Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
+
+	@Enumerated(EnumType.STRING)
+	private PaymentMethodSelected paymentMethodSelected;
+
+	@Column(columnDefinition = "DECIMAL(10,2) DEFAULT 0.00")
     private BigDecimal userMoney = BigDecimal.ZERO;
 
     @NotBlank
@@ -220,8 +223,12 @@ public class User implements IUser {
 	public void setUserMoney(BigDecimal userMoney) {
 		this.userMoney = userMoney;
 	}
-	
-	
- 
-    
+
+	public PaymentMethodSelected getPaymentMethodSelected() {
+		return paymentMethodSelected;
+	}
+
+	public void setPaymentMethodSelected(PaymentMethodSelected paymentMethodSelected) {
+		this.paymentMethodSelected = paymentMethodSelected;
+	}
 }
