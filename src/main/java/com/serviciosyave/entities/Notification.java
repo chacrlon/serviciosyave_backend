@@ -44,6 +44,14 @@ public class Notification{
 		this.id = id;
 	}
 
+	public Long getVendorServiceId() {
+		return vendorServiceId;
+	}
+
+	public void setVendorServiceId(Long id) {
+		this.vendorServiceId = id;
+	}
+
 	public Long getUserId() {
 		return userId;
 	}
@@ -82,14 +90,6 @@ public class Notification{
 
 	public void setUserType(String userType) {
 		this.userType = userType;
-	}
-
-	public Long getVendorServiceId() {
-		return vendorServiceId;
-	}
-
-	public void setVendorServiceId(Long vendorServiceId) {
-		this.vendorServiceId = vendorServiceId;
 	}
 
 	public String getResultadoProveedor() {
