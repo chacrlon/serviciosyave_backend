@@ -10,6 +10,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>{
 
     public Payment findByVendorServiceId(Long vendorServiceId);
 
-    public List<Payment> findByVendorServiceIdAndUserId(Long vendorServiceId, Long userId);
+    public List<Payment> findByVendorServiceIdAndUsersId(Long vendorServiceId, Long usersId);
 
 }

@@ -79,7 +79,7 @@ public class ClaimsController {
             String roomId = claim.get().getRoomId();
 
             Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
-            List<Payment> respnsePayment = paymentService.findByVendorServiceIdAndUserId(vendorServiceId, userId);
+            List<Payment> respnsePayment = paymentService.findByVendorServiceIdAndUsersId(vendorServiceId, userId);
             Optional<User> user = userService.findById(userId);
                            user.get().setPassword("");
             Optional<User> userReceiver = userService.findById(receiverId);

@@ -124,8 +124,8 @@ public class PaymentService {
         return paymentDTOs;  
     }  
 
-    public List<Payment> findByVendorServiceIdAndUserId(Long vendorServiceId, Long userId) {
-        List<Payment> payment = paymentRepository.findByVendorServiceIdAndUserId(vendorServiceId, userId);
+    public List<Payment> findByVendorServiceIdAndUsersId(Long vendorServiceId, Long usersId) {
+        List<Payment> payment = paymentRepository.findByVendorServiceIdAndUsersId(vendorServiceId, usersId);
         return payment;
     }
 

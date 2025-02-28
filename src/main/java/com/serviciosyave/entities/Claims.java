@@ -23,7 +23,7 @@ public class Claims {
 	private String roomId;
 
 	@Column(nullable = false)
-	private int status = ClaimStatus.PENDING.ordinal();
+	private int status = Claims.ClaimStatus.PENDING.ordinal();
 
 	@Lob
 	@Column(name = "voucher_user", columnDefinition = "MEDIUMBLOB")
