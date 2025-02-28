@@ -20,7 +20,7 @@ public class Payment {
     private Long vendorServiceId;  
 
     @Column(name = "users_id")   
-    private Long userId; 
+    private Long usersId;
 
     // Getters y Setters  
     public Long getId() {  
@@ -72,12 +72,12 @@ public class Payment {
         this.vendorServiceId = vendorServiceId;  
     }  
 
-    public Long getUserId() {  
-        return userId;  
+    public Long getUsersId() {
+        return usersId;
     }  
 
-    public void setUserId(Long userId) {  
-        this.userId = userId;  
+    public void setUsersId(Long usersId) {
+        this.usersId = usersId;
     }  
 
     public String getEstatus() {  

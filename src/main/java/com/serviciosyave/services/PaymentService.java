@@ -58,7 +58,7 @@ public class PaymentService {
         User seller = userRepository.findById(sellerId)  
             .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));  
 
-        User buyer = userRepository.findById(payment.getUserId())  
+        User buyer = userRepository.findById(payment.getUsersId())
             .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));  
 
         String messageToSeller = "El usuario " + buyer.getUsername() + " ha comprado tu servicio " + vendorService.getNombre() + ".";  
@@ -97,7 +97,7 @@ public class PaymentService {
         List<PaymentDTO> paymentDTOs = new ArrayList<>();  
 
         for (Payment payment : payments) {  
-            User user = userRepository.findById(payment.getUserId()).orElse(null);  
+            User user = userRepository.findById(payment.getUsersId()).orElse(null);
             PaymentDTO paymentDTO = new PaymentDTO();  
             paymentDTO.setId(payment.getId());  
             paymentDTO.setMonto(payment.getMonto());  
