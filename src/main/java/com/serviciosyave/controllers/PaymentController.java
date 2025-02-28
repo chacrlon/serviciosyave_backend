@@ -61,7 +61,7 @@ public class PaymentController {
         payment.setReferencia(paymentDTO.getReferencia());  
         payment.setEstatus("procesando");  
         payment.setVendorServiceId(paymentDTO.getVendorServiceId());  
-        payment.setUserId(userId);  
+        payment.setUsersId(userId);
 
         // Guardar el pago en la base de datos  
         Payment createdPayment = paymentService.createdPayment(payment);  
