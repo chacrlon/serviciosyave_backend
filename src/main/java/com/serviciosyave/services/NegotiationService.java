@@ -11,6 +11,8 @@ import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.Optional;
+
 @Service
 @Transactional
 public class NegotiationService {
@@ -33,27 +35,60 @@ public class NegotiationService {
         User sender = userService.getUserById(dto.getSenderUserId());
         User receiver = userService.getUserById(dto.getReceiverUserId());
         Ineed ineed = ineedService.getIneedById(dto.getIneedId());
+        Long negotiationId = dto.getId();
+        NegotiationStatus negotiationStatus = dto.getNegotiationStatus();
+        Negotiate negotiation = new Negotiate();
+        int currentCount = 0;
 
-        String threadId = generateThreadId(ineed.getId(), sender.getId(), receiver.getId());
+        if(negotiationId != null) {
+            negotiation.setId(negotiationId);
+            Optional<Negotiate> negotiateRepo = negotiateRepository.findById(negotiationId);
+            currentCount=negotiateRepo.get().getOfferCount();
+        } else {
+            String threadId = generateThreadId(ineed.getId(), sender.getId(), receiver.getId());
+            currentCount = negotiateRepository.countByThreadId(threadId);
+        }
 
-        int currentCount = negotiateRepository.countByThreadId(threadId);
         if(currentCount >= MAX_OFFERS) {
             throw new IllegalStateException("Límite de ofertas alcanzado");
         }
 
-        Negotiate negotiation = new Negotiate();
         negotiation.setAmount(dto.getAmount());
         negotiation.setJustification(dto.getJustification());
         negotiation.setIneed(ineed);
         negotiation.setSender(sender);
         negotiation.setReceiver(receiver);
         negotiation.setOfferCount(currentCount + 1);
-        negotiation.setStatus(NegotiationStatus.ACTIVE);
+        negotiation.setStatus(negotiationStatus);
 
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
         sseService.sendCounterOfferNotification(saved);
+
+        return saved;
+    }
+
+    public Negotiate update(NegotiationDTO dto) {
+        User sender = userService.getUserById(dto.getSenderUserId());
+        User receiver = userService.getUserById(dto.getReceiverUserId());
+        Ineed ineed = ineedService.getIneedById(dto.getIneedId());
+        Long negotiationId = dto.getId();
+        NegotiationStatus negotiationStatus = dto.getNegotiationStatus();
+        Negotiate negotiation = new Negotiate();
+
+        Optional<Negotiate> negotiateRepo = negotiateRepository.findById(negotiationId);
+
+        negotiation.setId(negotiationId);
+        negotiation.setAmount(negotiateRepo.get().getAmount());
+        negotiation.setJustification(negotiateRepo.get().getJustification());
+        negotiation.setIneed(ineed);
+        negotiation.setSender(sender);
+        negotiation.setReceiver(receiver);
+        negotiation.setOfferCount(negotiateRepo.get().getOfferCount());
+        negotiation.setStatus(negotiationStatus);
+
+        Negotiate saved = negotiateRepository.save(negotiation);
 
         return saved;
     }
@@ -81,5 +116,17 @@ public class NegotiationService {
 
         // Notificar a ambas partes
         sseService.sendNegotiationAcceptedNotification(negotiation);
+    }
+
+    public Negotiate getNegotiation(NegotiationDTO request) {
+        Negotiate negotiation = negotiateRepository.findByIneedIdAndReceiverIdAndSenderId(request.getIneedId(), request.getReceiverUserId(), request.getSenderUserId())
+                .orElseThrow(() -> new EntityNotFoundException("Servicio no posee negociación."));
+        System.out.println(negotiation.toString());
+
+        if(negotiation.getStatus() != NegotiationStatus.ACTIVE) {
+            throw new IllegalStateException("La negociación no está activa");
+        }
+
+        return negotiation;
     }
 }

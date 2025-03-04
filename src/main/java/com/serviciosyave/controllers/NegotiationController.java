@@ -16,10 +16,32 @@ public class NegotiationController {
     @Autowired
     private NegotiationService negotiationService;
 
+    @PostMapping("/getNegotiation")
+    public ResponseEntity<?> findByNegotiation(@RequestBody NegotiationDTO dto) {
+        try {
+            return ResponseEntity.ok(negotiationService.getNegotiation(dto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
     @PostMapping
     public ResponseEntity<?> createNegotiation(@RequestBody NegotiationDTO dto) {
         try {
             return ResponseEntity.ok(negotiationService.createNegotiation(dto));
+        } catch (EntityNotFoundException e) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
+        } catch (IllegalStateException e) {
+            return ResponseEntity.badRequest().body(e.getMessage());
+        }
+    }
+
+    @PostMapping("/update")
+    public ResponseEntity<?> update(@RequestBody NegotiationDTO dto) {
+        try {
+            return ResponseEntity.ok(negotiationService.update(dto));
         } catch (EntityNotFoundException e) {
             return ResponseEntity.status(HttpStatus.NOT_FOUND).body(e.getMessage());
         } catch (IllegalStateException e) {

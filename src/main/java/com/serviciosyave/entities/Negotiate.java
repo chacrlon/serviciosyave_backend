@@ -31,7 +31,7 @@ public class Negotiate {
 	private int offerCount;
 
 	@Enumerated(EnumType.STRING)
-	private NegotiationStatus status;
+	private NegotiationStatus status = NegotiationStatus.ACTIVE;
 
 	@PrePersist
 	public void generateThreadId() {

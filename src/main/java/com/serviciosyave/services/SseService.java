@@ -26,6 +26,7 @@ public class SseService {
         json.put("currentOffer", negotiation.getOfferCount());
         json.put("ineedId", negotiation.getIneed().getId());
         json.put("senderId", negotiation.getSender().getId());
+        json.put("negotiateId", negotiation.getId());
 
         SseEmitter emitter = emitters.get(negotiation.getReceiver().getId());
         if(emitter != null) {

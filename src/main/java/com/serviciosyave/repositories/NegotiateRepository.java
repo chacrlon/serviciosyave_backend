@@ -16,6 +16,8 @@ public interface NegotiateRepository extends JpaRepository<Negotiate, Long> {
 
     Optional<Negotiate> findById(Long id);
 
+    Optional<Negotiate> findByIneedIdAndReceiverIdAndSenderId(Long ineedId, Long receiverId, Long senderId);
+
     // Consulta actualizada con relaciones JPA
     @Query("SELECT n FROM Negotiate n WHERE n.ineed.id = :ineedId AND n.threadId LIKE %:threadIdPattern%")
     List<Negotiate> findAllThreadsForIneed(@Param("ineedId") Long ineedId,

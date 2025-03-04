@@ -76,6 +76,7 @@ public class SpringSecurityConfig {
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()
                         .requestMatchers("/notifications/**").permitAll()
+                        .requestMatchers("/sse/**").permitAll()
                         .requestMatchers("/api/negotiations/**").permitAll()
 
                 // Otras configuraciones para usuarios y administradores

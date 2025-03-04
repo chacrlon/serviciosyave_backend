@@ -1,11 +1,15 @@
 package com.serviciosyave.dto;
 
+import com.serviciosyave.Enum.NegotiationStatus;
+
 public class NegotiationDTO {
 	private Double amount;
 	private String justification;
 	private Long ineedId;
 	private Long senderUserId;
 	private Long receiverUserId;
+	private NegotiationStatus negotiationStatus;
+	private Long id;
 
 	public Double getAmount() {
 		return amount;
@@ -37,6 +41,23 @@ public class NegotiationDTO {
 
 	public void setSenderUserId(Long senderUserId) {
 		this.senderUserId = senderUserId;
+	}
+
+
+	public Long getId() {
+		return id;
+	}
+
+	public void setId(Long id) {
+		this.id = id;
+	}
+
+	public NegotiationStatus getNegotiationStatus() {
+		return negotiationStatus;
+	}
+
+	public void setNegotiationStatus(NegotiationStatus negotiationStatus) {
+		this.negotiationStatus = negotiationStatus;
 	}
 
 	public Long getReceiverUserId() {
