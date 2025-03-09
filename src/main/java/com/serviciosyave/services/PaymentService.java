@@ -1,16 +1,9 @@
 package com.serviciosyave.services;  
 
-import org.springframework.stereotype.Service;  
+import com.serviciosyave.entities.*;
+import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;  
 import com.serviciosyave.controllers.NotificationController;
-import com.serviciosyave.entities.BinancePayment;
-import com.serviciosyave.entities.Notification;
-import com.serviciosyave.entities.Payment;
-import com.serviciosyave.entities.PaymentDTO;  
-import com.serviciosyave.entities.User;  
-import com.serviciosyave.entities.VendorService;
-import com.serviciosyave.entities.bankTransferPayment;
-import com.serviciosyave.entities.mobilePaymentPayment;
 import com.serviciosyave.repositories.NotificationRepository;
 import com.serviciosyave.repositories.PaymentRepository;  
 import com.serviciosyave.repositories.UserRepository;  
@@ -25,11 +18,14 @@ public class PaymentService {
     private PaymentRepository paymentRepository;  
 
     @Autowired  
-    private UserRepository userRepository;  
+    private UserRepository userRepository;
 
-    @Autowired  
-    private VendorServiceRepository vendorServiceRepository; 
-    
+    @Autowired
+    private VendorServiceRepository vendorServiceRepository;
+
+    @Autowired
+    private IneedService ineedService;
+
     @Autowired  
     private NotificationRepository notificationRepository; 
 
@@ -43,52 +39,95 @@ public class PaymentService {
         return paymentRepository.save(payment);  
     }  
     
-    public void approvePayment(Long paymentId) {  
-        Payment payment = paymentRepository.findById(paymentId)  
-            .orElseThrow(() -> new RuntimeException("Pago no encontrado"));  
+    public void approvePayment(Long paymentId) {
 
-        payment.setEstatus("aprobado");  
-        paymentRepository.save(payment);  
+        Payment payment = paymentRepository.findById(paymentId)
+            .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
+        Long ineedId = payment.getIneedId();
 
-        Long vendorServiceId = payment.getVendorServiceId();  
-        VendorService vendorService = vendorServiceRepository.findById(vendorServiceId)  
-            .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));  
+        payment.setEstatus("aprobado");
+        paymentRepository.save(payment);
+        Long vendorServiceId = payment.getVendorServiceId();
 
-        Long sellerId = vendorService.getUserId();  
-        User seller = userRepository.findById(sellerId)  
-            .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));  
 
-        User buyer = userRepository.findById(payment.getUsersId())
-            .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));  
+        if(ineedId != null) {
+            Ineed ineedService = this.ineedService.findById(payment.getIneedId());
+            Long buyerId = ineedService.getUserId();
 
-        String messageToSeller = "El usuario " + buyer.getUsername() + " ha comprado tu servicio " + vendorService.getNombre() + ".";  
-        String messageToBuyer = "Has comprado el servicio " + vendorService.getNombre() + " de " + seller.getUsername() + ".";  
+            User seller = userRepository.findById(payment.getUsersId())
+                    .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
+            User buyer = userRepository.findById(buyerId)
+                    .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
 
-        emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);  
-        emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);  
+            String messageToSeller = "Has comprado el servicio " + ineedService.getTitulo() + " de " + buyer.getUsername() + ".";
+            String messageToBuyer = "El usuario " + seller.getUsername() + " ha comprado tu servicio " + ineedService.getTitulo() + ".";
+            emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);
+            emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);
 
-        // Crear notificaciones y capturar los IDs  
-        Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId);   
-        Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId);   
+            // Crear notificaciones y capturar los IDs
+            Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", null, payment.getIneedId());
+            Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", null, payment.getIneedId());
 
-        // Aquí puedes almacenar los IDs en la notificación si es necesario  
-        // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado  
-        // Puedes crear una lógica adicional para actualizar las notificaciones con el id2  
-        if (sellerNotificationId != null && buyerNotificationId != null) {  
-            // Actualizar la notificación del vendedor con el ID de la notificación del comprador  
-            Notification sellerNotification = notificationRepository.findById(sellerNotificationId).orElse(null);  
-            if (sellerNotification != null) {  
-                sellerNotification.setId2(buyerNotificationId);  
-                notificationRepository.save(sellerNotification);  
-            }  
+            // Aquí puedes almacenar los IDs en la notificación si es necesario
+            // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
+            // Puedes crear una lógica adicional para actualizar las notificaciones con el id2
+            if (sellerNotificationId != null && buyerNotificationId != null) {
+                // Actualizar la notificación del vendedor con el ID de la notificación del comprador
+                Notification sellerNotification = notificationRepository.findById(sellerNotificationId).orElse(null);
+                if (sellerNotification != null) {
+                    sellerNotification.setId2(buyerNotificationId);
+                    notificationRepository.save(sellerNotification);
+                }
 
-            // Actualizar la notificación del comprador con el ID de la notificación del vendedor  
-            Notification buyerNotification = notificationRepository.findById(buyerNotificationId).orElse(null);  
-            if (buyerNotification != null) {  
-                buyerNotification.setId2(sellerNotificationId);  
-                notificationRepository.save(buyerNotification);  
-            }  
-        }  
+                // Actualizar la notificación del comprador con el ID de la notificación del vendedor
+                Notification buyerNotification = notificationRepository.findById(buyerNotificationId).orElse(null);
+                if (buyerNotification != null) {
+                    buyerNotification.setId2(sellerNotificationId);
+                    notificationRepository.save(buyerNotification);
+                }
+            }
+
+        } else {
+            VendorService vendorService = vendorServiceRepository.findById(vendorServiceId)
+                    .orElseThrow(() -> new RuntimeException("Servicio no encontrado"));
+            Long sellerId = vendorService.getUserId();
+
+            User seller = userRepository.findById(sellerId)
+                    .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
+            User buyer = userRepository.findById(payment.getUsersId())
+                    .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
+
+            String messageToSeller = "El usuario " + buyer.getUsername() + " ha comprado tu servicio " + vendorService.getNombre() + ".";
+            String messageToBuyer = "Has comprado el servicio " + vendorService.getNombre() + " de " + seller.getUsername() + ".";
+
+            emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);
+            emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);
+
+            // Crear notificaciones y capturar los IDs
+            Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId, null);
+            Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId, null);
+
+            // Aquí puedes almacenar los IDs en la notificación si es necesario
+            // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
+            // Puedes crear una lógica adicional para actualizar las notificaciones con el id2
+            if (sellerNotificationId != null && buyerNotificationId != null) {
+                // Actualizar la notificación del vendedor con el ID de la notificación del comprador
+                Notification sellerNotification = notificationRepository.findById(sellerNotificationId).orElse(null);
+                if (sellerNotification != null) {
+                    sellerNotification.setId2(buyerNotificationId);
+                    notificationRepository.save(sellerNotification);
+                }
+
+                // Actualizar la notificación del comprador con el ID de la notificación del vendedor
+                Notification buyerNotification = notificationRepository.findById(buyerNotificationId).orElse(null);
+                if (buyerNotification != null) {
+                    buyerNotification.setId2(sellerNotificationId);
+                    notificationRepository.save(buyerNotification);
+                }
+            }
+
+        }
+
     }
     
     

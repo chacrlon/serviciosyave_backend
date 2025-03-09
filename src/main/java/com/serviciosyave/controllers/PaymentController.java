@@ -27,7 +27,8 @@ public class PaymentController {
     @PostMapping("/create")  
     public ResponseEntity<Payment> createPayment(@RequestBody PaymentDTO paymentDTO) {  
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
-        Long userId = (Long) authentication.getDetails();  
+        Long userId = (Long) authentication.getDetails();
+        Long ineedId = paymentDTO.getIneedId();
 
         Payment payment;  
 
@@ -36,19 +37,19 @@ public class PaymentController {
             mobilePaymentPayment mobilePayment = new mobilePaymentPayment();  
             mobilePayment.setTelefono(paymentDTO.getTelefono());  
             payment = mobilePayment;  
-            payment.setTipoPago("MOBILE"); // Asigna el valor aquí  
+            payment.setTipoPago("MOBILE"); // Asigna el valor aquí
             break;  
         case "transferenciaBancaria":  
             bankTransferPayment bankTransfer = new bankTransferPayment();  
             bankTransfer.setNumeroCuenta(paymentDTO.getNumeroCuenta());  
             payment = bankTransfer;  
-            payment.setTipoPago("BANK_TRANSFER"); // Asigna el valor aquí  
+            payment.setTipoPago("BANK_TRANSFER"); // Asigna el valor aquí
             break;  
         case "binance":  
             BinancePayment binancePayment = new BinancePayment();  
             binancePayment.setEmailBinance(paymentDTO.getEmailBinance());  
             payment = binancePayment;  
-            payment.setTipoPago("BINANCE"); // Asigna el valor aquí  
+            payment.setTipoPago("BINANCE"); // Asigna el valor aquí
             break;  
         default:  
             return ResponseEntity.status(HttpStatus.BAD_REQUEST).build();  
@@ -62,6 +63,7 @@ public class PaymentController {
         payment.setEstatus("procesando");  
         payment.setVendorServiceId(paymentDTO.getVendorServiceId());  
         payment.setUsersId(userId);
+        payment.setIneedId(ineedId);
 
         // Guardar el pago en la base de datos  
         Payment createdPayment = paymentService.createdPayment(payment);  
@@ -69,10 +71,15 @@ public class PaymentController {
     }
     
     @GetMapping("/all")  
-    public ResponseEntity<List<PaymentDTO>> getAllPayments() {  
-        List<PaymentDTO> payments = paymentService.getAllPayments();  
-        return ResponseEntity.ok(payments);  
-    }  
+    public ResponseEntity<List<PaymentDTO>> getAllPayments() {
+        try {
+            List<PaymentDTO> payments = paymentService.getAllPayments();
+            return ResponseEntity.ok(payments);
+        } catch (Exception e) {
+            e.printStackTrace();
+            throw new RuntimeException(e);
+        }
+    }
 
     @PutMapping("/approve/{id}")  
     public ResponseEntity<Void> approvePayment(@PathVariable Long id) {  

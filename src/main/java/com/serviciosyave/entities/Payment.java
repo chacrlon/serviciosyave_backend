@@ -2,7 +2,7 @@ package com.serviciosyave.entities;
 
 import jakarta.persistence.*;  
 
-@Entity  
+@Entity
 @Inheritance(strategy = InheritanceType.SINGLE_TABLE)
 @DiscriminatorColumn(name = "dtype")
 public class Payment {  
@@ -17,7 +17,10 @@ public class Payment {
     private String TipoPago;
 
     @Column(name = "vendor_service_id") 
-    private Long vendorServiceId;  
+    private Long vendorServiceId;
+
+    @Column(name = "ineed_id")
+    private Long ineedId;
 
     @Column(name = "users_id")   
     private Long usersId;
@@ -78,7 +81,16 @@ public class Payment {
 
     public void setUsersId(Long usersId) {
         this.usersId = usersId;
-    }  
+    }
+
+    public Long getIneedId() {
+        return ineedId;
+    }
+
+    public void setIneedId(Long ineedId) {
+        this.ineedId = ineedId;
+    }
+
 
     public String getEstatus() {  
         return estatus;  

@@ -1,5 +1,6 @@
 package com.serviciosyave.services;
 
+import com.serviciosyave.entities.Ineed;
 import com.serviciosyave.entities.Negotiate;
 import org.json.JSONObject;
 import org.springframework.stereotype.Service;
@@ -18,7 +19,7 @@ public class SseService {
         emitter.onTimeout(() -> emitters.remove(userId));
     }
 
-    public void sendCounterOfferNotification(Negotiate negotiation) {
+    public void sendCounterOfferNotification(Negotiate negotiation, Long userId, Ineed ineed) {
         JSONObject json = new JSONObject();
         json.put("type", "counteroffer");
         json.put("amount", negotiation.getAmount());
@@ -26,16 +27,20 @@ public class SseService {
         json.put("currentOffer", negotiation.getOfferCount());
         json.put("ineedId", negotiation.getIneed().getId());
         json.put("senderId", negotiation.getSender().getId());
+        json.put("receiverId", negotiation.getReceiver().getId());
         json.put("negotiateId", negotiation.getId());
+        json.put("status", negotiation.getStatus());
+        json.put("presupuesto", ineed.getPresupuesto());
+        json.put("titulo", ineed.getTitulo());
 
-        SseEmitter emitter = emitters.get(negotiation.getReceiver().getId());
+        SseEmitter emitter = emitters.get(userId);
         if(emitter != null) {
             try {
                 emitter.send(SseEmitter.event()
                         .name("negotiation")
                         .data(json.toString()));
             } catch (IOException e) {
-                emitters.remove(negotiation.getReceiver().getId());
+                emitters.remove(userId);
             }
         }
     }

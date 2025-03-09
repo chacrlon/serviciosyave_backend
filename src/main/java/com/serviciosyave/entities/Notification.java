@@ -12,9 +12,10 @@ public class Notification{
 	    private String message;  
 	    private boolean isRead;  
 	    private Long userId2;  
-	    private String userType;  
-	    private Long vendorServiceId;  
-	    private String resultadoProveedor;   
+	    private String userType;
+		private Long vendorServiceId;
+		private Long ineedId;
+	    private String resultadoProveedor;
 	    private String resultadoConsumidor;   
 	    private String estatus;   
 	    private Long id2;  
@@ -23,7 +24,7 @@ public class Notification{
 	    }  
 	    
 	    public Notification(Long userId, String message, Long userId2, String userType,   
-	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2) {  
+	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2, Long ineedId) {
 	        this.userId = userId;  
 	        this.message = message;  
 	        this.isRead = false; // Por defecto, la notificación no está leída  
@@ -33,7 +34,8 @@ public class Notification{
 	        this.resultadoProveedor = resultadoProveedor;  
 	        this.resultadoConsumidor = resultadoConsumidor;  
 	        this.estatus = estatus; // Correcto: asignado desde el argumento estatus  
-	        this.id2 = id2; // Guardar el id de la otra notificación  
+	        this.id2 = id2; // Guardar el id de la otra notificación
+			this.ineedId=ineedId;
 	    }  
 
 	public Long getId() {
@@ -123,8 +125,13 @@ public class Notification{
 	public void setId2(Long id2) {
 		this.id2 = id2;
 	}
-	
-	
-	
+
+	public Long getIneedId() {
+		return ineedId;
+	}
+
+	public void setIneedId(Long ineedId) {
+		this.ineedId = ineedId;
+	}
 	    
 }

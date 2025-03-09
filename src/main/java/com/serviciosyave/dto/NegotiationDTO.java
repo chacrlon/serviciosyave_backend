@@ -10,6 +10,7 @@ public class NegotiationDTO {
 	private Long receiverUserId;
 	private NegotiationStatus negotiationStatus;
 	private Long id;
+	private Long sendId;
 
 	public Double getAmount() {
 		return amount;
@@ -50,6 +51,14 @@ public class NegotiationDTO {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public Long getSendId() {
+		return sendId;
+	}
+
+	public void setSendId(Long sendId) {
+		this.sendId = sendId;
 	}
 
 	public NegotiationStatus getNegotiationStatus() {

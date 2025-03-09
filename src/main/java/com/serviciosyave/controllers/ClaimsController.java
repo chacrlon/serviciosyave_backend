@@ -58,8 +58,8 @@ public class ClaimsController {
             emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
             emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
 
-            notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",responseVendorService.get().getId());
-            notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",responseVendorService.get().getId());
+            notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",responseVendorService.get().getId(), null);
+            notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",responseVendorService.get().getId(), null);
 
             return ResponseEntity.ok(responseClaims);
         } catch (Exception e) {

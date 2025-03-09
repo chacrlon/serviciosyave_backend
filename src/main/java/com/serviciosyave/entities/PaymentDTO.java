@@ -12,6 +12,7 @@ public class PaymentDTO {
     private String telefono;
     private String numeroCuenta;
     private String emailBinance;
+	private Long ineedId;
 
     public Long getId() {  
 		return id;  
@@ -100,5 +101,14 @@ public class PaymentDTO {
 
 	public void setUsername(String username) {
 		this.username = username;
-	}  
+	}
+
+	public Long getIneedId() {
+		return ineedId;
+	}
+
+	public void setIneedId(Long ineedId) {
+		this.ineedId = ineedId;
+	}
+
 }

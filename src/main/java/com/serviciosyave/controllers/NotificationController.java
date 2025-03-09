@@ -31,7 +31,7 @@ public class NotificationController {
     @Autowired
     private PaymentToSellerService paymentToSellerService;
     
-    public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId) {  
+    public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId, Long ineedId) {
         List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
         if (existingNotifications.isEmpty()) {  
             Notification notification = new Notification(  	
@@ -43,12 +43,13 @@ public class NotificationController {
                 null,
                 null, 
                 userType, 
-                null  
-            );  
+                null,
+                ineedId
+            );
             notification = notificationRepository.save(notification);
 
             // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId);  
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId, ineedId);
 
             return notification.getId(); // Devuelve el ID de la notificación creada  
         }  

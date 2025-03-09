@@ -38,6 +38,7 @@ public class NegotiationService {
         Long negotiationId = dto.getId();
         NegotiationStatus negotiationStatus = dto.getNegotiationStatus();
         Negotiate negotiation = new Negotiate();
+        Long sendId = dto.getSendId();
         int currentCount = 0;
 
         if(negotiationId != null) {
@@ -64,7 +65,7 @@ public class NegotiationService {
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
-        sseService.sendCounterOfferNotification(saved);
+        sseService.sendCounterOfferNotification(saved, sendId, ineed);
 
         return saved;
     }
@@ -74,21 +75,34 @@ public class NegotiationService {
         User receiver = userService.getUserById(dto.getReceiverUserId());
         Ineed ineed = ineedService.getIneedById(dto.getIneedId());
         Long negotiationId = dto.getId();
+        String justify = dto.getJustification();
+        Double amount = dto.getAmount();
         NegotiationStatus negotiationStatus = dto.getNegotiationStatus();
+        Long sendId = dto.getSendId();
         Negotiate negotiation = new Negotiate();
 
         Optional<Negotiate> negotiateRepo = negotiateRepository.findById(negotiationId);
+        int newCurrentOffer = negotiateRepo.get().getOfferCount();
+        if(
+            negotiationStatus != NegotiationStatus.ACCEPTED &&
+            negotiationStatus != NegotiationStatus.REJECTED
+        ) {
+            newCurrentOffer = negotiateRepo.get().getOfferCount()+ 1;
+        }
 
         negotiation.setId(negotiationId);
-        negotiation.setAmount(negotiateRepo.get().getAmount());
-        negotiation.setJustification(negotiateRepo.get().getJustification());
+        negotiation.setAmount(amount);
+        negotiation.setJustification(justify);
         negotiation.setIneed(ineed);
         negotiation.setSender(sender);
         negotiation.setReceiver(receiver);
-        negotiation.setOfferCount(negotiateRepo.get().getOfferCount());
+        negotiation.setOfferCount(newCurrentOffer);
         negotiation.setStatus(negotiationStatus);
 
         Negotiate saved = negotiateRepository.save(negotiation);
+
+        // Notificar via SSE
+        sseService.sendCounterOfferNotification(saved, sendId, ineed);
 
         return saved;
     }
@@ -121,12 +135,6 @@ public class NegotiationService {
     public Negotiate getNegotiation(NegotiationDTO request) {
         Negotiate negotiation = negotiateRepository.findByIneedIdAndReceiverIdAndSenderId(request.getIneedId(), request.getReceiverUserId(), request.getSenderUserId())
                 .orElseThrow(() -> new EntityNotFoundException("Servicio no posee negociación."));
-        System.out.println(negotiation.toString());
-
-        if(negotiation.getStatus() != NegotiationStatus.ACTIVE) {
-            throw new IllegalStateException("La negociación no está activa");
-        }
-
         return negotiation;
     }
 }
