@@ -1,160 +1,211 @@
 package com.serviciosyave.entities;
 
+
 import jakarta.persistence.*;
+
+
+import java.time.LocalDate;
+import java.time.LocalDateTime;
 import java.util.Date;
 import java.util.List;
+
 
 @Entity
 @Table(name = "sellers")
 public class Seller {
 
-	@Id
-	@GeneratedValue(strategy = GenerationType.IDENTITY)
-	private Long id;
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
+    private Long id;
 
-	private String fullName; // Nombre completo
-	private String idNumber; // Cédula
-	private String gender; // Género
+    // Paso 1: Información Personal
+    private String fullName;
+    private int age;
+    private LocalDate birthdate;
+    private String idNumber;
+    private String gender;
+    private String city;
 
-	private String profession; // Profesión/Ocupación
-	private int yearsOfExperience; // Años de experiencia
-	private String skillsDescription; // Descripción de habilidades
+    // Paso 2: Información Profesional
+    private String profession;
+    private int yearsOfExperience;
+    private String skillsDescription;
 
-	private String profilePicture; // Foto de perfil (ruta o URL)
+    @ElementCollection
+    private List<String> modalities; // ["presencial", "online", "hibrido"]
 
-	@ElementCollection // Para manejar una lista de imágenes
-	private List<String> galleryImages; // Galería de imágenes (rutas o URLs)
+    // Paso 3: Verificación
+    private String dniFrontName;
+    private String dniBackName;
+    private String selfieName;
+    private String universityTitleName;
 
-	private String email; // Correo electrónico
+    @ElementCollection
+    private List<String> certificationsNames;
 
-	@Temporal(TemporalType.TIMESTAMP)
-	private Date createdAt; // Fecha de creación
+    // Paso 4: Galería
+    @ElementCollection
+    private List<String> galleryImagesNames;
 
-	private String serviceName; // Nombre del servicio
-	private String certifications; // Certificaciones
-	private String extras; // Información adicional
+    // Relación con el usuario
+    @Column(name = "user_id", unique = true)
+    private Long userId;
 
-	@Column(name = "users_id")
-	private Long userId;
+    // Campos adicionales
+    private LocalDateTime createdAt;
 
-	public Long getUserId() {
-		return userId;
-	}
+    public Seller() {}
 
-	public void setUserId(Long userId) {
-		this.userId = userId;
-	}
-// Getters y Setters
+    public Long getId() {
+        return id;
+    }
 
-	public Long getId() {
-		return id;
-	}
+    public void setId(Long id) {
+        this.id = id;
+    }
 
-	public void setId(Long id) {
-		this.id = id;
-	}
+    public String getFullName() {
+        return fullName;
+    }
 
-	public String getFullName() {
-		return fullName;
-	}
+    public void setFullName(String fullName) {
+        this.fullName = fullName;
+    }
 
-	public void setFullName(String fullName) {
-		this.fullName = fullName;
-	}
+    public int getAge() {
+        return age;
+    }
 
-	public String getIdNumber() {
-		return idNumber;
-	}
+    public void setAge(int age) {
+        this.age = age;
+    }
 
-	public void setIdNumber(String idNumber) {
-		this.idNumber = idNumber;
-	}
+    public LocalDate getBirthdate() {
+        return birthdate;
+    }
 
-	public String getGender() {
-		return gender;
-	}
+    public void setBirthdate(LocalDate birthdate) {
+        this.birthdate = birthdate;
+    }
 
-	public void setGender(String gender) {
-		this.gender = gender;
-	}
+    public String getIdNumber() {
+        return idNumber;
+    }
 
-	public String getProfession() {
-		return profession;
-	}
+    public void setIdNumber(String idNumber) {
+        this.idNumber = idNumber;
+    }
 
-	public void setProfession(String profession) {
-		this.profession = profession;
-	}
+    public String getGender() {
+        return gender;
+    }
 
-	public int getYearsOfExperience() {
-		return yearsOfExperience;
-	}
+    public void setGender(String gender) {
+        this.gender = gender;
+    }
 
-	public void setYearsOfExperience(int yearsOfExperience) {
-		this.yearsOfExperience = yearsOfExperience;
-	}
+    public String getCity() {
+        return city;
+    }
 
-	public String getSkillsDescription() {
-		return skillsDescription;
-	}
+    public void setCity(String city) {
+        this.city = city;
+    }
 
-	public void setSkillsDescription(String skillsDescription) {
-		this.skillsDescription = skillsDescription;
-	}
+    public String getProfession() {
+        return profession;
+    }
 
-	public String getProfilePicture() {
-		return profilePicture;
-	}
+    public void setProfession(String profession) {
+        this.profession = profession;
+    }
 
-	public void setProfilePicture(String profilePicture) {
-		this.profilePicture = profilePicture;
-	}
+    public int getYearsOfExperience() {
+        return yearsOfExperience;
+    }
 
-	public List<String> getGalleryImages() {
-		return galleryImages;
-	}
+    public void setYearsOfExperience(int yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
+    }
 
-	public void setGalleryImages(List<String> galleryImages) {
-		this.galleryImages = galleryImages;
-	}
+    public String getSkillsDescription() {
+        return skillsDescription;
+    }
 
-	public String getEmail() {
-		return email;
-	}
+    public void setSkillsDescription(String skillsDescription) {
+        this.skillsDescription = skillsDescription;
+    }
 
-	public void setEmail(String email) {
-		this.email = email;
-	}
+    public List<String> getModalities() {
+        return modalities;
+    }
 
-	public Date getCreatedAt() {
-		return createdAt;
-	}
+    public void setModalities(List<String> modalities) {
+        this.modalities = modalities;
+    }
 
-	public void setCreatedAt(Date createdAt) {
-		this.createdAt = createdAt;
-	}
+    public String getDniFrontName() {
+        return dniFrontName;
+    }
 
-	public String getServiceName() {
-		return serviceName;
-	}
+    public void setDniFrontName(String dniFrontName) {
+        this.dniFrontName = dniFrontName;
+    }
 
-	public void setServiceName(String serviceName) {
-		this.serviceName = serviceName;
-	}
+    public String getDniBackName() {
+        return dniBackName;
+    }
 
-	public String getCertifications() {
-		return certifications;
-	}
+    public void setDniBackName(String dniBackName) {
+        this.dniBackName = dniBackName;
+    }
 
-	public void setCertifications(String certifications) {
-		this.certifications = certifications;
-	}
+    public String getSelfieName() {
+        return selfieName;
+    }
 
-	public String getExtras() {
-		return extras;
-	}
+    public void setSelfieName(String selfieName) {
+        this.selfieName = selfieName;
+    }
 
-	public void setExtras(String extras) {
-		this.extras = extras;
-	}
+    public String getUniversityTitleName() {
+        return universityTitleName;
+    }
+
+    public void setUniversityTitleName(String universityTitleName) {
+        this.universityTitleName = universityTitleName;
+    }
+
+    public List<String> getCertificationsNames() {
+        return certificationsNames;
+    }
+
+    public void setCertificationsNames(List<String> certificationsNames) {
+        this.certificationsNames = certificationsNames;
+    }
+
+    public List<String> getGalleryImagesNames() {
+        return galleryImagesNames;
+    }
+
+    public void setGalleryImagesNames(List<String> galleryImagesNames) {
+        this.galleryImagesNames = galleryImagesNames;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
+    }
 }
+

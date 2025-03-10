@@ -6,9 +6,12 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
+import java.time.LocalDateTime;
+import java.util.Base64;
 import java.util.List;
-import java.util.Optional;
+import java.util.stream.Collectors;
 
+@CrossOrigin(origins = "http://localhost:4200")
 @RestController
 @RequestMapping("/api/sellers")
 public class SellerController {
@@ -20,41 +23,46 @@ public class SellerController {
         this.sellerService = sellerService;
     }
 
-    // Crear un nuevo perfil de vendedor
-    @PostMapping
-    public ResponseEntity<Seller> createSeller(@RequestBody Seller seller) {
-        Seller createdSeller = sellerService.createSeller(seller);
-        return ResponseEntity.ok(createdSeller);
+    @PostMapping("/register")
+    public ResponseEntity<Seller> createOrUpdateSeller(@RequestBody Seller seller) {
+        // Establecer la fecha de creación si no está presente
+        if (seller.getCreatedAt() == null) {
+            seller.setCreatedAt(LocalDateTime.now());
+        }
 
+        // Convertir Base64 a bytes (si es necesario)
+        if (seller.getDniFrontName() != null) {
+            seller.setDniFrontName(Base64.getEncoder().encodeToString(seller.getDniFrontName().getBytes()));
+        }
+        if (seller.getDniBackName() != null) {
+            seller.setDniBackName(Base64.getEncoder().encodeToString(seller.getDniBackName().getBytes()));
+        }
+        if (seller.getSelfieName() != null) {
+            seller.setSelfieName(Base64.getEncoder().encodeToString(seller.getSelfieName().getBytes()));
+        }
+        if (seller.getUniversityTitleName() != null) {
+            seller.setUniversityTitleName(Base64.getEncoder().encodeToString(seller.getUniversityTitleName().getBytes()));
+        }
+        if (seller.getCertificationsNames() != null) {
+            seller.setCertificationsNames(seller.getCertificationsNames().stream()
+                    .map(cert -> Base64.getEncoder().encodeToString(cert.getBytes()))
+                    .collect(Collectors.toList()));
+        }
+        if (seller.getGalleryImagesNames() != null) {
+            seller.setGalleryImagesNames(seller.getGalleryImagesNames().stream()
+                    .map(img -> Base64.getEncoder().encodeToString(img.getBytes()))
+                    .collect(Collectors.toList()));
+        }
 
+        // Guardar o actualizar el seller
+        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
+        return ResponseEntity.ok(savedSeller);
     }
 
-    // Obtener todos los perfiles de vendedores
-    @GetMapping
-    public ResponseEntity<List<Seller>> getAllSellers() {
-        List<Seller> sellers = sellerService.getAllSellers();
-        return ResponseEntity.ok(sellers);
-    }
-
-    // Obtener un perfil de vendedor por ID
-    @GetMapping("/{id}")
-    public ResponseEntity<Seller> getSellerById(@PathVariable Long id) {
-        Optional<Seller> seller = sellerService.getSellerById(id);
-        return seller.map(ResponseEntity::ok)
-                .orElseThrow(() -> new RuntimeException("Vendedor no encontrado con ID: " + id));
-    }
-
-    // Actualizar un perfil de vendedor existente
-    @PutMapping("/{id}")
-    public ResponseEntity<Seller> updateSeller(@PathVariable Long id, @RequestBody Seller updatedSeller) {
-        Seller seller = sellerService.updateSeller(id, updatedSeller);
-        return ResponseEntity.ok(seller);
-    }
-
-    // Eliminar un perfil de vendedor por ID
-    @DeleteMapping("/{id}")
-    public ResponseEntity<Void> deleteSeller(@PathVariable Long id) {
-        sellerService.deleteSeller(id);
-        return ResponseEntity.noContent().build();
+    @GetMapping("/seller/{userId}")
+    public ResponseEntity<Seller> getSellerByUserId(@PathVariable Long userId) {
+        return sellerService.getSellerByUserId(userId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 }
