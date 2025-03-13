@@ -13,6 +13,7 @@ public class PaymentDTO {
     private String numeroCuenta;
     private String emailBinance;
 	private Long ineedId;
+	private Long receiverId;
 
     public Long getId() {  
 		return id;  
@@ -109,6 +110,14 @@ public class PaymentDTO {
 
 	public void setIneedId(Long ineedId) {
 		this.ineedId = ineedId;
+	}
+
+	public Long getReceiverId() {
+		return receiverId;
+	}
+
+	public void setReceiverId(Long receiverId) {
+		this.receiverId = receiverId;
 	}
 
 }

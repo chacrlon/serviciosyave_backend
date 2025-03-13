@@ -29,6 +29,7 @@ public class PaymentController {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
         Long userId = (Long) authentication.getDetails();
         Long ineedId = paymentDTO.getIneedId();
+        Long receiverId = paymentDTO.getReceiverId();
 
         Payment payment;  
 
@@ -64,12 +65,13 @@ public class PaymentController {
         payment.setVendorServiceId(paymentDTO.getVendorServiceId());  
         payment.setUsersId(userId);
         payment.setIneedId(ineedId);
+        payment.setReceiverId(receiverId);
 
         // Guardar el pago en la base de datos  
         Payment createdPayment = paymentService.createdPayment(payment);  
         return ResponseEntity.status(HttpStatus.CREATED).body(createdPayment);  
     }
-    
+
     @GetMapping("/all")  
     public ResponseEntity<List<PaymentDTO>> getAllPayments() {
         try {
