@@ -44,6 +44,7 @@ public class PaymentService {
         Payment payment = paymentRepository.findById(paymentId)
             .orElseThrow(() -> new RuntimeException("Pago no encontrado"));
         Long ineedId = payment.getIneedId();
+        Long receiverId = payment.getReceiverId();
 
         payment.setEstatus("aprobado");
         paymentRepository.save(payment);
@@ -52,37 +53,36 @@ public class PaymentService {
 
         if(ineedId != null) {
             Ineed ineedService = this.ineedService.findById(payment.getIneedId());
-            Long buyerId = ineedService.getUserId();
 
-            User seller = userRepository.findById(payment.getUsersId())
-                    .orElseThrow(() -> new RuntimeException("Vendedor no encontrado"));
-            User buyer = userRepository.findById(buyerId)
-                    .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
+            User needy = userRepository.findById(payment.getUsersId())
+                    .orElseThrow(() -> new RuntimeException("Usuario no encontrado"));
+            User provider = userRepository.findById(receiverId)
+                    .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
 
-            String messageToSeller = "Has comprado el servicio " + ineedService.getTitulo() + " de " + buyer.getUsername() + ".";
-            String messageToBuyer = "El usuario " + seller.getUsername() + " ha comprado tu servicio " + ineedService.getTitulo() + ".";
-            emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);
-            emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);
+            String messageToNeedy = "Has comprado el servicio " + ineedService.getTitulo() + " de " + provider.getUsername() + ".";
+            String messageToProvider = "El usuario " + needy.getUsername() + " ha comprado tu servicio " + ineedService.getTitulo() + ".";
+            emailService.sendEmail(provider.getEmail(), "Notificación de Servicio", messageToProvider);
+            emailService.sendEmail(needy.getEmail(), "Confirmación de Compra", messageToNeedy);
 
             // Crear notificaciones y capturar los IDs
-            Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", null, payment.getIneedId());
-            Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", null, payment.getIneedId());
+            Long needyNotificationId = notificationController.notifyUser(needy.getId(), provider.getId(), messageToNeedy, "Needy", null, payment.getIneedId());
+            Long providerNotificationId = notificationController.notifyUser(provider.getId(), needy.getId(), messageToProvider, "Provider", null, payment.getIneedId());
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
             // Puedes crear una lógica adicional para actualizar las notificaciones con el id2
-            if (sellerNotificationId != null && buyerNotificationId != null) {
+            if (needyNotificationId != null && providerNotificationId != null) {
                 // Actualizar la notificación del vendedor con el ID de la notificación del comprador
-                Notification sellerNotification = notificationRepository.findById(sellerNotificationId).orElse(null);
+                Notification sellerNotification = notificationRepository.findById(needyNotificationId).orElse(null);
                 if (sellerNotification != null) {
-                    sellerNotification.setId2(buyerNotificationId);
+                    sellerNotification.setId2(providerNotificationId);
                     notificationRepository.save(sellerNotification);
                 }
 
                 // Actualizar la notificación del comprador con el ID de la notificación del vendedor
-                Notification buyerNotification = notificationRepository.findById(buyerNotificationId).orElse(null);
+                Notification buyerNotification = notificationRepository.findById(needyNotificationId).orElse(null);
                 if (buyerNotification != null) {
-                    buyerNotification.setId2(sellerNotificationId);
+                    buyerNotification.setId2(providerNotificationId);
                     notificationRepository.save(buyerNotification);
                 }
             }

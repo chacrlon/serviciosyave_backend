@@ -22,6 +22,9 @@ public class Payment {
     @Column(name = "ineed_id")
     private Long ineedId;
 
+    @Column(name = "receiver_id")
+    private Long receiverId;
+
     @Column(name = "users_id")   
     private Long usersId;
 
@@ -91,6 +94,13 @@ public class Payment {
         this.ineedId = ineedId;
     }
 
+    public Long getReceiverId() {
+        return receiverId;
+    }
+
+    public void setReceiverId(Long receiverId) {
+        this.receiverId = receiverId;
+    }
 
     public String getEstatus() {  
         return estatus;  
