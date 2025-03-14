@@ -103,7 +103,25 @@ public class UserController {
         return ResponseEntity.status(HttpStatus.CREATED).body(service.save(user));
     }
 
+    private static final double PROMEDIO = 3.0;
+    private static final double FACTOR_AJUSTE = 0.5;
 
+    @PostMapping("/valorate")
+    public ResponseEntity<?> valorate(@RequestBody Map<String, String> payloadRequest) {
+        Long receiverId = Long.valueOf(payloadRequest.get("receiverId"));
+        Double rating = Double.valueOf(payloadRequest.get("rating"));
+        User receiverUser = userRepository.findById(receiverId).get();
+
+        Double latestRating = receiverUser.getRating();
+        double difference = rating - PROMEDIO;
+        double fix = difference * FACTOR_AJUSTE;
+        double newRating = latestRating + fix;
+
+             receiverUser.setRating(newRating);
+        User receiverSaved = userRepository.save(receiverUser);
+
+        return ResponseEntity.status(HttpStatus.NO_CONTENT).build();
+    }
 
     @PutMapping("/{id}")
     public ResponseEntity<?> update(@Valid @RequestBody UserRequest user, BindingResult result, @PathVariable Long id) {

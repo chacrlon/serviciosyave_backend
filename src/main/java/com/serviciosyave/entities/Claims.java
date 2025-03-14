@@ -33,6 +33,15 @@ public class Claims {
 	@Column(name = "voucher_receiver", columnDefinition = "MEDIUMBLOB")
 	private byte[] voucherReceiver;
 
+	@Column(name = "ineed_id")
+	private Long ineedId;
+
+	@Column(name = "observation_user", columnDefinition = "TEXT", length=300)
+	private String observation_user;
+
+	@Column(name = "observation_receiver", columnDefinition = "TEXT", length=300)
+	private String observation_receiver;
+
 	@Column(name = "created_at", nullable = false, updatable = false)
 	private Date createdAt = new Date();
 
@@ -41,11 +50,17 @@ public class Claims {
 
 	public Claims() {}
 
-	public Claims(Long userId, Long receiverId, String roomId, Long vendorServiceId) {
+	public Claims(Long userId, Long receiverId, String roomId, Long vendorServiceId,
+				  Long ineedId,
+				  String observation_user,
+				  String observation_receiver) {
 		this.userId = userId;
 		this.receiverId = receiverId;
 		this.roomId = roomId;
 		this.vendorServiceId = vendorServiceId;
+		this.ineedId = ineedId;
+		this.observation_user = observation_user;
+		this.observation_receiver=observation_receiver;
 	}
 
 	public Long getId() {
@@ -100,6 +115,14 @@ public class Claims {
 		return voucherReceiver;
 	}
 
+	public Long getIneedId() {
+		return ineedId;
+	}
+
+	public void setIneedId(Long ineedId) {
+		this.ineedId = ineedId;
+	}
+
 	public void setVoucherReceiver(byte[] voucherReceiver) {
 		this.voucherReceiver = voucherReceiver;
 	}
@@ -112,6 +135,21 @@ public class Claims {
 		this.status = status;
 	}
 
+	public String getObservation_user() {
+		return observation_user;
+	}
+
+	public void setObservation_user(String observation_user) {
+		this.observation_user = observation_user;
+	}
+
+	public String getObservation_receiver() {
+		return observation_receiver;
+	}
+
+	public void setObservation_receiver(String observation_receiver) {
+		this.observation_receiver = observation_receiver;
+	}
 	@Override
 	public String toString() {
 		return "Claims{" +
