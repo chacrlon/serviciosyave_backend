@@ -1,9 +1,6 @@
 package com.serviciosyave.controllers;
 
-import com.serviciosyave.entities.Claims;
-import com.serviciosyave.entities.Payment;
-import com.serviciosyave.entities.User;
-import com.serviciosyave.entities.VendorService;
+import com.serviciosyave.entities.*;
 import com.serviciosyave.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -33,6 +30,9 @@ public class ClaimsController {
     private VendorServiceService vendorService;
 
     @Autowired
+    private IneedService ineedService;
+
+    @Autowired
     private PaymentService paymentService;
 
     @PostMapping("/create")
@@ -41,25 +41,51 @@ public class ClaimsController {
             Long userId = Long.valueOf(payloadRequest.get("userId"));
             Long receiverId = Long.valueOf(payloadRequest.get("receiverId"));
             Long vendorServiceId = Long.valueOf(payloadRequest.get("vendorServiceId"));
+            Long ineedId = Long.valueOf(payloadRequest.get("ineedId"));
             String roomId = payloadRequest.get("roomId");
 
-            Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
+            Claims responseClaims;
+
             Optional<User> user = userService.findById(userId);
             Optional<User> receiver = userService.findById(receiverId);
 
-            Claims claims = new Claims(userId, receiverId, roomId, vendorServiceId);
-            Claims responseClaims = claimsService.save(claims);
+            if(ineedId != null) {
+                Ineed responseIneedService = ineedService.findById(ineedId);
+                String observationUser = payloadRequest.get("observationUser");
+                String observationReceiver = payloadRequest.get("observationReceiver");
 
-            String redirectUrl = "http://localhost:4200/claims/"+responseClaims.getId();
-            String subject = "Tienes una Disputa #"+responseClaims.getId()+" por el servicio "+responseVendorService.get().getNombre();
-            String messageToBuyer = "Se ha creado una disputa, número de seguimiento: "+responseClaims.getId()+" \n\n por el servicio: " + responseVendorService.get().getNombre() + " del usuario " + receiver.get().getUsername() + "."+ ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
-            String messageToSeller = "El usuario " + user.get().getUsername() + " ha creado una disputa por tu servicio: " + responseVendorService.get().getNombre() + ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
+                Claims claims = new Claims(userId, receiverId, roomId, vendorServiceId,ineedId,observationUser,observationReceiver);
+                responseClaims = claimsService.save(claims);
 
-            emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
-            emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
+                String redirectUrl = "http://localhost:4200/claims/"+responseClaims.getId();
+                String subject = "Tienes una Disputa #"+responseClaims.getId()+" por el servicio "+responseIneedService.getTitulo();
+                String messageToBuyer = "Se ha creado una disputa, número de seguimiento: "+responseClaims.getId()+" \n\n por el servicio: " + responseIneedService.getTitulo() + " del usuario " + receiver.get().getUsername() + "."+ ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
+                String messageToSeller = "El usuario " + user.get().getUsername() + " ha creado una disputa por tu servicio: " + responseIneedService.getTitulo() + ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
 
-            notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",responseVendorService.get().getId(), null);
-            notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",responseVendorService.get().getId(), null);
+                emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
+                emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
+
+                notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",null, responseIneedService.getId());
+                notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",null, responseIneedService.getId());
+
+            } else {
+                Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
+
+                Claims claims = new Claims(userId, receiverId, roomId, vendorServiceId,null,null,null);
+                responseClaims = claimsService.save(claims);
+
+                String redirectUrl = "http://localhost:4200/claims/"+responseClaims.getId();
+                String subject = "Tienes una Disputa #"+responseClaims.getId()+" por el servicio "+responseVendorService.get().getNombre();
+                String messageToBuyer = "Se ha creado una disputa, número de seguimiento: "+responseClaims.getId()+" \n\n por el servicio: " + responseVendorService.get().getNombre() + " del usuario " + receiver.get().getUsername() + "."+ ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
+                String messageToSeller = "El usuario " + user.get().getUsername() + " ha creado una disputa por tu servicio: " + responseVendorService.get().getNombre() + ".\n\n"+" Completa los datos solicitados en el siguiente enlace: "+redirectUrl;
+
+                emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
+                emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
+
+                notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",responseVendorService.get().getId(), null);
+                notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",responseVendorService.get().getId(), null);
+
+            }
 
             return ResponseEntity.ok(responseClaims);
         } catch (Exception e) {
@@ -76,10 +102,13 @@ public class ClaimsController {
             Long userId = claim.get().getUserId();
             Long receiverId = claim.get().getReceiverId();
             Long vendorServiceId = claim.get().getVendorServiceId();
+            Long ineedServiceId = claim.get().getIneedId();
             String roomId = claim.get().getRoomId();
 
             Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
-            List<Payment> respnsePayment = paymentService.findByVendorServiceIdAndUsersId(vendorServiceId, userId);
+            Ineed responseIneedService = ineedService.getIneedById(ineedServiceId);
+
+            List<Payment> respnsePayment = paymentService.findByVendorServiceIdOrIneedIdAndUsersIdAndReceiverId(vendorServiceId, ineedServiceId, userId, receiverId);
             Optional<User> user = userService.findById(userId);
                            user.get().setPassword("");
             Optional<User> userReceiver = userService.findById(receiverId);
@@ -90,6 +119,7 @@ public class ClaimsController {
                                 response.put("receiver", userReceiver);
                                 response.put("claim", claim);
                                 response.put("vendor", responseVendorService);
+                                response.put("ineed", responseIneedService);
                                 response.put("payment", respnsePayment);
 
             return ResponseEntity.ok(response);
@@ -104,6 +134,8 @@ public class ClaimsController {
     public ResponseEntity<Map<String, Object>> getClaim(
             @RequestPart("file") MultipartFile file,
             @RequestParam("user") String user,
+            @RequestParam("observation_user") String observation_user,
+            @RequestParam("observation_receiver") String observation_receiver,
             @RequestParam("claimId") String claimId) {
 
         try {
@@ -120,8 +152,16 @@ public class ClaimsController {
 
             Long longClaimId = Long.valueOf(claimId);
             Optional<Claims> claim = claimsService.getClaim(longClaimId);
-            if(user.equals(claim.get().getUserId().toString())) { claim.get().setVoucherUser(fileContent); }
-            if(user.equals(claim.get().getReceiverId().toString())) { claim.get().setVoucherReceiver(fileContent); }
+            if(user.equals(claim.get().getUserId().toString())) {
+                claim.get().setVoucherUser(fileContent);
+                claim.get().setObservation_user(observation_user);
+            }
+
+            if(user.equals(claim.get().getReceiverId().toString())) {
+                claim.get().setVoucherReceiver(fileContent);
+                claim.get().setObservation_receiver(observation_receiver);
+            }
+
             Claims latestClaim = claimsService.save(claim.get());
 
             response.put("claim", latestClaim);

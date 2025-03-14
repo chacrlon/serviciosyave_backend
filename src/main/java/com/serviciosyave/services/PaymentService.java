@@ -65,8 +65,8 @@ public class PaymentService {
             emailService.sendEmail(needy.getEmail(), "Confirmación de Compra", messageToNeedy);
 
             // Crear notificaciones y capturar los IDs
-            Long needyNotificationId = notificationController.notifyUser(needy.getId(), provider.getId(), messageToNeedy, "Needy", null, payment.getIneedId());
-            Long providerNotificationId = notificationController.notifyUser(provider.getId(), needy.getId(), messageToProvider, "Provider", null, payment.getIneedId());
+            Long needyNotificationId = notificationController.notifyUser(needy.getId(), provider.getId(), messageToNeedy, "Buyer", null, payment.getIneedId());
+            Long providerNotificationId = notificationController.notifyUser(provider.getId(), needy.getId(), messageToProvider, "Seller", null, payment.getIneedId());
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
@@ -165,6 +165,11 @@ public class PaymentService {
 
     public List<Payment> findByVendorServiceIdAndUsersId(Long vendorServiceId, Long usersId) {
         List<Payment> payment = paymentRepository.findByVendorServiceIdAndUsersId(vendorServiceId, usersId);
+        return payment;
+    }
+
+    public List<Payment> findByVendorServiceIdOrIneedIdAndUsersIdAndReceiverId(Long vendorServiceId, Long ineedId,Long usersId, Long receiverId) {
+        List<Payment> payment = paymentRepository.findByVendorServiceIdOrIneedIdAndUsersIdAndReceiverId(vendorServiceId, ineedId, usersId, receiverId);
         return payment;
     }
 

@@ -12,4 +12,6 @@ public interface PaymentRepository extends JpaRepository<Payment, Long>{
 
     public List<Payment> findByVendorServiceIdAndUsersId(Long vendorServiceId, Long usersId);
 
+    public List<Payment> findByVendorServiceIdOrIneedIdAndUsersIdAndReceiverId(Long vendorServiceId, Long ineedId,Long usersId, Long receiverId);
+
 }

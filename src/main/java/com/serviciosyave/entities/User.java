@@ -94,7 +94,9 @@ public class User implements IUser {
     @OneToOne(cascade = CascadeType.ALL)  
     @JoinColumn(name = "ubicacion_id", referencedColumnName = "id")  
     private Ubication ubicacion;
-    
+
+	private double rating = 0.0;
+
  // Constructor por defecto  
     public User() {  
         this.roles = new ArrayList<>();  
@@ -230,5 +232,13 @@ public class User implements IUser {
 
 	public void setPaymentMethodSelected(PaymentMethodSelected paymentMethodSelected) {
 		this.paymentMethodSelected = paymentMethodSelected;
+	}
+
+	public double getRating() {
+		return rating;
+	}
+
+	public void setRating(double rating) {
+		this.rating = rating;
 	}
 }
