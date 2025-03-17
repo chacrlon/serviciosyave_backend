@@ -32,33 +32,52 @@ public class JpaUserDetailsService implements UserDetailsService {
 
     public static String getMensaje() {  
         return threadLocalMensaje.get();  
-    }    
+    }
+
+    // Agrega este campo para almacenar el ID temporalmente
+    private static ThreadLocal<Long> threadLocalUserId = new ThreadLocal<>();
+
+    // ThreadLocal para almacenar el tipo de error
+    private static ThreadLocal<String> threadLocalErrorType = new ThreadLocal<>();
+
+    public static void setErrorType(String errorType) {
+        threadLocalErrorType.set(errorType);
+    }
+
+    public static String getErrorType() {
+        return threadLocalErrorType.get();
+    }
+
+    public static void clearThreadLocals() {
+        threadLocalMensaje.remove();
+        threadLocalUserId.remove();
+        threadLocalErrorType.remove(); // Limpiar el nuevo ThreadLocal
+    }
 
     @Transactional(readOnly = true)  
     @Override  
-    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {  
-        // Establecer un mensaje inicial si es necesario  
-        setMensaje("Intentando cargar usuario por el nombre de usuario: " + username);  
-        System.out.println(getMensaje()); // Imprimir mensaje inicial  
+    public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
+        setMensaje("Intentando cargar usuario: " + username);
+        setErrorType("UNKNOWN"); // Reinicia el errorType
 
-        Optional<User> optionalUser = repository.findByUsername(username);  
+        Optional<User> optionalUser = repository.findByUsername(username);
 
-        if (optionalUser.isEmpty()) {  
-            // Establecer mensaje de error  
-            setMensaje("No se encontró el usuario: " + username);  
-            System.out.println(getMensaje());  // Imprimir mensaje de error  
-            throw new UsernameNotFoundException(getMensaje());  
-        }  
+        if (optionalUser.isEmpty()) {
+            String mensajeError = "[USER_NOT_FOUND] El usuario '" + username + "' no existe";
+            setMensaje(mensajeError);
+            setErrorType("USER_NOT_FOUND"); // Establecer tipo de error
+            throw new UsernameNotFoundException(mensajeError);
+        }
 
-        User user = optionalUser.get();  
-        System.out.println("Usuario encontrado: " + username);  
+        User user = optionalUser.get();
 
-        // Validar si el email está verificado  
-        if (!user.isEmailVerified()) {  
-            setMensaje("El correo electrónico del usuario " + username + " no ha sido verificado.");  
-            System.out.println(getMensaje()); // Imprimir mensaje de verificación  
-            throw new UsernameNotFoundException(getMensaje());  
-        }  
+        if (!user.isEmailVerified()) {
+            String mensajeError = "[EMAIL_NOT_VERIFIED] Correo no verificado para " + username;
+            setMensaje(mensajeError);
+            setErrorType("EMAIL_NOT_VERIFIED"); // Establecer tipo de error
+            threadLocalUserId.set(user.getId());
+            throw new UsernameNotFoundException(mensajeError);
+        }
 
         List<GrantedAuthority> authorities = user.getRoles()  
                 .stream()  
@@ -77,7 +96,12 @@ public class JpaUserDetailsService implements UserDetailsService {
 
         System.out.println("Login exitoso para el usuario: " + username);  
         return userDetails;   
-    }  
+    }
+
+    // Agrega este método para obtener el ID
+    public static Long getUserIdFromThread() {
+        return threadLocalUserId.get();
+    }
 
     public Long getUserId() {  
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
