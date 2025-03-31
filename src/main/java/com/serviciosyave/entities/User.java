@@ -10,6 +10,7 @@ import jakarta.persistence.GeneratedValue;
 import static jakarta.persistence.GenerationType.*;
 
 import java.math.BigDecimal;
+import java.time.LocalDateTime;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -86,9 +87,15 @@ public class User implements IUser {
     private String birthdate;    
     private boolean isVendor; // true si es vendedor, false si es comprador    
     private boolean isEmailVerified; // true si esta verificado, false si no esta verificado  
-    private String verificationCode; // código de verificación para el correo   
-    
-    @OneToMany(mappedBy = "userId") // Cambiatelo a userId  
+    private String verificationCode; // código de verificación para el correo
+	private LocalDateTime VerificationCodeExpiry;
+
+	private String resetToken;
+	private LocalDateTime resetTokenExpiry;
+
+// No olvides generar los getters y setters (Lombok @Data los incluye)
+
+	@OneToMany(mappedBy = "userId") // Cambiatelo a userId
     private List<VendorService> vendorServices;  
     
     @OneToOne(cascade = CascadeType.ALL)  
@@ -97,7 +104,7 @@ public class User implements IUser {
 
 	private double rating = 0.0;
 
- // Constructor por defecto  
+	// Constructor por defecto
     public User() {  
         this.roles = new ArrayList<>();  
         this.status = UserStatus.NO_OCUPADO;  // Asigna el valor por defecto  
@@ -181,7 +188,13 @@ public class User implements IUser {
 	public void setVerificationCode(String verificationCode) {
 		this.verificationCode = verificationCode;
 	}
+	public LocalDateTime getVerificationCodeExpiry() {
+		return VerificationCodeExpiry;
+	}
 
+	public void setVerificationCodeExpiry(LocalDateTime verificationCodeExpiry) {
+		VerificationCodeExpiry = verificationCodeExpiry;
+	}
 	public boolean isAdmin() {
         return admin;
     }
@@ -232,6 +245,22 @@ public class User implements IUser {
 
 	public void setPaymentMethodSelected(PaymentMethodSelected paymentMethodSelected) {
 		this.paymentMethodSelected = paymentMethodSelected;
+	}
+
+	public String getResetToken() {
+		return resetToken;
+	}
+
+	public void setResetToken(String resetToken) {
+		this.resetToken = resetToken;
+	}
+
+	public LocalDateTime getResetTokenExpiry() {
+		return resetTokenExpiry;
+	}
+
+	public void setResetTokenExpiry(LocalDateTime resetTokenExpiry) {
+		this.resetTokenExpiry = resetTokenExpiry;
 	}
 
 	public double getRating() {

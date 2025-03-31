@@ -5,15 +5,15 @@ import java.util.Collection;
 import java.util.Date;
 import java.util.HashMap;
 import java.util.Map;
+import java.util.regex.Matcher;
+import java.util.regex.Pattern;
 
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.security.authentication.AuthenticationManager;
+import org.springframework.security.authentication.BadCredentialsException;
 import org.springframework.security.authentication.UsernamePasswordAuthenticationToken;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.AuthenticationException;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContextHolder;
-import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import com.fasterxml.jackson.core.exc.StreamReadException;
@@ -114,20 +114,41 @@ public class JwtAuthenticationFilter extends UsernamePasswordAuthenticationFilte
         response.setStatus(HttpServletResponse.SC_OK);  
     }
 
-    @Override  
-    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,  
-                                              AuthenticationException failed) throws IOException, ServletException {  
-        String mensaje = JpaUserDetailsService.getMensaje(); // Obtener el mensaje del hilo actual  
+    // En el método unsuccessfulAuthentication
+    @Override
+    protected void unsuccessfulAuthentication(HttpServletRequest request, HttpServletResponse response,
+                                              AuthenticationException failed) throws IOException {
 
-        // Crear cuerpo de respuesta  
-        Map<String, String> body = new HashMap<>();  
-        body.put("message", mensaje);  
-        body.put("error", failed.getMessage());  
+        Map<String, Object> body = new HashMap<>();
 
-        // Enviar respuesta  
-        response.getWriter().write(new ObjectMapper().writeValueAsString(body));  
-        response.setContentType(CONTENT_TYPE);  
-        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);  
-    }  
+        // Obtener datos del ThreadLocal
+        String mensajeError = JpaUserDetailsService.getMensaje();
+        String errorType = JpaUserDetailsService.getErrorType();
+        Long userId = JpaUserDetailsService.getUserIdFromThread();
+
+        if (errorType.equals("USER_NOT_FOUND")) {
+            body.put("errorType", "USER_NOT_FOUND");
+            body.put("message", "El usuario no existe");
+        } else if (errorType.equals("EMAIL_NOT_VERIFIED")) {
+            body.put("errorType", "EMAIL_NOT_VERIFIED");
+            body.put("message", "Correo no verificado");
+            if (userId != null) {
+                body.put("userId", userId);
+            }
+        } else if (failed instanceof BadCredentialsException) {
+            body.put("errorType", "INVALID_CREDENTIALS");
+            body.put("message", "Usuario o contraseña incorrectos");
+        } else {
+            body.put("errorType", "UNKNOWN");
+            body.put("message", "Error de autenticación");
+        }
+
+        response.getWriter().write(new ObjectMapper().writeValueAsString(body));
+        response.setContentType(CONTENT_TYPE);
+        response.setStatus(HttpServletResponse.SC_UNAUTHORIZED);
+
+        // Limpiar ThreadLocals después de usarlos
+        JpaUserDetailsService.clearThreadLocals();
+    }
 }
 

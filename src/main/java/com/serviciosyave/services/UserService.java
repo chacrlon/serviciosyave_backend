@@ -32,6 +32,7 @@ public interface UserService {
     
     Optional<User> updateUserStatus(Long id, UserStatus status);
 
+    void processForgotPassword(String username);
 
     //esto se creo exclusivamente para NegotiationService
     User getUserById(Long id);

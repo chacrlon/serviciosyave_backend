@@ -3,7 +3,7 @@ package com.serviciosyave.services;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.Optional;
-
+import java.util.UUID;
 import jakarta.persistence.EntityNotFoundException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.data.domain.Page;
@@ -12,7 +12,7 @@ import org.springframework.lang.NonNull;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
-
+import java.time.LocalDateTime;
 import com.serviciosyave.entities.Role;
 import com.serviciosyave.entities.User;
 import com.serviciosyave.entities.UserStatus;
@@ -63,6 +63,23 @@ public class UserServiceImpl implements UserService{
     @Override
     public Optional<User> findByUserEmail(@NonNull String email) {
         return repository.findByEmail(email);
+    }
+
+    @Override
+    @Transactional
+    public void processForgotPassword(String username) {
+        User user = repository.findByUsername(username)
+                .orElseThrow(() -> new EntityNotFoundException("Usuario no encontrado"));
+
+        String token = UUID.randomUUID().toString();
+        user.setResetToken(token);
+        user.setResetTokenExpiry(LocalDateTime.now().plusMinutes(30));
+
+        repository.save(user);
+        String resetLink = "http://localhost:4200/reset-password?token=" + token;
+        String emailContent = "Haz clic aquí para restablecer tu contraseña: " + resetLink;
+
+        emailService.sendEmail(user.getEmail(), "Recuperación de contraseña", emailContent);
     }
 
     @Transactional

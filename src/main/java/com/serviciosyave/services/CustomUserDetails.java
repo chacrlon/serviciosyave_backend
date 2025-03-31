@@ -39,7 +39,8 @@ public class CustomUserDetails implements UserDetails {
     }  
 
     public boolean isEmailVerified() {  
-        return emailVerified; // Método para obtener el estado de verificación  
+
+        return emailVerified; // Método para obtener el estado de verificación
     }  
 
     @Override  

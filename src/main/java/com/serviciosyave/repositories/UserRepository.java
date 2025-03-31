@@ -24,5 +24,7 @@ public interface UserRepository extends JpaRepository<User, Long>{
     
     Optional<User> findByLastname(String lastName);  
     
-    List<User> findByStatus(UserStatus status);  
+    List<User> findByStatus(UserStatus status);
+
+    Optional<User> findByResetToken(String resetToken);
 }
