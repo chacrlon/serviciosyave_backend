@@ -39,7 +39,7 @@ public class NotificationController {
                 message,   
                 buyerId,   
                 userType,   
-                vendorServiceId,   
+                vendorServiceId,
                 null,
                 null, 
                 userType, 
@@ -49,7 +49,7 @@ public class NotificationController {
             notification = notificationRepository.save(notification);
 
             // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId, ineedId);
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId, ineedId, userType);
 
             return notification.getId(); // Devuelve el ID de la notificación creada  
         }  

@@ -5,8 +5,10 @@ public class ChatMessage {
     private String sender;  
     private String receiver;  
     private String user;
-    
-    public ChatMessage() {  
+	private Long vendorServiceId;
+	private Long ineedId;
+
+	public ChatMessage() {
         super();  
     }
     
@@ -41,7 +43,21 @@ public class ChatMessage {
 	}
 	public void setUser(String user) {
 		this.user = user;
-	}  
+	}
+	public Long getIneedId() {
+		return ineedId;
+	}
 
+	public void setIneedId(Long ineedId) {
+		this.ineedId = ineedId;
+	}
+
+	public Long getVendorServiceId() {
+		return vendorServiceId;
+	}
+
+	public void setVendorServiceId(Long vendorServiceId) {
+		this.vendorServiceId = vendorServiceId;
+	}
     
 }
