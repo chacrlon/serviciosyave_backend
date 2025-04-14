@@ -27,7 +27,13 @@ public class Seller {
     private String skillsDescription;
 
     @ElementCollection
-    private List<String> modalities; // ["presencial", "online", "hibrido"]
+    @Enumerated(EnumType.STRING)
+    private List<Modality> modalities;
+
+    // Opcional: Crear un enum
+    public enum Modality {
+        PRESENCIAL, ONLINE
+    }
 
     // Paso 3: Verificación
     private String dniFrontName;
@@ -131,11 +137,11 @@ public class Seller {
         this.skillsDescription = skillsDescription;
     }
 
-    public List<String> getModalities() {
+    public List<Modality> getModalities() {
         return modalities;
     }
 
-    public void setModalities(List<String> modalities) {
+    public void setModalities(List<Modality> modalities) {
         this.modalities = modalities;
     }
 
