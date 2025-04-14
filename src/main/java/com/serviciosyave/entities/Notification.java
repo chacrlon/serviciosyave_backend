@@ -1,6 +1,7 @@
 package com.serviciosyave.entities;  
 
 import jakarta.persistence.*;  
+import java.util.Date;
 
 @Entity   
 public class Notification{  
@@ -18,8 +19,11 @@ public class Notification{
 	    private String resultadoProveedor;
 	    private String resultadoConsumidor;   
 	    private String estatus;   
-	    private Long id2;  
-	    
+	    private Long id2;
+
+		@Column(name = "created_at", updatable = false)
+		private Date createdAt = new Date();
+
 	    public Notification() {  
 	    }  
 	    
@@ -133,5 +137,13 @@ public class Notification{
 	public void setIneedId(Long ineedId) {
 		this.ineedId = ineedId;
 	}
-	    
+
+	public Date getCreatedAt() {
+		return createdAt;
+	}
+
+	public void setCreateAt(Date createdAt) {
+		this.createdAt = createdAt;
+	}  
+
 }
