@@ -32,25 +32,25 @@ public class SellerController {
 
         // Convertir Base64 a bytes (si es necesario)
         if (seller.getDniFrontName() != null) {
-            seller.setDniFrontName(Base64.getEncoder().encodeToString(seller.getDniFrontName().getBytes()));
+            seller.setDniFrontName(seller.getDniFrontName());
         }
         if (seller.getDniBackName() != null) {
-            seller.setDniBackName(Base64.getEncoder().encodeToString(seller.getDniBackName().getBytes()));
+            seller.setDniBackName(seller.getDniBackName());
         }
         if (seller.getSelfieName() != null) {
-            seller.setSelfieName(Base64.getEncoder().encodeToString(seller.getSelfieName().getBytes()));
+            seller.setSelfieName(seller.getSelfieName());
         }
         if (seller.getUniversityTitleName() != null) {
-            seller.setUniversityTitleName(Base64.getEncoder().encodeToString(seller.getUniversityTitleName().getBytes()));
+            seller.setUniversityTitleName(seller.getUniversityTitleName());
         }
         if (seller.getCertificationsNames() != null) {
             seller.setCertificationsNames(seller.getCertificationsNames().stream()
-                    .map(cert -> Base64.getEncoder().encodeToString(cert.getBytes()))
+                    .map(cert -> cert)
                     .collect(Collectors.toList()));
         }
         if (seller.getGalleryImagesNames() != null) {
             seller.setGalleryImagesNames(seller.getGalleryImagesNames().stream()
-                    .map(img -> Base64.getEncoder().encodeToString(img.getBytes()))
+                    .map(img -> img)
                     .collect(Collectors.toList()));
         }
 

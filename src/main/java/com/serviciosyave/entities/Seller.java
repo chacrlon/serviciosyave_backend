@@ -36,17 +36,31 @@ public class Seller {
     }
 
     // Paso 3: Verificación
-    private String dniFrontName;
-    private String dniBackName;
-    private String selfieName;
-    private String universityTitleName;
+    @Lob
+    @Column(name = "dni_front_name", columnDefinition = "LONGBLOB")
+    private byte[] dniFrontName;
+    @Lob
+    @Column(name = "dni_back_name", columnDefinition = "LONGBLOB")
+    private byte[] dniBackName;
+    @Lob
+    @Column(name = "selfie_name", columnDefinition = "LONGBLOB")
+    private byte[] selfieName;
+    @Lob
+    @Column(name = "university_title_name", columnDefinition = "LONGBLOB")
+    private byte[] universityTitleName;
 
     @ElementCollection
-    private List<String> certificationsNames;
+    @Lob
+    @Column(name = "certifications_names", columnDefinition = "LONGBLOB")
+    @CollectionTable(name = "seller_certifications_names", joinColumns = @JoinColumn(name = "seller_id"))
+    private List<byte[]> certificationsNames;
 
     // Paso 4: Galería
     @ElementCollection
-    private List<String> galleryImagesNames;
+    @Lob
+    @Column(name = "gallery_images_names", columnDefinition = "LONGBLOB")
+    @CollectionTable(name = "seller_gallery_images_names", joinColumns = @JoinColumn(name = "seller_id"))
+    private List<byte[]> galleryImagesNames;
 
     // Relación con el usuario
     @Column(name = "user_id", unique = true)
@@ -145,51 +159,51 @@ public class Seller {
         this.modalities = modalities;
     }
 
-    public String getDniFrontName() {
+    public byte[] getDniFrontName() {
         return dniFrontName;
     }
 
-    public void setDniFrontName(String dniFrontName) {
+    public void setDniFrontName(byte[] dniFrontName) {
         this.dniFrontName = dniFrontName;
     }
 
-    public String getDniBackName() {
+    public byte[] getDniBackName() {
         return dniBackName;
     }
 
-    public void setDniBackName(String dniBackName) {
+    public void setDniBackName(byte[] dniBackName) {
         this.dniBackName = dniBackName;
     }
 
-    public String getSelfieName() {
+    public byte[] getSelfieName() {
         return selfieName;
     }
 
-    public void setSelfieName(String selfieName) {
+    public void setSelfieName(byte[] selfieName) {
         this.selfieName = selfieName;
     }
 
-    public String getUniversityTitleName() {
+    public byte[] getUniversityTitleName() {
         return universityTitleName;
     }
 
-    public void setUniversityTitleName(String universityTitleName) {
+    public void setUniversityTitleName(byte[] universityTitleName) {
         this.universityTitleName = universityTitleName;
     }
 
-    public List<String> getCertificationsNames() {
+    public List<byte[]> getCertificationsNames() {
         return certificationsNames;
     }
 
-    public void setCertificationsNames(List<String> certificationsNames) {
+    public void setCertificationsNames(List<byte[]> certificationsNames) {
         this.certificationsNames = certificationsNames;
     }
 
-    public List<String> getGalleryImagesNames() {
+    public List<byte[]> getGalleryImagesNames() {
         return galleryImagesNames;
     }
 
-    public void setGalleryImagesNames(List<String> galleryImagesNames) {
+    public void setGalleryImagesNames(List<byte[]> galleryImagesNames) {
         this.galleryImagesNames = galleryImagesNames;
     }
 
