@@ -3,6 +3,7 @@ package com.serviciosyave.dto;
 import com.serviciosyave.Enum.NegotiationStatus;
 
 public class NegotiationDTO {
+	private String type;
 	private Double amount;
 	private String justification;
 	private Long ineedId;
@@ -11,6 +12,14 @@ public class NegotiationDTO {
 	private NegotiationStatus negotiationStatus;
 	private Long id;
 	private Long sendId;
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
 
 	public Double getAmount() {
 		return amount;

@@ -20,7 +20,8 @@ public class Ineed{
 	    private Subcategory subcategory; 
 	     
 	    private String ubicacion;  
-	    private LocalDateTime fechaHora;  
+	    private LocalDateTime fechaHora;
+		private Boolean allowNegotiation;
 	    private Double presupuesto;  
 		private Long userId; 
 		private Long professionalUserId; 
@@ -79,6 +80,14 @@ public class Ineed{
 
 		public void setFechaHora(LocalDateTime fechaHora) {
 			this.fechaHora = fechaHora;
+		}
+
+		public Boolean getAllowNegotiation() {
+			return allowNegotiation;
+		}
+
+		public void setAllowNegotiation(Boolean allowNegotiation) {
+			this.allowNegotiation = allowNegotiation;
 		}
 
 		public Double getPresupuesto() {

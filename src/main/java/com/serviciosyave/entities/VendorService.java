@@ -33,6 +33,7 @@ public class VendorService {
     private Subcategory subcategory;  
 
     private Boolean remoto;  
+    private Boolean allowNegotiation;  
     private double latitude;  
     private double longitude;  
     
@@ -101,6 +102,14 @@ public class VendorService {
 
 	public void setRemoto(Boolean remoto) {
 		this.remoto = remoto;
+	}
+
+	public Boolean getAllowNegotiation() {
+		return allowNegotiation;
+	}
+
+	public void setAllowNegotiation(Boolean allowNegotiation) {
+		this.allowNegotiation = allowNegotiation;
 	}
 
 	public double getLatitude() {

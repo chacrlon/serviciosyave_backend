@@ -9,7 +9,7 @@ public class Negotiate {
 	@Id
 	@GeneratedValue(strategy = GenerationType.IDENTITY)
 	private Long id;
-
+	private String type;
 	private Double amount;
 	private String justification;
 	private LocalDateTime timestamp;
@@ -17,6 +17,10 @@ public class Negotiate {
 	@ManyToOne
 	@JoinColumn(name = "ineed_id")
 	private Ineed ineed;
+
+	@ManyToOne
+	@JoinColumn(name = "vendor_service_id")
+	private VendorService vendorService;
 
 	@ManyToOne
 	@JoinColumn(name = "sender_id")
@@ -33,26 +37,19 @@ public class Negotiate {
 	@Enumerated(EnumType.STRING)
 	private NegotiationStatus status = NegotiationStatus.ACTIVE;
 
-	@PrePersist
-	public void generateThreadId() {
-		this.threadId = String.format("%d-%d-%d",
-				ineed.getId(),
-				Math.min(sender.getId(), receiver.getId()),
-				Math.max(sender.getId(), receiver.getId()));
-	}
-
 	public Negotiate() {
 
 	}
 
 	public Negotiate(Long id, Double amount, String justification, LocalDateTime timestamp,
-					 Ineed ineed, User sender, User receiver, String threadId, int offerCount,
+					 Ineed ineed, VendorService vendorService, User sender, User receiver, String threadId, int offerCount,
 					 NegotiationStatus status) {
 		this.id = id;
 		this.amount = amount;
 		this.justification = justification;
 		this.timestamp = timestamp;
 		this.ineed = ineed;
+		this.vendorService = vendorService;
 		this.sender = sender;
 		this.receiver = receiver;
 		this.threadId = threadId;
@@ -66,6 +63,14 @@ public class Negotiate {
 
 	public void setId(Long id) {
 		this.id = id;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
 	}
 
 	public Double getAmount() {
@@ -98,6 +103,14 @@ public class Negotiate {
 
 	public void setIneed(Ineed ineed) {
 		this.ineed = ineed;
+	}
+
+	public VendorService getVendorService() {
+		return vendorService;
+	}
+
+	public void setVendorService(VendorService vendorService) {
+		this.vendorService = vendorService;
 	}
 
 	public User getSender() {

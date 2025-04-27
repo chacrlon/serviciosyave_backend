@@ -10,7 +10,8 @@ import jakarta.persistence.EntityNotFoundException;
 import jakarta.transaction.Transactional;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
-
+import com.serviciosyave.entities.VendorService;
+import com.serviciosyave.services.VendorServiceService;
 import java.util.Optional;
 
 @Service
@@ -30,11 +31,23 @@ public class NegotiationService {
     @Autowired
     private IneedService ineedService;
 
+    @Autowired
+    private VendorServiceService vendorServiceService;
+
 
     public Negotiate createNegotiation(NegotiationDTO dto) {
         User sender = userService.getUserById(dto.getSenderUserId());
         User receiver = userService.getUserById(dto.getReceiverUserId());
-        Ineed ineed = ineedService.getIneedById(dto.getIneedId());
+
+        Ineed ineed = null;
+        VendorService vendorService = null;
+
+        if("requirement".equals(dto.getType())) {
+            ineed = ineedService.getIneedById(dto.getIneedId());
+        } else if ("service".equals(dto.getType())) {
+            vendorService = vendorServiceService.getVendorServiceById(dto.getIneedId());
+        }
+
         Long negotiationId = dto.getId();
         NegotiationStatus negotiationStatus = dto.getNegotiationStatus();
         Negotiate negotiation = new Negotiate();
@@ -46,7 +59,12 @@ public class NegotiationService {
             Optional<Negotiate> negotiateRepo = negotiateRepository.findById(negotiationId);
             currentCount=negotiateRepo.get().getOfferCount();
         } else {
-            String threadId = generateThreadId(ineed.getId(), sender.getId(), receiver.getId());
+            String threadId = null;
+            if("requirement".equals(dto.getType())) {
+                threadId = generateThreadId(ineed.getId(), sender.getId(), receiver.getId());
+            } else if ("service".equals(dto.getType())) {
+                threadId = generateThreadId(vendorService.getId(), sender.getId(), receiver.getId());
+            }
             currentCount = negotiateRepository.countByThreadId(threadId);
         }
 
@@ -56,16 +74,23 @@ public class NegotiationService {
 
         negotiation.setAmount(dto.getAmount());
         negotiation.setJustification(dto.getJustification());
-        negotiation.setIneed(ineed);
+
+        if("requirement".equals(dto.getType())) {
+            negotiation.setIneed(ineed);
+        } else if ("service".equals(dto.getType())) {
+            negotiation.setVendorService(vendorService);
+        }
+
         negotiation.setSender(sender);
         negotiation.setReceiver(receiver);
         negotiation.setOfferCount(currentCount + 1);
         negotiation.setStatus(negotiationStatus);
+        negotiation.setType(dto.getType());
 
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
-        sseService.sendCounterOfferNotification(saved, sendId, ineed);
+        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService);
 
         return saved;
     }
@@ -73,7 +98,15 @@ public class NegotiationService {
     public Negotiate update(NegotiationDTO dto) {
         User sender = userService.getUserById(dto.getSenderUserId());
         User receiver = userService.getUserById(dto.getReceiverUserId());
-        Ineed ineed = ineedService.getIneedById(dto.getIneedId());
+        Ineed ineed = null;
+        VendorService vendorService = null;
+
+        if("requirement".equals(dto.getType())) {
+            ineed = ineedService.getIneedById(dto.getIneedId());
+        } else if ("service".equals(dto.getType())) {
+            vendorService = vendorServiceService.getVendorServiceById(dto.getIneedId());
+        }
+
         Long negotiationId = dto.getId();
         String justify = dto.getJustification();
         Double amount = dto.getAmount();
@@ -93,16 +126,21 @@ public class NegotiationService {
         negotiation.setId(negotiationId);
         negotiation.setAmount(amount);
         negotiation.setJustification(justify);
-        negotiation.setIneed(ineed);
+        if("requirement".equals(dto.getType())) {
+            negotiation.setIneed(ineed);
+        } else if ("service".equals(dto.getType())) {
+            negotiation.setVendorService(vendorService);
+        }
         negotiation.setSender(sender);
         negotiation.setReceiver(receiver);
         negotiation.setOfferCount(newCurrentOffer);
         negotiation.setStatus(negotiationStatus);
+        negotiation.setType(negotiateRepo.get().getType());
 
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
-        sseService.sendCounterOfferNotification(saved, sendId, ineed);
+        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService);
 
         return saved;
     }
@@ -133,8 +171,17 @@ public class NegotiationService {
     }
 
     public Negotiate getNegotiation(NegotiationDTO request) {
-        Negotiate negotiation = negotiateRepository.findByIneedIdAndReceiverIdAndSenderId(request.getIneedId(), request.getReceiverUserId(), request.getSenderUserId())
-                .orElseThrow(() -> new EntityNotFoundException("Servicio no posee negociación."));
+        Negotiate negotiation = null;
+
+        if("requirement".equals(request.getType())){
+
+            negotiation = negotiateRepository.findByIneedIdAndReceiverIdAndSenderId(request.getIneedId(), request.getReceiverUserId(), request.getSenderUserId())
+            .orElseThrow(() -> new EntityNotFoundException("Servicio no posee negociación."));
+        } else if ("service".equals(request.getType())) {
+            negotiation = negotiateRepository.findByVendorServiceIdAndReceiverIdAndSenderId(request.getIneedId(), request.getReceiverUserId(), request.getSenderUserId())
+            .orElseThrow(() -> new EntityNotFoundException("Servicio no posee negociación."));
+        }
+
         return negotiation;
     }
 }

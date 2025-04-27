@@ -108,6 +108,10 @@ public class VendorServiceService {
         return vendorServiceRepository.findById(id);  
     }  
 
+    public VendorService getVendorServiceById(Long id) {
+        return vendorServiceRepository.findById(id).orElseThrow(() -> new RuntimeException("Service not found"));  
+    }
+
     public VendorService updateService(Long id, VendorService serviceDetails) {  
         VendorService serviceToUpdate = vendorServiceRepository.findById(id).orElseThrow();   
         
@@ -118,9 +122,10 @@ public class VendorServiceService {
         serviceToUpdate.setDestacado(serviceDetails.getDestacado());  
         serviceToUpdate.setCategory(serviceDetails.getCategory());  
         serviceToUpdate.setSubcategory(serviceDetails.getSubcategory());  
-        serviceToUpdate.setRemoto(serviceDetails.getRemoto());  
+        serviceToUpdate.setRemoto(serviceDetails.getRemoto());
+        serviceToUpdate.setAllowNegotiation(serviceDetails.getAllowNegotiation());
         serviceToUpdate.setLatitude(serviceDetails.getLatitude());  
-        serviceToUpdate.setLongitude(serviceDetails.getLongitude());    
+        serviceToUpdate.setLongitude(serviceDetails.getLongitude());
         
         return vendorServiceRepository.save(serviceToUpdate);  
     }  
