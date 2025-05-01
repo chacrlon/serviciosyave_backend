@@ -48,16 +48,16 @@ public class IneedController {
     }
 
     @PostMapping  
-    public ResponseEntity<Ineed> crearNecesidad(@RequestBody Ineed ineed) {  
+    public ResponseEntity<Ineed> crearNecesidad(@RequestBody Ineed ineed) throws Exception {
         Ineed nuevaNecesidad = ineedService.crearNecesidad(ineed);  
         return new ResponseEntity<>(nuevaNecesidad, HttpStatus.CREATED);  
     }  
 
     @GetMapping  
-    public ResponseEntity<List<Ineed>> obtenerNecesidades() {  
-        List<Ineed> necesidades = ineedService.obtenerNecesidades();  
-        return new ResponseEntity<>(necesidades, HttpStatus.OK);  
-    }  
+    public ResponseEntity<List<Ineed>> obtenerNecesidades(@RequestParam Double lat, @RequestParam Double lon) {
+        List<Ineed> necesidades = ineedService.obtenerNecesidades(lat, lon);
+        return new ResponseEntity<>(necesidades, HttpStatus.OK);
+    }
 
     @GetMapping("/{id}")  
     public ResponseEntity<Ineed> obtenerNecesidadPorId(@PathVariable Long id) {  

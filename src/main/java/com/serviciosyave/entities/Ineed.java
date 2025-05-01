@@ -19,7 +19,10 @@ public class Ineed{
 	    @JoinColumn(name = "subcategory_id")
 	    private Subcategory subcategory; 
 	     
-	    private String ubicacion;  
+	    private String address;
+		private double latitude;
+		private double longitude;
+		private double nearby;
 	    private LocalDateTime fechaHora;
 		private Boolean allowNegotiation;
 	    private Double presupuesto;  
@@ -66,12 +69,28 @@ public class Ineed{
 			this.subcategory = subcategory;
 		}
 
-		public String getUbicacion() {
-			return ubicacion;
+		public String getAddress() {
+			return address;
 		}
 
-		public void setUbicacion(String ubicacion) {
-			this.ubicacion = ubicacion;
+		public void setAddress(String address) {
+			this.address = address;
+		}
+
+		public double getLatitude() {
+			return latitude;
+		}
+
+		public void setLatitude(double latitude) {
+			this.latitude = latitude;
+		}
+
+		public double getLongitude() {
+			return longitude;
+		}
+
+		public void setLongitude(double longitude) {
+			this.longitude = longitude;
 		}
 
 		public LocalDateTime getFechaHora() {
@@ -112,5 +131,13 @@ public class Ineed{
 
 		public void setProfessionalUserId(Long professionalUserId) {
 			this.professionalUserId = professionalUserId;
+		}
+
+		public double getNearby() {
+			return nearby;
+		}
+
+		public void setNearby(double nearby) {
+			this.nearby = nearby;
 		}
 }

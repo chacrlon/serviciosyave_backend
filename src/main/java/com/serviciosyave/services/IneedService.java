@@ -5,18 +5,16 @@ import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.serviciosyave.entities.Ineed;
 import com.serviciosyave.repositories.IneedRepository;
-import java.util.List;  
-import org.json.JSONObject;
-import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
-import java.net.URI;
+import java.util.List;
 
 @Service  
 public class IneedService {  
 
     @Autowired
     private final IneedRepository ineedRepository;
+
+    @Autowired
+    private GPSService gpsService;
 
     public Ineed findById(Long id) {
         return ineedRepository.findById(id)
@@ -28,25 +26,25 @@ public class IneedService {
                 .orElseThrow(() -> new EntityNotFoundException("Ineed no encontrado con ID: " + id));
     }
 
-    public IneedService(IneedRepository ineedRepository) {  
-        this.ineedRepository = ineedRepository;  
-    }  
-
-    public Ineed crearNecesidad(Ineed ineed) {  
-        return ineedRepository.save(ineed);  
+    public IneedService(IneedRepository ineedRepository) {
+        this.ineedRepository = ineedRepository;
     }
 
-    public List<Ineed> obtenerNecesidades() {  
+    public Ineed crearNecesidad(Ineed ineed) throws Exception {
+        String address = gpsService.fetchAddressFromCoordinates(ineed.getLatitude(), ineed.getLongitude());
+        ineed.setAddress(address);
+        return ineedRepository.save(ineed);
+    }
+
+    public List<Ineed> obtenerNecesidades(Double customerLat, Double customerLong) {
         List<Ineed> necesidades = ineedRepository.findAll();
-        HttpClient client = HttpClient.newHttpClient();
 
         for (Ineed necesidad : necesidades) {
             try {
-                String[] coordenadas = parseCoordinates(necesidad.getUbicacion());
-                double latitud = Double.parseDouble(coordenadas[0]);
-                double longitud = Double.parseDouble(coordenadas[1]);
-                String direccion = fetchAddressFromCoordinates(client, latitud, longitud);
-                necesidad.setUbicacion(direccion);
+                double latitudIneed = necesidad.getLatitude();
+                double longitudIneed = necesidad.getLongitude();
+                double nearby = gpsService.nearbyDistance(latitudIneed, longitudIneed, customerLat, customerLong);
+                necesidad.setNearby(nearby);
             } catch (Exception e) {
                 System.err.println("Error processing necesidad with ID " + necesidad.getId() + ": " + e.getMessage());
             }
@@ -60,16 +58,6 @@ public class IneedService {
             coordenadas[0].split(": ")[1],
             coordenadas[1].split(": ")[1]
         };
-    }
-
-    private String fetchAddressFromCoordinates(HttpClient client, double latitud, double longitud) throws Exception {
-        String url = "https://nominatim.openstreetmap.org/reverse?format=jsonv2&lat=" + latitud + "&lon=" + longitud;
-        HttpRequest request = HttpRequest.newBuilder()
-                .uri(URI.create(url))
-                .build();
-        HttpResponse<String> response = client.send(request, HttpResponse.BodyHandlers.ofString());
-        JSONObject jsonObject = new JSONObject(response.body());
-        return jsonObject.getString("display_name");
     }
 
     public Ineed obtenerNecesidadPorId(Long id) {  

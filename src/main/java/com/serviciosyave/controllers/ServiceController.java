@@ -36,9 +36,9 @@ public class ServiceController {
     private SubcategoryService subcategoryService;  
     
     @GetMapping("/available")  
-    public ResponseEntity<List<VendorService>> getAvailableServices() {  
-        List<VendorService> services = vendorServiceService.getAllAvailableServices();  
-        return ResponseEntity.ok(services);  
+    public ResponseEntity<List<VendorService>> getAvailableServices(@RequestParam Double lat, @RequestParam Double lon) {
+        List<VendorService> services = vendorServiceService.getAllAvailableServices(lat, lon);
+        return ResponseEntity.ok(services);
     }  
 
     @PostMapping("/filter")  
@@ -48,7 +48,7 @@ public class ServiceController {
     }  
 
     @PostMapping("/create")  
-    public ResponseEntity<VendorService> createService(@RequestBody VendorService vendorService) {  
+    public ResponseEntity<VendorService> createService(@RequestBody VendorService vendorService) throws Exception {
         Authentication authentication = SecurityContextHolder.getContext().getAuthentication();  
         Long userId = (Long) authentication.getDetails();  
 

@@ -14,7 +14,7 @@ import lombok.Data;
 @Entity  
 @Table(name = "vendorService")  
 @Data   
-public class VendorService {  
+public class VendorService {
 	
     @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
@@ -35,8 +35,10 @@ public class VendorService {
     private Boolean remoto;  
     private Boolean allowNegotiation;  
     private double latitude;  
-    private double longitude;  
-    
+    private double longitude;
+	private double nearby;
+	private String address;
+
     @Column(name = "users_id")   
     private Long userId;
    
@@ -135,8 +137,20 @@ public class VendorService {
 	public void setUserId(Long userId) {
 		this.userId = userId;
 	}
-	
-	
 
-    
+	public String getAddress() {
+		return address;
+	}
+
+	public void setAddress(String address) {
+		this.address = address;
+	}
+
+	public double getNearby() {
+		return nearby;
+	}
+
+	public void setNearby(double nearby) {
+		this.nearby = nearby;
+	}
 }

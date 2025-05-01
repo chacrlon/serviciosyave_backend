@@ -20,21 +20,34 @@ public class VendorServiceService {
     private VendorServiceRepository vendorServiceRepository;  
     
     @Autowired  
-    private UserRepository userRepository; 
+    private UserRepository userRepository;
 
-    
-    public List<VendorService> getAllAvailableServices() {  
-        // Obtén todos los usuarios que no están ocupados  
-        List<User> availableUsers = userRepository.findByStatus(UserStatus.NO_OCUPADO);  
-        
-        // Recopila todos los servicios de estos usuarios  
-        List<VendorService> availableServices = new ArrayList<>();  
-        for (User user : availableUsers) {  
-            availableServices.addAll(user.getVendorServices());  
-        }  
-        
-        return availableServices;  
-    } 
+    @Autowired
+    private GPSService gpsService;
+
+    public List<VendorService> getAllAvailableServices(double customerLat, double customerLong) {
+        List<User> availableUsers = userRepository.findByStatus(UserStatus.NO_OCUPADO);
+
+        List<VendorService> availableServices = new ArrayList<>();
+        for (User user : availableUsers) {
+            List<VendorService> userServices = user.getVendorServices();
+
+            for (VendorService service : userServices) {
+                try {
+                    double latitudIneed = service.getLatitude();
+                    double longitudIneed = service.getLongitude();
+                    double nearby = gpsService.nearbyDistance(latitudIneed, longitudIneed, customerLat, customerLong);
+                    service.setNearby(nearby);
+                } catch (Exception e) {
+                    System.err.println("Error processing service with ID " + service.getId() + ": " + e.getMessage());
+                }
+            }
+
+            availableServices.addAll(userServices);
+        }
+
+        return availableServices;
+    }
 
     public List<VendorService> filterServices(ServiceFilter filter) {  
         // Obtén todos los usuarios que no están ocupados  
@@ -96,9 +109,11 @@ public class VendorServiceService {
         return resultList;  
     }  
 
-    public VendorService createService(VendorService service) {  
-        return vendorServiceRepository.save(service);  
-    }  
+    public VendorService createService(VendorService service) throws Exception {
+        String address = gpsService.fetchAddressFromCoordinates(service.getLatitude(), service.getLongitude());
+        service.setAddress(address);
+        return vendorServiceRepository.save(service);
+    }
 
     public List<VendorService> getAllServices() {  
         return vendorServiceRepository.findAll();  
