@@ -55,7 +55,7 @@ public class SellerController {
         }
 
         // Guardar o actualizar el seller
-        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
+        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUser().getId(), seller);
         return ResponseEntity.ok(savedSeller);
     }
 

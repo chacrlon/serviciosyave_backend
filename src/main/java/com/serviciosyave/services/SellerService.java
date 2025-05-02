@@ -44,7 +44,7 @@ public class SellerService {
                 })
                 .orElseGet(() -> {
                     // Si no existe un seller con ese userId, se crea uno nuevo
-                    updatedSeller.setUserId(userId);
+                    updatedSeller.getUser().setId(userId);
                     updatedSeller.setCreatedAt(LocalDateTime.now());
                     return sellerRepository.save(updatedSeller);
                 });

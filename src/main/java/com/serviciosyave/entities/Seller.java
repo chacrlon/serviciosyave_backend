@@ -26,6 +26,9 @@ public class Seller {
     private int yearsOfExperience;
     private String skillsDescription;
 
+    @ManyToOne
+    private User user;
+
     @ElementCollection
     @Enumerated(EnumType.STRING)
     private List<Modality> modalities;
@@ -46,6 +49,9 @@ public class Seller {
     @Column(name = "selfie_name", columnDefinition = "LONGBLOB")
     private byte[] selfieName;
     @Lob
+    @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
+    private byte[] profilePicture;
+    @Lob
     @Column(name = "university_title_name", columnDefinition = "LONGBLOB")
     private byte[] universityTitleName;
 
@@ -62,14 +68,18 @@ public class Seller {
     @CollectionTable(name = "seller_gallery_images_names", joinColumns = @JoinColumn(name = "seller_id"))
     private List<byte[]> galleryImagesNames;
 
-    // Relación con el usuario
-    @Column(name = "user_id", unique = true)
-    private Long userId;
-
     // Campos adicionales
     private LocalDateTime createdAt;
 
     public Seller() {}
+
+    public User getUser() {
+        return user;
+    }
+
+    public void setUser(User user) {
+        this.user = user;
+    }
 
     public Long getId() {
         return id;
@@ -207,20 +217,20 @@ public class Seller {
         this.galleryImagesNames = galleryImagesNames;
     }
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
-
     public LocalDateTime getCreatedAt() {
         return createdAt;
     }
 
     public void setCreatedAt(LocalDateTime createdAt) {
         this.createdAt = createdAt;
+    }
+
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
     }
 }
 
