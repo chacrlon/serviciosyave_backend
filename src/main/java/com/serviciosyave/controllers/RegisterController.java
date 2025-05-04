@@ -41,12 +41,16 @@ public class RegisterController {
     // Registro de usuario
     @PostMapping("/register")
     public ResponseEntity<?> register(@Valid @RequestBody User user, BindingResult result) {
+        System.out.println("Contraseña recibida: " + user.getPassword()); // Verificar valor de la contraseña
         if (result.hasErrors()) {
             return validation(result);
         }
 
         // Generar código de verificación y asignarlo
         generateAndAssignVerificationCode(user);
+
+        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        System.out.println("La contraseña encriptada es : "+user.getPassword());
 
         // Guardar usuario en la base de datos
         User savedUser = service.save(user);

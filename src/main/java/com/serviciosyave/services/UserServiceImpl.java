@@ -86,7 +86,8 @@ public class UserServiceImpl implements UserService{
     @Override
     public User save(User user) {
         user.setRoles(getRoles(user));
-        user.setPassword(passwordEncoder.encode(user.getPassword()));
+        //user.setPassword(passwordEncoder.encode(user.getPassword()));
+        System.out.println("La contraseña es : "+user.getPassword());
         return repository.save(user);
     }
     
