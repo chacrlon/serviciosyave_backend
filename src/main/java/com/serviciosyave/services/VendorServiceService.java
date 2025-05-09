@@ -38,6 +38,7 @@ public class VendorServiceService {
                     double longitudIneed = service.getLongitude();
                     double nearby = gpsService.nearbyDistance(latitudIneed, longitudIneed, customerLat, customerLong);
                     service.setNearby(nearby);
+                    service.setNameProfessional(user.getName() + " " + user.getLastname());
                 } catch (Exception e) {
                     System.err.println("Error processing service with ID " + service.getId() + ": " + e.getMessage());
                 }

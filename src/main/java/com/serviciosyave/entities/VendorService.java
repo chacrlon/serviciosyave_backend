@@ -19,7 +19,8 @@ public class VendorService {
     @Id  
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
     private Long id;  
-    private String nombre;  
+    private String nombre;
+	private String nameProfessional;
     private String descripcion;  
     private Double precio;  
     private Boolean destacado;   
@@ -56,6 +57,14 @@ public class VendorService {
 
 	public void setNombre(String nombre) {
 		this.nombre = nombre;
+	}
+
+	public String getNameProfessional() {
+		return nameProfessional;
+	}
+
+	public void setNameProfessional(String nameProfessional) {
+		this.nameProfessional = nameProfessional;
 	}
 
 	public String getDescripcion() {

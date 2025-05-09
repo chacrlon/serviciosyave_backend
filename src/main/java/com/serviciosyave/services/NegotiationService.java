@@ -90,7 +90,7 @@ public class NegotiationService {
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
-        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService);
+        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService, sender.getName()+" "+sender.getLastname());
 
         return saved;
     }
@@ -140,7 +140,7 @@ public class NegotiationService {
         Negotiate saved = negotiateRepository.save(negotiation);
 
         // Notificar via SSE
-        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService);
+        sseService.sendCounterOfferNotification(saved, sendId, ineed, vendorService, sender.getName()+" "+sender.getLastname());
 
         return saved;
     }
