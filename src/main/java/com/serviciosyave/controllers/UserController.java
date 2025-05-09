@@ -1,5 +1,6 @@
 package com.serviciosyave.controllers;
 
+import java.time.LocalDateTime;
 import java.util.Collections;
 import java.util.HashMap;
 import java.util.List;
@@ -15,6 +16,7 @@ import org.springframework.data.domain.Pageable;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.validation.BindingResult;
 import org.springframework.web.bind.annotation.*;
 
@@ -36,6 +38,9 @@ public class UserController {
 
     @Autowired
     private UserRepository userRepository; // Añadir esta línea
+
+    @Autowired
+    private PasswordEncoder passwordEncoder;
 
     @GetMapping
     public List<User> list() {
@@ -207,5 +212,47 @@ public class UserController {
         }  
         return ResponseEntity.status(HttpStatus.NOT_FOUND)  
                 .body(Collections.singletonMap("error", "Usuario no encontrado con ID: " + id));  
+    }
+
+    @GetMapping("/validate-reset-token")
+    public ResponseEntity<?> validateResetToken(@RequestParam String token) {
+        Optional<User> user = userRepository.findByResetToken(token);
+
+        if (user.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token inválido");
+        }
+
+        if (user.get().getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expirado");
+        }
+
+        return ResponseEntity.ok().build();
+    }
+
+    @PostMapping("/reset-password")
+    public ResponseEntity<?> resetPasswordHandler(@RequestBody Map<String, String> request) {
+        String token = request.get("token");
+        String newPassword = request.get("newPassword");
+        Map<String, Object> response = new HashMap<>();  
+
+        Optional<User> userOptional = userRepository.findByResetToken(token);
+
+        if (userOptional.isEmpty()) {
+            return ResponseEntity.status(HttpStatus.NOT_FOUND).body("Token inválido");
+        }
+
+        User user = userOptional.get();
+
+        if (user.getResetTokenExpiry().isBefore(LocalDateTime.now())) {
+            return ResponseEntity.status(HttpStatus.BAD_REQUEST).body("Token expirado");
+        }
+
+        user.setPassword(passwordEncoder.encode(newPassword));
+        user.setResetToken(null);
+        user.setResetTokenExpiry(null);
+        userRepository.save(user);
+        response.put("message", "Contraseña actualizada");  
+
+        return ResponseEntity.ok(response);
     }
 }

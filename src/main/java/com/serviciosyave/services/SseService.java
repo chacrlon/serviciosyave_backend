@@ -20,9 +20,10 @@ public class SseService {
         emitter.onTimeout(() -> emitters.remove(userId));
     }
 
-    public void sendCounterOfferNotification(Negotiate negotiation, Long userId, Ineed ineed, VendorService vendorService) {
+    public void sendCounterOfferNotification(Negotiate negotiation, Long userId, Ineed ineed, VendorService vendorService, String nameProfessional) {
         JSONObject json = new JSONObject();
         json.put("type", "counteroffer");
+        json.put("nameProfessional", nameProfessional);
         json.put("amount", negotiation.getAmount());
         json.put("justification", negotiation.getJustification());
         json.put("currentOffer", negotiation.getOfferCount());

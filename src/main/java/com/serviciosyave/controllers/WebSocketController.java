@@ -43,7 +43,7 @@ public class WebSocketController {
                 Long.valueOf(message.getReceiver()),
                 "Tienes un nuevo mensaje: "+message.getMessage(),
                 Long.valueOf(message.getUser()),
-                "Message",
+                message.getUserType(),
                 message.getVendorServiceId() > 0 ? message.getVendorServiceId() : null,
                 null,
                 null,
