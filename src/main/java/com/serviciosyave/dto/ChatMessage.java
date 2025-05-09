@@ -5,6 +5,7 @@ public class ChatMessage {
     private String sender;  
     private String receiver;  
     private String user;
+    private String userType;
 	private Long vendorServiceId;
 	private Long ineedId;
 
@@ -43,6 +44,12 @@ public class ChatMessage {
 	}
 	public void setUser(String user) {
 		this.user = user;
+	}
+	public String getUserType() {
+		return userType;
+	}
+	public void setUserType(String userType) {
+		this.userType = userType;
 	}
 	public Long getIneedId() {
 		return ineedId;
