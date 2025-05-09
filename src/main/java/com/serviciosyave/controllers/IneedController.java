@@ -2,6 +2,7 @@ package com.serviciosyave.controllers;
 
 import com.serviciosyave.Enum.NegotiationStatus;
 import com.serviciosyave.repositories.NegotiateRepository;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;  
 import org.springframework.http.ResponseEntity;  
@@ -47,11 +48,17 @@ public class IneedController {
         }  
     }
 
-    @PostMapping  
-    public ResponseEntity<Ineed> crearNecesidad(@RequestBody Ineed ineed) throws Exception {
-        Ineed nuevaNecesidad = ineedService.crearNecesidad(ineed);  
-        return new ResponseEntity<>(nuevaNecesidad, HttpStatus.CREATED);  
-    }  
+    @PostMapping
+    public ResponseEntity<Ineed> crearNecesidad(@RequestBody Ineed ineed) {
+        try {
+            Ineed nuevaNecesidad = ineedService.crearNecesidad(ineed);
+            return new ResponseEntity<>(nuevaNecesidad, HttpStatus.CREATED);
+        } catch (ValidationException e) {
+            return new ResponseEntity<>(null, HttpStatus.BAD_REQUEST);
+        } catch (Exception e) {
+            return new ResponseEntity<>(null, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+    }
 
     @GetMapping  
     public ResponseEntity<List<Ineed>> obtenerNecesidades(@RequestParam Double lat, @RequestParam Double lon) {

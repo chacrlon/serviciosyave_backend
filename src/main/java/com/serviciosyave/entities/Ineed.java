@@ -15,6 +15,10 @@ public class Ineed{
 	    @JoinColumn(name = "category_id")
 	    private Category category;
 
+		//Formulario Dinamico
+	    @Column(columnDefinition = "TEXT")
+	    private String formularioData;
+
 	    @ManyToOne 
 	    @JoinColumn(name = "subcategory_id")
 	    private Subcategory subcategory; 
@@ -61,7 +65,15 @@ public class Ineed{
 			this.category = category;
 		}
 
-		public Subcategory getSubcategory() {
+	public String getFormularioData() {
+		return formularioData;
+	}
+
+	public void setFormularioData(String formularioData) {
+		this.formularioData = formularioData;
+	}
+
+	public Subcategory getSubcategory() {
 			return subcategory;
 		}
 

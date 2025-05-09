@@ -43,6 +43,8 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
+                        .requestMatchers(HttpMethod.POST, "/api/ineeds").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/ineeds").permitAll()
                 .requestMatchers(HttpMethod.POST, "/register/**").permitAll()
                 .requestMatchers("/register/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}").permitAll()

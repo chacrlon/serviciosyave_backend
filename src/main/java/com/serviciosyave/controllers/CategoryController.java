@@ -37,38 +37,37 @@ public class CategoryController {
             createdCategory.setSubcategories(new ArrayList<>());  
         }  
         return new ResponseEntity<>(createdCategory, HttpStatus.CREATED);  
-    }  
+    }
 
-    @PutMapping("/{id}")  
-    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {  
-        Map<String, Object> response = new HashMap<>();  
-        Category categoryActual = categoryService.getCateoryById(id).orElse(null);  
-        
-        if (categoryActual == null) {  
-            response.put("mensaje", "Error: no se pudo editar, la categoría ID: " + id + " no existe en la base de datos!");  
-            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);  
-        }  
+    @PutMapping("/{id}")
+    public ResponseEntity<?> updateCategory(@PathVariable Long id, @RequestBody Category categoryDetails) {
+        Map<String, Object> response = new HashMap<>();
+        Category categoryActual = categoryService.getCateoryById(id).orElse(null);
 
-        try {  
-            categoryActual.setName(categoryDetails.getName());  
-            // O cualquier otro campo que necesites actualizar  
-            categoryService.updateCategory(id, categoryActual);  
-            
-            // Asegúrate de que las subcategorías se devuelvan  
-            if (categoryActual.getSubcategories() == null) {  
-                categoryActual.setSubcategories(new ArrayList<>());  
-            }  
-        } catch (Exception e) {  
-            response.put("mensaje", "Error al actualizar la categoría en la base de datos");  
-            response.put("error", e.getMessage().concat(": ").concat(e.getCause() != null ? e.getCause().getMessage() : ""));  
-            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);  
-        }  
+        if (categoryActual == null) {
+            response.put("mensaje", "Error: no se pudo editar, la categoría ID: " + id + " no existe en la base de datos!");
+            return new ResponseEntity<>(response, HttpStatus.NOT_FOUND);
+        }
 
-        response.put("mensaje", "La categoría ha sido actualizada con éxito!");  
-        response.put("categoría", categoryActual);  
+        try {
+            categoryActual.setName(categoryDetails.getName());
+            categoryActual.setFormulario(categoryDetails.getFormulario()); // Añade esta línea
+            categoryService.updateCategory(id, categoryActual);
 
-        return new ResponseEntity<>(response, HttpStatus.OK);  
-    }  
+            if (categoryActual.getSubcategories() == null) {
+                categoryActual.setSubcategories(new ArrayList<>());
+            }
+        } catch (Exception e) {
+            response.put("mensaje", "Error al actualizar la categoría en la base de datos");
+            response.put("error", e.getMessage().concat(": ").concat(e.getCause() != null ? e.getCause().getMessage() : ""));
+            return new ResponseEntity<>(response, HttpStatus.INTERNAL_SERVER_ERROR);
+        }
+
+        response.put("mensaje", "La categoría ha sido actualizada con éxito!");
+        response.put("categoría", categoryActual);
+
+        return new ResponseEntity<>(response, HttpStatus.OK);
+    }
 
     @DeleteMapping("/{id}")  
     public ResponseEntity<Void> deleteCategory(@PathVariable Long id) {  

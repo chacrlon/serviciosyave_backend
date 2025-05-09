@@ -1,6 +1,11 @@
 package com.serviciosyave.services;  
 
+import com.serviciosyave.entities.Category;
+import com.serviciosyave.entities.Subcategory;
+import com.serviciosyave.repositories.CategoryRepository;
+import com.serviciosyave.repositories.SubcategoryRepository;
 import jakarta.persistence.EntityNotFoundException;
+import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 import com.serviciosyave.entities.Ineed;
@@ -12,6 +17,12 @@ public class IneedService {
 
     @Autowired
     private final IneedRepository ineedRepository;
+
+    @Autowired
+    private CategoryRepository categoryRepository; // Nuevo repositorio añadido
+
+    @Autowired
+    private SubcategoryRepository subcategoryRepository; // Opcional si usas subcategorías
 
     @Autowired
     private GPSService gpsService;
@@ -31,6 +42,25 @@ public class IneedService {
     }
 
     public Ineed crearNecesidad(Ineed ineed) throws Exception {
+        // Validar que la categoría tenga formulario
+        Category categoriaCompleta = categoryRepository.findById(ineed.getCategory().getId())
+                .orElseThrow(() -> new ValidationException("Categoría no encontrada"));
+
+        // Validar formulario
+        if(categoriaCompleta.getFormulario() == null) {
+            throw new ValidationException("La categoría no tiene formulario configurado");
+        }
+
+        // Asignar la categoría completa al Ineed
+        ineed.setCategory(categoriaCompleta);
+
+        // Opcional: Hacer lo mismo para subcategoría si es necesario
+        if(ineed.getSubcategory() != null) {
+            Subcategory subcategoriaCompleta = subcategoryRepository.findById(ineed.getSubcategory().getId())
+                    .orElseThrow(() -> new ValidationException("Subcategoría no encontrada"));
+            ineed.setSubcategory(subcategoriaCompleta);
+        }
+
         String address = gpsService.fetchAddressFromCoordinates(ineed.getLatitude(), ineed.getLongitude());
         ineed.setAddress(address);
         return ineedRepository.save(ineed);

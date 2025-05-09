@@ -12,7 +12,10 @@ public class Category{
     @GeneratedValue(strategy = GenerationType.IDENTITY)  
 	private Long id;  
 
-	private String name;  
+	private String name;
+
+	@Column(columnDefinition = "TEXT") // Para MySQL usa columnDefinition = "JSON"
+	private String formulario;
 
 	@OneToMany(mappedBy = "category", cascade = CascadeType.ALL, orphanRemoval = true)  
     @JsonManagedReference // Indica que este es el lado administrador de la relación  
@@ -33,6 +36,14 @@ public class Category{
 
 	public void setName(String name) {
 		this.name = name;
+	}
+
+	public String getFormulario() {
+		return formulario;
+	}
+
+	public void setFormulario(String formulario) {
+		this.formulario = formulario;
 	}
 
 	public List<Subcategory> getSubcategories() {
