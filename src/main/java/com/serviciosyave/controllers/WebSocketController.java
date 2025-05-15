@@ -13,6 +13,8 @@ import org.springframework.stereotype.Controller;
 import com.serviciosyave.dto.ChatMessage;
 import com.serviciosyave.entities.CountdownMessage;
 import java.time.LocalDateTime;
+import java.util.Optional;
+
 import com.fasterxml.jackson.databind.ObjectMapper;
 
 @Controller
@@ -38,22 +40,34 @@ public class WebSocketController {
                             chat.setTimestamp(LocalDateTime.now());
 
         ConversationMessage savedConversation = conversationMessageRepository.save(chat);
+        Notification notification=null;
+        Optional<Notification> lastNotification = notificationRepository.findTopByUserIdAndUserId2AndEstatusOrderByIdDesc(Long.valueOf(message.getReceiver()), Long.valueOf(message.getSender()), "Message");
+ 
+        if (lastNotification.isPresent()) {
 
-        Notification notification = new Notification(
-                Long.valueOf(message.getReceiver()),
-                "Tienes un nuevo mensaje: "+message.getMessage(),
-                Long.valueOf(message.getUser()),
-                message.getUserType(),
-                message.getVendorServiceId() > 0 ? message.getVendorServiceId() : null,
-                null,
-                null,
-                null,
-                null,
-                message.getIneedId() > 0 ? message.getIneedId() : null
-        );
-        notification = notificationRepository.save(notification);
+            notification = lastNotification.get();
+            notificationRepository.updateExistingNotification(
+                notification.getId(),
+                "Tienes un nuevo mensaje: "+message.getMessage()
+            );
 
-        notificationSseController.sendNotification(notification.getId(),"Tienes un nuevo mensaje: "+message.getMessage(), Long.valueOf(message.getUser()), Long.valueOf(message.getSender()), message.getVendorServiceId(), message.getIneedId(), notification.getUserType());
+        } else {
+            notification = new Notification(
+                    Long.valueOf(message.getReceiver()),
+                    "Tienes un nuevo mensaje: "+message.getMessage(),
+                Long.valueOf(message.getSender()),
+                    message.getUserType(),
+                    message.getVendorServiceId() > 0 ? message.getVendorServiceId() : null,
+                    null,
+                    null,
+                    "Message",
+                    null,
+                    message.getIneedId() > 0 ? message.getIneedId() : null
+            );
+            notification = notificationRepository.save(notification);
+        }
+
+        notificationSseController.sendNotification(notification.getId(),"Tienes un nuevo mensaje: "+message.getMessage(), Long.valueOf(message.getReceiver()), Long.valueOf(message.getSender()), message.getVendorServiceId(), message.getIneedId(), notification.getUserType());
 
         return new ChatMessage(
         		message.getMessage(), 

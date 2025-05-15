@@ -39,7 +39,13 @@ public class ServiceController {
     public ResponseEntity<List<VendorService>> getAvailableServices(@RequestParam Double lat, @RequestParam Double lon) {
         List<VendorService> services = vendorServiceService.getAllAvailableServices(lat, lon);
         return ResponseEntity.ok(services);
-    }  
+    }
+
+    @GetMapping("/available/{id}")  
+    public ResponseEntity<List<VendorService>> getAvailableServicesByProfessional(@PathVariable Long id) {
+        List<VendorService> services = vendorServiceService.getServicesByUserId(id);
+        return ResponseEntity.ok(services);
+    } 
 
     @PostMapping("/filter")  
     public ResponseEntity<List<VendorService>> filterServices(@RequestBody ServiceFilter filter) {  
