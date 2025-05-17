@@ -26,8 +26,9 @@ public class Seller {
     private int yearsOfExperience;
     private String skillsDescription;
 
-    @ManyToOne
-    private User user;
+    // Relación con User (lado inverso)
+    @Column(name = "user_id", nullable = true) // Columna en la tabla 'sellers' que referencia a 'users.id'
+    private Long userId;
 
     @ElementCollection
     @Enumerated(EnumType.STRING)
@@ -73,12 +74,12 @@ public class Seller {
 
     public Seller() {}
 
-    public User getUser() {
-        return user;
+    public Long getUserId() {
+        return userId;
     }
 
-    public void setUser(User user) {
-        this.user = user;
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public Long getId() {

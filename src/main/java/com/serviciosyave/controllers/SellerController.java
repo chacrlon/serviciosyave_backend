@@ -55,8 +55,27 @@ public class SellerController {
         }
 
         // Guardar o actualizar el seller
-        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUser().getId(), seller);
+        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
         return ResponseEntity.ok(savedSeller);
+    }
+
+    @GetMapping
+    public ResponseEntity<List<Seller>> getAllSellers() {
+        List<Seller> sellers = sellerService.getAllSellers();
+        return ResponseEntity.ok(sellers);
+    }
+
+    @PutMapping("/{userId}")
+    public ResponseEntity<Seller> updateSeller(@PathVariable Long userId, @RequestBody Seller updatedSeller) {
+        Seller seller = sellerService.updateSellerByUserId(userId, updatedSeller);
+        return ResponseEntity.ok(seller);
+    }
+
+    @GetMapping("/id/{sellerId}")
+    public ResponseEntity<Seller> getSellerById(@PathVariable Long sellerId) {
+        return sellerService.getSellerById(sellerId)
+                .map(ResponseEntity::ok)
+                .orElseGet(() -> ResponseEntity.notFound().build());
     }
 
     @GetMapping("/seller/{userId}")

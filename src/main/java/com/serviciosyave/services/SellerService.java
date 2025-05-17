@@ -35,20 +35,23 @@ public class SellerService {
     }
 
     // Actualizar por userId
+// Actualizar por userId
     public Seller updateSellerByUserId(Long userId, Seller updatedSeller) {
         return sellerRepository.findByUserId(userId)
                 .map(existingSeller -> {
                     // Copiar propiedades del seller actualizado al existente, excluyendo "id" y "userId"
-                    BeanUtils.copyProperties(updatedSeller, existingSeller, "id", "userId", "createdAt");
+                    BeanUtils.copyProperties(existingSeller, updatedSeller, "id", "userId", "createdAt");
                     return sellerRepository.save(existingSeller);
                 })
                 .orElseGet(() -> {
                     // Si no existe un seller con ese userId, se crea uno nuevo
-                    updatedSeller.getUser().setId(userId);
+                    updatedSeller.setId(null); // Asegurar que sea una entidad nueva
+                    updatedSeller.setUserId(userId); // Asignar el userId directamente
                     updatedSeller.setCreatedAt(LocalDateTime.now());
                     return sellerRepository.save(updatedSeller);
                 });
     }
+
 
     // Método adicional para obtener todos los sellers (opcional)
     public List<Seller> getAllSellers() {
@@ -58,5 +61,9 @@ public class SellerService {
     // Método adicional para eliminar un seller por userId (opcional)
     public void deleteSellerByUserId(Long userId) {
         sellerRepository.findByUserId(userId).ifPresent(sellerRepository::delete);
+    }
+    // Obtener por Seller ID (el ID único del Seller)
+    public Optional<Seller> getSellerById(Long sellerId) {
+        return sellerRepository.findById(sellerId);
     }
 }

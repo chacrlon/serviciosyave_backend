@@ -93,8 +93,6 @@ public class User implements IUser {
 	private String resetToken;
 	private LocalDateTime resetTokenExpiry;
 
-// No olvides generar los getters y setters (Lombok @Data los incluye)
-
 	@OneToMany(mappedBy = "userId") // Cambiatelo a userId
     private List<VendorService> vendorServices;  
     
@@ -103,6 +101,10 @@ public class User implements IUser {
     private Ubication ubicacion;
 
 	private double rating = 0.0;
+
+	// Relación con Seller el perfil profesional
+	@Column(name = "professionalId", nullable = true) // Columna existente que referencia a 'sellers.id'
+	private Long sellerId;
 
 	// Constructor por defecto
     public User() {  
@@ -265,6 +267,14 @@ public class User implements IUser {
 
 	public double getRating() {
 		return rating;
+	}
+
+	public Long getSellerId() {
+		return sellerId;
+	}
+
+	public void setSellerId(Long sellerId) {
+		this.sellerId = sellerId;
 	}
 
 	public void setRating(double rating) {
