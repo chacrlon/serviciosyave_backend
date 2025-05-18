@@ -31,7 +31,8 @@ public class NotificationController {
     @Autowired
     private PaymentToSellerService paymentToSellerService;
     
-    public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId, Long ineedId) {
+    public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId, Long ineedId, String type,   // Nuevo parámetro
+                           String status, Double amount) {
         List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
         if (existingNotifications.isEmpty()) {  
             Notification notification = new Notification(  	
@@ -44,7 +45,10 @@ public class NotificationController {
                 null, 
                 userType, 
                 null,
-                ineedId
+                ineedId,
+                    type,
+                    status,
+                    amount
             );
             notification = notificationRepository.save(notification);
 

@@ -20,6 +20,16 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
         @Param("id") Long id,
         @Param("newMessage") String newMessage
     );
+
+    @Modifying
+    @Query("UPDATE Notification n SET n.status = :newStatus " +
+            "WHERE (n.ineedId = :ineedId OR :ineedId IS NULL) " +
+            "OR (n.vendorServiceId = :vendorServiceId OR :vendorServiceId IS NULL)")
+    void updateStatusByIneedOrVendorService(
+            @Param("ineedId") Long ineedId,
+            @Param("vendorServiceId") Long vendorServiceId,
+            @Param("newStatus") String newStatus
+    );
     
     List<Notification> findByUserIdAndMessageAndIsRead(Long userId, String message, boolean isRead);
 

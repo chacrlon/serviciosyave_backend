@@ -1,6 +1,7 @@
 package com.serviciosyave.services;  
 
 import com.serviciosyave.entities.*;
+import jakarta.transaction.Transactional;
 import org.springframework.stereotype.Service;
 import org.springframework.beans.factory.annotation.Autowired;  
 import com.serviciosyave.controllers.NotificationController;
@@ -37,8 +38,9 @@ public class PaymentService {
 
     public Payment createdPayment(Payment payment) {  
         return paymentRepository.save(payment);  
-    }  
-    
+    }
+
+    @Transactional
     public void approvePayment(Long paymentId) {
 
         Payment payment = paymentRepository.findById(paymentId)
@@ -46,10 +48,19 @@ public class PaymentService {
         Long ineedId = payment.getIneedId();
         Long receiverId = payment.getReceiverId();
 
+        if (payment.getIneedId() == null && payment.getVendorServiceId() == null) {
+            throw new RuntimeException("El pago no está asociado a un servicio o requerimiento");
+        }
+
         payment.setEstatus("aprobado");
         paymentRepository.save(payment);
         Long vendorServiceId = payment.getVendorServiceId();
 
+        notificationRepository.updateStatusByIneedOrVendorService(
+                payment.getIneedId(),
+                payment.getVendorServiceId(),
+                "aprobado" // <-- Mismo valor que en Payment
+        );
 
         if(ineedId != null) {
             Ineed ineedService = this.ineedService.findById(payment.getIneedId());
@@ -63,10 +74,28 @@ public class PaymentService {
             String messageToProvider = "El usuario " + needy.getUsername() + " ha comprado tu servicio " + ineedService.getTitulo() + ".";
             emailService.sendEmail(provider.getEmail(), "Notificación de Servicio", messageToProvider);
             emailService.sendEmail(needy.getEmail(), "Confirmación de Compra", messageToNeedy);
-
+            Double paymentAmount = payment.getMonto();
             // Crear notificaciones y capturar los IDs
-            Long needyNotificationId = notificationController.notifyUser(needy.getId(), provider.getId(), messageToNeedy, "Buyer", null, payment.getIneedId());
-            Long providerNotificationId = notificationController.notifyUser(provider.getId(), needy.getId(), messageToProvider, "Seller", null, payment.getIneedId());
+            Long needyNotificationId = notificationController.notifyUser(
+                    needy.getId(),
+                    provider.getId(),
+                    messageToNeedy,
+                    "Buyer",
+                    null,
+                    payment.getIneedId(),
+                    "requerimiento",
+                    "aprobado",
+                    paymentAmount );
+            Long providerNotificationId = notificationController.notifyUser(
+                    provider.getId(),
+                    needy.getId(),
+                    messageToProvider,
+                    "Seller",
+                    null,
+                    payment.getIneedId(),
+                    "requerimiento",
+                    "aprobado",
+                    paymentAmount );
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
@@ -102,10 +131,28 @@ public class PaymentService {
 
             emailService.sendEmail(seller.getEmail(), "Notificación de Servicio", messageToSeller);
             emailService.sendEmail(buyer.getEmail(), "Confirmación de Compra", messageToBuyer);
-
+            Double paymentAmount = payment.getMonto();
             // Crear notificaciones y capturar los IDs
-            Long sellerNotificationId = notificationController.notifyUser(seller.getId(), buyer.getId(), messageToSeller, "Seller", vendorServiceId, null);
-            Long buyerNotificationId = notificationController.notifyUser(buyer.getId(), seller.getId(), messageToBuyer, "Buyer", vendorServiceId, null);
+            Long sellerNotificationId = notificationController.notifyUser(
+                    seller.getId(),
+                    buyer.getId(),
+                    messageToSeller,
+                    "Seller",
+                    vendorServiceId,
+                    null,
+                    "servicio",
+                    "aprobado",
+                    paymentAmount);
+            Long buyerNotificationId = notificationController.notifyUser(
+                    buyer.getId(),
+                    seller.getId(),
+                    messageToBuyer,
+                    "Buyer",
+                    vendorServiceId,
+                    null,
+                    "servicio",
+                    "aprobado",
+                    paymentAmount);
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado

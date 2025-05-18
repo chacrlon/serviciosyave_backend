@@ -1,9 +1,12 @@
 package com.serviciosyave.services;  
 
+import com.serviciosyave.controllers.NotificationController;
 import com.serviciosyave.entities.Category;
 import com.serviciosyave.entities.Subcategory;
+import com.serviciosyave.entities.User;
 import com.serviciosyave.repositories.CategoryRepository;
 import com.serviciosyave.repositories.SubcategoryRepository;
+import com.serviciosyave.repositories.UserRepository;
 import jakarta.persistence.EntityNotFoundException;
 import jakarta.validation.ValidationException;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -27,6 +30,15 @@ public class IneedService {
     @Autowired
     private GPSService gpsService;
 
+    @Autowired
+    private UserRepository userRepository;
+
+    @Autowired
+    private EmailService emailService;
+
+    @Autowired
+    private NotificationController notificationController;
+
     public Ineed findById(Long id) {
         return ineedRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ineed no encontrado con ID: " + id));
@@ -35,6 +47,41 @@ public class IneedService {
     public Ineed getIneedById(Long id) {
         return ineedRepository.findById(id)
                 .orElseThrow(() -> new EntityNotFoundException("Ineed no encontrado con ID: " + id));
+    }
+
+    public void acceptIneed(Long ineedId, Long providerId) {
+        Ineed ineed = ineedRepository.findById(ineedId)
+                .orElseThrow(() -> new RuntimeException("Ineed no encontrado"));
+
+        // Obtener usuarios involucrados
+        User buyer = userRepository.findById(ineed.getUserId())
+                .orElseThrow(() -> new RuntimeException("Comprador no encontrado"));
+        User provider = userRepository.findById(providerId)
+                .orElseThrow(() -> new RuntimeException("Proveedor no encontrado"));
+
+        // Crear mensaje de notificación
+        String notificationMessage = "Tu requerimiento '" + ineed.getTitulo() + "' ha sido aceptado por " + provider.getUsername();
+
+        Double ineedAmount = ineed.getPresupuesto();
+        // Enviar email
+        emailService.sendEmail(
+                buyer.getEmail(),
+                "Requerimiento Aceptado",
+                notificationMessage
+        );
+
+        // Crear notificación (Buyer es el userType)
+        notificationController.notifyUser(
+                buyer.getId(),      // userId (destinatario)
+                provider.getId(),   // userId2 (proveedor)
+                notificationMessage,
+                "Buyer",           // userType
+                null,              // vendorServiceId (no aplica)
+                ineedId,
+                "requerimiento",
+                "no_pagado",
+                ineedAmount
+        );
     }
 
     public IneedService(IneedRepository ineedRepository) {

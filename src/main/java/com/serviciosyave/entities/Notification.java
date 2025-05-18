@@ -18,8 +18,11 @@ public class Notification{
 		private Long ineedId;
 	    private String resultadoProveedor;
 	    private String resultadoConsumidor;   
-	    private String estatus;   
+	    private String estatus;
 	    private Long id2;
+		private String type; //requerimiento, servicio
+		private String status; //pagado, no_pagado, pendiente
+	    private Double amount;
 
 		@Column(name = "created_at", updatable = false)
 		private Date createdAt = new Date();
@@ -27,20 +30,24 @@ public class Notification{
 	    public Notification() {  
 	    }  
 	    
-	    public Notification(Long userId, String message, Long userId2, String userType,   
-	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2, Long ineedId) {
-	        this.userId = userId;  
-	        this.message = message;  
-	        this.isRead = false; // Por defecto, la notificación no está leída  
-	        this.userId2 = userId2;  
-	        this.userType = userType;  
-	        this.vendorServiceId = vendorServiceId;  
-	        this.resultadoProveedor = resultadoProveedor;  
-	        this.resultadoConsumidor = resultadoConsumidor;  
-	        this.estatus = estatus; // Correcto: asignado desde el argumento estatus  
+	    public Notification(Long userId, String message, Long userId2, String userType,
+	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2, Long ineedId,     String type,  // Nuevo parámetro
+							String status, Double amount) {
+	        this.userId = userId;
+	        this.message = message;
+	        this.isRead = false; // Por defecto, la notificación no está leída
+	        this.userId2 = userId2;
+	        this.userType = userType;
+	        this.vendorServiceId = vendorServiceId;
+	        this.resultadoProveedor = resultadoProveedor;
+	        this.resultadoConsumidor = resultadoConsumidor;
+	        this.estatus = estatus; // Correcto: asignado desde el argumento estatus
 	        this.id2 = id2; // Guardar el id de la otra notificación
 			this.ineedId=ineedId;
-	    }  
+			this.type = type;
+			this.status = status;
+			this.amount = amount;
+	    }
 
 	public Long getId() {
 		return id;
@@ -136,6 +143,30 @@ public class Notification{
 
 	public void setIneedId(Long ineedId) {
 		this.ineedId = ineedId;
+	}
+
+	public String getType() {
+		return type;
+	}
+
+	public void setType(String type) {
+		this.type = type;
+	}
+
+	public String getStatus() {
+		return status;
+	}
+
+	public void setStatus(String status) {
+		this.status = status;
+	}
+
+	public Double getAmount() {
+		return amount;
+	}
+
+	public void setAmount(Double amount) {
+		this.amount = amount;
 	}
 
 	public Date getCreatedAt() {

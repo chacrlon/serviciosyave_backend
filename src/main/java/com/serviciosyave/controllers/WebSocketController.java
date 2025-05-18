@@ -62,7 +62,8 @@ public class WebSocketController {
                     null,
                     "Message",
                     null,
-                    message.getIneedId() > 0 ? message.getIneedId() : null
+                    message.getIneedId() > 0 ? message.getIneedId() : null,
+                    null, null, null
             );
             notification = notificationRepository.save(notification);
         }

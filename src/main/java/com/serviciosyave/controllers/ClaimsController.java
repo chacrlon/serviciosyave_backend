@@ -50,6 +50,7 @@ public class ClaimsController {
             Optional<User> receiver = userService.findById(receiverId);
 
             if(ineedId != null) {
+                Double ineedAmount = ineedService.findById(ineedId).getPresupuesto();
                 Ineed responseIneedService = ineedService.findById(ineedId);
                 String observationUser = payloadRequest.get("observationUser");
                 String observationReceiver = payloadRequest.get("observationReceiver");
@@ -65,8 +66,24 @@ public class ClaimsController {
                 emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
                 emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
 
-                notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",null, responseIneedService.getId());
-                notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",null, responseIneedService.getId());
+                notificationController.notifyUser(user.get().getId(),
+                        receiver.get().getId(),
+                        messageToBuyer,
+                        "Buyer",
+                        null,
+                        responseIneedService.getId(),
+                        "requerimiento",
+                        "pagado",
+                        ineedAmount );
+                notificationController.notifyUser(receiver.get().getId(),
+                        user.get().getId(),
+                        messageToSeller,
+                        "Seller",
+                        null,
+                        responseIneedService.getId(),
+                        "requerimiento",
+                        "pagado",
+                        ineedAmount);
 
             } else {
                 Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
@@ -81,9 +98,24 @@ public class ClaimsController {
 
                 emailService.sendEmail(user.get().getEmail(), subject, messageToBuyer);
                 emailService.sendEmail(receiver.get().getEmail(), subject, messageToSeller);
-
-                notificationController.notifyUser(user.get().getId(),receiver.get().getId(), messageToBuyer, "Buyer",responseVendorService.get().getId(), null);
-                notificationController.notifyUser(receiver.get().getId(),user.get().getId(), messageToSeller, "Seller",responseVendorService.get().getId(), null);
+                Double ineedAmount = ineedService.findById(ineedId).getPresupuesto();
+                notificationController.notifyUser(user.get().getId(),
+                        receiver.get().getId(),
+                        messageToBuyer,
+                        "Buyer",responseVendorService.get().getId(),
+                        null,
+                        "servicio",
+                        "pagado",
+                        ineedAmount);
+                notificationController.notifyUser(receiver.get().getId(),
+                        user.get().getId(),
+                        messageToSeller,
+                        "Seller",
+                        responseVendorService.get().getId(),
+                        null,
+                        "servicio",
+                        "pagado",
+                        ineedAmount);
 
             }
 
