@@ -35,7 +35,8 @@ import lombok.Data;
 
 @Entity
 @Table(name = "users")
-@Data 
+@Data
+@JsonIgnoreProperties({"hibernateLazyInitializer", "handler"})
 public class User implements IUser {
 
     @Id

@@ -43,11 +43,15 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/payroll/**").permitAll()
+                        .requestMatchers(HttpMethod.GET, "/api/payroll/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/ineeds").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ineeds").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/ineeds/*/accept/**").permitAll()
                 .requestMatchers(HttpMethod.POST, "/register/**").permitAll()
                 .requestMatchers("/register/**").permitAll()
+                        .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/users", "/api/users/page/{page}").permitAll()
                 .requestMatchers(HttpMethod.GET, "/api/binance/").permitAll()
                 .requestMatchers(HttpMethod.POST, "/api/binance/create").permitAll()
@@ -101,8 +105,8 @@ public class SpringSecurityConfig {
         CorsConfiguration config = new CorsConfiguration();
         config.setAllowedOriginPatterns(Arrays.asList("*"));
         config.setAllowedOrigins(Arrays.asList("http://localhost:4200"));
-        config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE"));
-        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type"));
+        config.setAllowedMethods(Arrays.asList("POST", "GET", "PUT", "DELETE","PATCH", "OPTIONS"));
+        config.setAllowedHeaders(Arrays.asList("Authorization", "Content-Type", "Accept"));
         config.setAllowCredentials(true);
 
         UrlBasedCorsConfigurationSource source = new UrlBasedCorsConfigurationSource();

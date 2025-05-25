@@ -17,7 +17,7 @@ public class BankTransfer{
     private VendorService vendorService; // Relación con el servicio del vendedor  
 
     @ManyToOne  
-    private User user; // Relación con el usuario  
+    private User user;
 
     
  // Getters y Setters 

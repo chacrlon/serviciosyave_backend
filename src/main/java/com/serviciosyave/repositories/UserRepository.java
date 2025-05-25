@@ -1,5 +1,6 @@
 package com.serviciosyave.repositories;
 
+import java.math.BigDecimal;
 import java.util.List;
 import java.util.Optional;
 
@@ -10,6 +11,9 @@ import com.serviciosyave.entities.User;
 import com.serviciosyave.entities.UserStatus;
 
 public interface UserRepository extends JpaRepository<User, Long>{
+
+    // Nuevo método para buscar usuarios con userMoney > 0
+    List<User> findByUserMoneyGreaterThan(BigDecimal amount);
 
     Optional<User> findByUsername(String name);  
     
