@@ -91,6 +91,9 @@ public class User implements IUser {
     private String verificationCode; // código de verificación para el correo
 	private LocalDateTime VerificationCodeExpiry;
 
+	private String gender;
+	private String city;
+
 	private String resetToken;
 	private LocalDateTime resetTokenExpiry;
 
@@ -281,4 +284,21 @@ public class User implements IUser {
 	public void setRating(double rating) {
 		this.rating = rating;
 	}
+
+	public String getGender() {
+		return gender;
+	}
+
+	public void setGender(String gender) {
+		this.gender = gender;
+	}
+
+	public String getCity() {
+		return city;
+	}
+
+	public void setCity(String city) {
+		this.city = city;
+	}
+
 }

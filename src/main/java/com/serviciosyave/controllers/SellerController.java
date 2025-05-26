@@ -1,8 +1,10 @@
 package com.serviciosyave.controllers;
 
 import com.serviciosyave.entities.Seller;
+import com.serviciosyave.services.LocationService;
 import com.serviciosyave.services.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.dao.DataIntegrityViolationException;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
 
@@ -17,14 +19,25 @@ import java.util.stream.Collectors;
 public class SellerController {
 
     private final SellerService sellerService;
+    private final LocationService locationService;
 
     @Autowired
-    public SellerController(SellerService sellerService) {
+    public SellerController(SellerService sellerService, LocationService locationService) {
         this.sellerService = sellerService;
+        this.locationService = locationService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<Seller> createOrUpdateSeller(@RequestBody Seller seller) {
+    public ResponseEntity<?> createOrUpdateSeller(@RequestBody Seller seller){
+        try {
+            // Validar coordenadas
+            if (seller.getLatitude() == 0 || seller.getLongitude() == 0) {
+                return ResponseEntity.badRequest().body("Coordenadas obligatorias");
+            }
+
+            // Obtener serviceArea automáticamente
+            String serviceArea = locationService.getServiceArea(seller.getLatitude(), seller.getLongitude());
+            seller.setServiceArea(serviceArea);
         // Establecer la fecha de creación si no está presente
         if (seller.getCreatedAt() == null) {
             seller.setCreatedAt(LocalDateTime.now());
@@ -55,8 +68,12 @@ public class SellerController {
         }
 
         // Guardar o actualizar el seller
-        Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
-        return ResponseEntity.ok(savedSeller);
+            Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
+            return ResponseEntity.ok(savedSeller);
+
+        } catch (Exception e) {
+            return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
+        }
     }
 
     @GetMapping
@@ -83,5 +100,11 @@ public class SellerController {
         return sellerService.getSellerByUserId(userId)
                 .map(ResponseEntity::ok)
                 .orElseGet(() -> ResponseEntity.notFound().build());
+    }
+
+    // En SellerController:
+    @ExceptionHandler(DataIntegrityViolationException.class)
+    public ResponseEntity<String> handleDataError(DataIntegrityViolationException ex) {
+        return ResponseEntity.badRequest().body("Error en datos: " + ex.getMessage());
     }
 }

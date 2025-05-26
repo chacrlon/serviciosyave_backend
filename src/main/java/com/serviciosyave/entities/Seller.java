@@ -1,5 +1,6 @@
 package com.serviciosyave.entities;
 
+import com.serviciosyave.Enum.Estatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
@@ -13,33 +14,9 @@ public class Seller {
     @GeneratedValue(strategy = GenerationType.IDENTITY)
     private Long id;
 
-    // Paso 1: Información Personal
+    // Paso 1: Verificación
     private String fullName;
-    private int age;
-    private LocalDate birthdate;
-    private String idNumber;
-    private String gender;
-    private String city;
 
-    // Paso 2: Información Profesional
-    private String profession;
-    private int yearsOfExperience;
-    private String skillsDescription;
-
-    // Relación con User (lado inverso)
-    @Column(name = "user_id", nullable = true) // Columna en la tabla 'sellers' que referencia a 'users.id'
-    private Long userId;
-
-    @ElementCollection
-    @Enumerated(EnumType.STRING)
-    private List<Modality> modalities;
-
-    // Opcional: Crear un enum
-    public enum Modality {
-        PRESENCIAL, ONLINE
-    }
-
-    // Paso 3: Verificación
     @Lob
     @Column(name = "dni_front_name", columnDefinition = "LONGBLOB")
     private byte[] dniFrontName;
@@ -52,6 +29,9 @@ public class Seller {
     @Lob
     @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
     private byte[] profilePicture;
+
+
+    // Paso 2: Información Profesional
     @Lob
     @Column(name = "university_title_name", columnDefinition = "LONGBLOB")
     private byte[] universityTitleName;
@@ -62,15 +42,50 @@ public class Seller {
     @CollectionTable(name = "seller_certifications_names", joinColumns = @JoinColumn(name = "seller_id"))
     private List<byte[]> certificationsNames;
 
-    // Paso 4: Galería
     @ElementCollection
     @Lob
     @Column(name = "gallery_images_names", columnDefinition = "LONGBLOB")
     @CollectionTable(name = "seller_gallery_images_names", joinColumns = @JoinColumn(name = "seller_id"))
     private List<byte[]> galleryImagesNames;
 
-    // Campos adicionales
+    private String profession;
+    private int yearsOfExperience;
+    private String skillsDescription;
+
+    // Relación con User (lado inverso)
+    @Column(name = "user_id", nullable = true) // Columna en la tabla 'sellers' que referencia a 'users.id'
+    private Long userId;
+
+    @ManyToMany
+    @JoinTable(
+            name = "seller_subcategories",
+            joinColumns = @JoinColumn(name = "seller_id"),
+            inverseJoinColumns = @JoinColumn(name = "subcategory_id")
+    )
+    private List<Subcategory> subcategories;
+
+    // Postularse en las subcategorias
+    @ManyToMany
+    @JoinTable(
+            name = "seller_selected_subcategories",
+            joinColumns = @JoinColumn(name = "seller_id"),
+            inverseJoinColumns = @JoinColumn(name = "subcategory_id")
+    )
+    private List<Subcategory> selectedSubcategories;
+
+    //La ubicacion del profesional
+    private String serviceArea;
+    private double latitude;
+    private double longitude;
+    private double coverageRadius; // En kilómetros
+
+
+    // Esto es por debajo
     private LocalDateTime createdAt;
+
+    //PENDIENTE, APROBADO, RECHAZADO
+    private Estatus status;
+
 
     public Seller() {}
 
@@ -98,46 +113,6 @@ public class Seller {
         this.fullName = fullName;
     }
 
-    public int getAge() {
-        return age;
-    }
-
-    public void setAge(int age) {
-        this.age = age;
-    }
-
-    public LocalDate getBirthdate() {
-        return birthdate;
-    }
-
-    public void setBirthdate(LocalDate birthdate) {
-        this.birthdate = birthdate;
-    }
-
-    public String getIdNumber() {
-        return idNumber;
-    }
-
-    public void setIdNumber(String idNumber) {
-        this.idNumber = idNumber;
-    }
-
-    public String getGender() {
-        return gender;
-    }
-
-    public void setGender(String gender) {
-        this.gender = gender;
-    }
-
-    public String getCity() {
-        return city;
-    }
-
-    public void setCity(String city) {
-        this.city = city;
-    }
-
     public String getProfession() {
         return profession;
     }
@@ -160,14 +135,6 @@ public class Seller {
 
     public void setSkillsDescription(String skillsDescription) {
         this.skillsDescription = skillsDescription;
-    }
-
-    public List<Modality> getModalities() {
-        return modalities;
-    }
-
-    public void setModalities(List<Modality> modalities) {
-        this.modalities = modalities;
     }
 
     public byte[] getDniFrontName() {
@@ -232,6 +199,62 @@ public class Seller {
 
     public void setProfilePicture(byte[] profilePicture) {
         this.profilePicture = profilePicture;
+    }
+
+    public List<Subcategory> getSubcategories() {
+        return subcategories;
+    }
+
+    public void setSubcategories(List<Subcategory> subcategories) {
+        this.subcategories = subcategories;
+    }
+
+    public List<Subcategory> getSelectedSubcategories() {
+        return selectedSubcategories;
+    }
+
+    public void setSelectedSubcategories(List<Subcategory> selectedSubcategories) {
+        this.selectedSubcategories = selectedSubcategories;
+    }
+
+    public String getServiceArea() {
+        return serviceArea;
+    }
+
+    public void setServiceArea(String serviceArea) {
+        this.serviceArea = serviceArea;
+    }
+
+    public double getLatitude() {
+        return latitude;
+    }
+
+    public void setLatitude(double latitude) {
+        this.latitude = latitude;
+    }
+
+    public double getLongitude() {
+        return longitude;
+    }
+
+    public void setLongitude(double longitude) {
+        this.longitude = longitude;
+    }
+
+    public double getCoverageRadius() {
+        return coverageRadius;
+    }
+
+    public void setCoverageRadius(double coverageRadius) {
+        this.coverageRadius = coverageRadius;
+    }
+
+    public Estatus getStatus() {
+        return status;
+    }
+
+    public void setStatus(Estatus status) {
+        this.status = status;
     }
 }
 
