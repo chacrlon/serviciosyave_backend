@@ -4,6 +4,7 @@ import com.serviciosyave.Enum.Estatus;
 import jakarta.persistence.*;
 import java.time.LocalDate;
 import java.time.LocalDateTime;
+import java.util.ArrayList;
 import java.util.List;
 
 @Entity
@@ -18,42 +19,44 @@ public class Seller {
     private String fullName;
 
     @Lob
-    @Column(name = "dni_front_name", columnDefinition = "LONGBLOB")
+    @Column(name = "dni_front_name", columnDefinition = "LONGBLOB", nullable = true)
     private byte[] dniFrontName;
-    @Lob
-    @Column(name = "dni_back_name", columnDefinition = "LONGBLOB")
-    private byte[] dniBackName;
-    @Lob
-    @Column(name = "selfie_name", columnDefinition = "LONGBLOB")
-    private byte[] selfieName;
-    @Lob
-    @Column(name = "profile_picture", columnDefinition = "LONGBLOB")
-    private byte[] profilePicture;
 
+    @Lob
+    @Column(name = "dni_back_name", columnDefinition = "LONGBLOB", nullable = true)
+    private byte[] dniBackName;
+
+    @Lob
+    @Column(name = "selfie_name", columnDefinition = "LONGBLOB", nullable = true)
+    private byte[] selfieName;
+
+    @Lob
+    @Column(name = "profile_picture", columnDefinition = "LONGBLOB", nullable = true)
+    private byte[] profilePicture;
 
     // Paso 2: Información Profesional
     @Lob
-    @Column(name = "university_title_name", columnDefinition = "LONGBLOB")
+    @Column(name = "university_title_name", columnDefinition = "LONGBLOB", nullable = true)
     private byte[] universityTitleName;
 
     @ElementCollection
     @Lob
-    @Column(name = "certifications_names", columnDefinition = "LONGBLOB")
+    @Column(name = "certifications_names", columnDefinition = "LONGBLOB", nullable = true)
     @CollectionTable(name = "seller_certifications_names", joinColumns = @JoinColumn(name = "seller_id"))
-    private List<byte[]> certificationsNames;
+    private List<byte[]> certificationsNames = new ArrayList<>();
 
     @ElementCollection
     @Lob
-    @Column(name = "gallery_images_names", columnDefinition = "LONGBLOB")
+    @Column(name = "gallery_images_names", columnDefinition = "LONGBLOB", nullable = true)
     @CollectionTable(name = "seller_gallery_images_names", joinColumns = @JoinColumn(name = "seller_id"))
-    private List<byte[]> galleryImagesNames;
+    private List<byte[]> galleryImagesNames = new ArrayList<>();
 
     private String profession;
-    private int yearsOfExperience;
+    private Integer yearsOfExperience; // Cambiado de int a Integer
     private String skillsDescription;
 
     // Relación con User (lado inverso)
-    @Column(name = "user_id", nullable = true) // Columna en la tabla 'sellers' que referencia a 'users.id'
+    @Column(name = "user_id", nullable = true)
     private Long userId;
 
     @ManyToMany
@@ -62,7 +65,7 @@ public class Seller {
             joinColumns = @JoinColumn(name = "seller_id"),
             inverseJoinColumns = @JoinColumn(name = "subcategory_id")
     )
-    private List<Subcategory> subcategories;
+    private List<Subcategory> subcategories = new ArrayList<>();
 
     // Postularse en las subcategorias
     @ManyToMany
@@ -71,31 +74,22 @@ public class Seller {
             joinColumns = @JoinColumn(name = "seller_id"),
             inverseJoinColumns = @JoinColumn(name = "subcategory_id")
     )
-    private List<Subcategory> selectedSubcategories;
+    private List<Subcategory> selectedSubcategories = new ArrayList<>();
 
-    //La ubicacion del profesional
     private String serviceArea;
-    private double latitude;
-    private double longitude;
-    private double coverageRadius; // En kilómetros
+    private Double latitude;   // Cambiado de double a Double
+    private Double longitude;  // Cambiado de double a Double
+    private Double coverageRadius; // Cambiado de double a Double
 
-
-    // Esto es por debajo
     private LocalDateTime createdAt;
 
     //PENDIENTE, APROBADO, RECHAZADO
     private Estatus status;
 
 
+
     public Seller() {}
 
-    public Long getUserId() {
-        return userId;
-    }
-
-    public void setUserId(Long userId) {
-        this.userId = userId;
-    }
 
     public Long getId() {
         return id;
@@ -111,30 +105,6 @@ public class Seller {
 
     public void setFullName(String fullName) {
         this.fullName = fullName;
-    }
-
-    public String getProfession() {
-        return profession;
-    }
-
-    public void setProfession(String profession) {
-        this.profession = profession;
-    }
-
-    public int getYearsOfExperience() {
-        return yearsOfExperience;
-    }
-
-    public void setYearsOfExperience(int yearsOfExperience) {
-        this.yearsOfExperience = yearsOfExperience;
-    }
-
-    public String getSkillsDescription() {
-        return skillsDescription;
-    }
-
-    public void setSkillsDescription(String skillsDescription) {
-        this.skillsDescription = skillsDescription;
     }
 
     public byte[] getDniFrontName() {
@@ -161,6 +131,14 @@ public class Seller {
         this.selfieName = selfieName;
     }
 
+    public byte[] getProfilePicture() {
+        return profilePicture;
+    }
+
+    public void setProfilePicture(byte[] profilePicture) {
+        this.profilePicture = profilePicture;
+    }
+
     public byte[] getUniversityTitleName() {
         return universityTitleName;
     }
@@ -185,20 +163,36 @@ public class Seller {
         this.galleryImagesNames = galleryImagesNames;
     }
 
-    public LocalDateTime getCreatedAt() {
-        return createdAt;
+    public String getProfession() {
+        return profession;
     }
 
-    public void setCreatedAt(LocalDateTime createdAt) {
-        this.createdAt = createdAt;
+    public void setProfession(String profession) {
+        this.profession = profession;
     }
 
-    public byte[] getProfilePicture() {
-        return profilePicture;
+    public Integer getYearsOfExperience() {
+        return yearsOfExperience;
     }
 
-    public void setProfilePicture(byte[] profilePicture) {
-        this.profilePicture = profilePicture;
+    public void setYearsOfExperience(Integer yearsOfExperience) {
+        this.yearsOfExperience = yearsOfExperience;
+    }
+
+    public String getSkillsDescription() {
+        return skillsDescription;
+    }
+
+    public void setSkillsDescription(String skillsDescription) {
+        this.skillsDescription = skillsDescription;
+    }
+
+    public Long getUserId() {
+        return userId;
+    }
+
+    public void setUserId(Long userId) {
+        this.userId = userId;
     }
 
     public List<Subcategory> getSubcategories() {
@@ -225,28 +219,36 @@ public class Seller {
         this.serviceArea = serviceArea;
     }
 
-    public double getLatitude() {
+    public Double getLatitude() {
         return latitude;
     }
 
-    public void setLatitude(double latitude) {
+    public void setLatitude(Double latitude) {
         this.latitude = latitude;
     }
 
-    public double getLongitude() {
+    public Double getLongitude() {
         return longitude;
     }
 
-    public void setLongitude(double longitude) {
+    public void setLongitude(Double longitude) {
         this.longitude = longitude;
     }
 
-    public double getCoverageRadius() {
+    public Double getCoverageRadius() {
         return coverageRadius;
     }
 
-    public void setCoverageRadius(double coverageRadius) {
+    public void setCoverageRadius(Double coverageRadius) {
         this.coverageRadius = coverageRadius;
+    }
+
+    public LocalDateTime getCreatedAt() {
+        return createdAt;
+    }
+
+    public void setCreatedAt(LocalDateTime createdAt) {
+        this.createdAt = createdAt;
     }
 
     public Estatus getStatus() {

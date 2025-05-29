@@ -43,8 +43,8 @@ public class SpringSecurityConfig {
     @Bean
     SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
         return http.authorizeHttpRequests(authz -> authz
-                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/payroll/**").permitAll()
+                        .requestMatchers(HttpMethod.POST, "/api/sellers/register").permitAll()
+                        .requestMatchers(HttpMethod.OPTIONS, "/**").permitAll().requestMatchers(HttpMethod.POST, "/api/payroll/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/payroll/**").permitAll()
                         .requestMatchers(HttpMethod.POST, "/api/ineeds").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/ineeds").permitAll()
@@ -60,7 +60,6 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.PUT, "/api/usuarios/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/usuarios/**").permitAll()
                         .requestMatchers(HttpMethod.PATCH, "/api/users/**").permitAll()
-                        .requestMatchers(HttpMethod.POST, "/api/sellers/**").permitAll()
                         .requestMatchers(HttpMethod.GET, "/api/sellers/**").permitAll()
                         .requestMatchers(HttpMethod.DELETE, "/api/sellers/**").permitAll()
                         // Permitir acceso a todos los endpoints de Bank Transfer
@@ -74,11 +73,10 @@ public class SpringSecurityConfig {
                 .requestMatchers(HttpMethod.GET, "/api/mobilepayment/").permitAll()
 
              // Permitir acceso a todos los endpoints de Service
-                .requestMatchers("/api/service/**").permitAll()  // <--- Añadir esta línea
+                .requestMatchers("/api/service/**").permitAll()
                 .requestMatchers("/api/currency/dolar/**").permitAll()
                 .requestMatchers("/chat-socket/**").permitAll()
                 .requestMatchers("/api/categories/**").permitAll()
-                .requestMatchers("/api/payment/**").permitAll()
                 .requestMatchers("/api/payment/**").permitAll()
                 .requestMatchers("/api/users/**").permitAll()
                 .requestMatchers("/api/notifications/**").permitAll()

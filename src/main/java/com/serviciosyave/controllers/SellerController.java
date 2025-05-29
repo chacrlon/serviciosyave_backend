@@ -1,6 +1,9 @@
 package com.serviciosyave.controllers;
 
+import com.serviciosyave.dto.SellerDTO;
 import com.serviciosyave.entities.Seller;
+import com.serviciosyave.entities.Subcategory;
+import com.serviciosyave.repositories.SubcategoryRepository;
 import com.serviciosyave.services.LocationService;
 import com.serviciosyave.services.SellerService;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -22,52 +25,55 @@ public class SellerController {
     private final LocationService locationService;
 
     @Autowired
+    private SubcategoryRepository subcategoryRepository;
+
+    @Autowired
     public SellerController(SellerService sellerService, LocationService locationService) {
         this.sellerService = sellerService;
         this.locationService = locationService;
     }
 
     @PostMapping("/register")
-    public ResponseEntity<?> createOrUpdateSeller(@RequestBody Seller seller){
+    public ResponseEntity<?> createOrUpdateSeller(@RequestBody SellerDTO sellerDTO){
         try {
             // Validar coordenadas
-            if (seller.getLatitude() == 0 || seller.getLongitude() == 0) {
+            if (sellerDTO.getLatitude() == 0 || sellerDTO.getLongitude() == 0) {
                 return ResponseEntity.badRequest().body("Coordenadas obligatorias");
             }
 
-            // Obtener serviceArea automáticamente
-            String serviceArea = locationService.getServiceArea(seller.getLatitude(), seller.getLongitude());
-            seller.setServiceArea(serviceArea);
-        // Establecer la fecha de creación si no está presente
-        if (seller.getCreatedAt() == null) {
-            seller.setCreatedAt(LocalDateTime.now());
-        }
+            System.out.println("Received subcategory IDs: " + sellerDTO.getSelectedSubcategories());
 
-        // Convertir Base64 a bytes (si es necesario)
-        if (seller.getDniFrontName() != null) {
-            seller.setDniFrontName(seller.getDniFrontName());
-        }
-        if (seller.getDniBackName() != null) {
-            seller.setDniBackName(seller.getDniBackName());
-        }
-        if (seller.getSelfieName() != null) {
-            seller.setSelfieName(seller.getSelfieName());
-        }
-        if (seller.getUniversityTitleName() != null) {
-            seller.setUniversityTitleName(seller.getUniversityTitleName());
-        }
-        if (seller.getCertificationsNames() != null) {
-            seller.setCertificationsNames(seller.getCertificationsNames().stream()
-                    .map(cert -> cert)
-                    .collect(Collectors.toList()));
-        }
-        if (seller.getGalleryImagesNames() != null) {
-            seller.setGalleryImagesNames(seller.getGalleryImagesNames().stream()
-                    .map(img -> img)
-                    .collect(Collectors.toList()));
-        }
+            // Convertir DTO a entidad Seller
+            Seller seller = new Seller();
+            seller.setId(sellerDTO.getId());
+            seller.setFullName(sellerDTO.getFullName());
+            seller.setDniFrontName(sellerDTO.getDniFrontName());
+            seller.setDniBackName(sellerDTO.getDniBackName());
+            seller.setSelfieName(sellerDTO.getSelfieName());
+            seller.setProfilePicture(sellerDTO.getProfilePicture());
+            seller.setUniversityTitleName(sellerDTO.getUniversityTitleName());
+            seller.setCertificationsNames(sellerDTO.getCertificationsNames());
+            seller.setGalleryImagesNames(sellerDTO.getGalleryImagesNames());
+            seller.setProfession(sellerDTO.getProfession());
+            seller.setYearsOfExperience(sellerDTO.getYearsOfExperience());
+            seller.setSkillsDescription(sellerDTO.getSkillsDescription());
+            seller.setUserId(sellerDTO.getUserId());
+            seller.setServiceArea(sellerDTO.getServiceArea());
+            seller.setLatitude(sellerDTO.getLatitude());
+            seller.setLongitude(sellerDTO.getLongitude());
+            seller.setCoverageRadius(sellerDTO.getCoverageRadius());
+            seller.setStatus(sellerDTO.getStatus());
+            seller.setCreatedAt(sellerDTO.getCreatedAt());
 
-        // Guardar o actualizar el seller
+            // Convertir IDs a entidades Subcategory
+            if (sellerDTO.getSelectedSubcategories() != null) {  // Cambiado aquí
+                List<Subcategory> subcategories = subcategoryRepository.findAllById(
+                        sellerDTO.getSelectedSubcategories()  // Y aquí
+                );
+                seller.setSelectedSubcategories(subcategories);
+            }
+
+            // Guardar o actualizar el seller
             Seller savedSeller = sellerService.updateSellerByUserId(seller.getUserId(), seller);
             return ResponseEntity.ok(savedSeller);
 
@@ -75,6 +81,7 @@ public class SellerController {
             return ResponseEntity.internalServerError().body("Error: " + e.getMessage());
         }
     }
+
 
     @GetMapping
     public ResponseEntity<List<Seller>> getAllSellers() {

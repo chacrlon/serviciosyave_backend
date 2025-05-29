@@ -39,14 +39,28 @@ public class SellerService {
     public Seller updateSellerByUserId(Long userId, Seller updatedSeller) {
         return sellerRepository.findByUserId(userId)
                 .map(existingSeller -> {
-                    // Copiar propiedades del seller actualizado al existente, excluyendo "id" y "userId"
-                    BeanUtils.copyProperties(existingSeller, updatedSeller, "id", "userId", "createdAt");
+                    // Copiar propiedades básicas excluyendo colecciones y campos críticos
+                    BeanUtils.copyProperties(updatedSeller, existingSeller,
+                            "id", "userId", "createdAt",
+                            "selectedSubcategories", "subcategories",
+                            "certificationsNames", "galleryImagesNames");
+
+                    // Actualizar colecciones MANUALMENTE
+                    existingSeller.getSelectedSubcategories().clear();
+                    existingSeller.getSelectedSubcategories().addAll(updatedSeller.getSelectedSubcategories());
+
+                    // Repite para otras colecciones si es necesario
+                    existingSeller.getCertificationsNames().clear();
+                    existingSeller.getCertificationsNames().addAll(updatedSeller.getCertificationsNames());
+
+                    existingSeller.getGalleryImagesNames().clear();
+                    existingSeller.getGalleryImagesNames().addAll(updatedSeller.getGalleryImagesNames());
+
                     return sellerRepository.save(existingSeller);
                 })
                 .orElseGet(() -> {
-                    // Si no existe un seller con ese userId, se crea uno nuevo
-                    updatedSeller.setId(null); // Asegurar que sea una entidad nueva
-                    updatedSeller.setUserId(userId); // Asignar el userId directamente
+                    updatedSeller.setId(null);
+                    updatedSeller.setUserId(userId);
                     updatedSeller.setCreatedAt(LocalDateTime.now());
                     return sellerRepository.save(updatedSeller);
                 });
