@@ -70,7 +70,8 @@ public class IneedController {
                 ineedId,
                 "requerimiento",
                 "no_pagado",
-                ineedAmount);
+                ineedAmount,
+                null);
 
         // 3. Enviar email
         emailService.sendEmail(
@@ -104,7 +105,8 @@ public class IneedController {
                     null,
                     "requerimiento",
                     "no_pagado",
-                    montoRequerimiento); // Aquí se envía la notificación
+                    montoRequerimiento,
+                    null); // Aquí se envía la notificación
 
             return ResponseEntity.ok(updatedNecesidad);  
         } else {  

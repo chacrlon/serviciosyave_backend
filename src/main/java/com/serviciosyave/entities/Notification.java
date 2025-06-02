@@ -24,6 +24,9 @@ public class Notification{
 		private String status; //pagado, no_pagado, pendiente
 	    private Double amount;
 
+     	@Column(name = "payment_id")
+     	private Long paymentId;
+
 		@Column(name = "created_at", updatable = false)
 		private Date createdAt = new Date();
 
@@ -32,7 +35,7 @@ public class Notification{
 	    
 	    public Notification(Long userId, String message, Long userId2, String userType,
 	                       Long vendorServiceId, String resultadoProveedor, String resultadoConsumidor, String estatus, Long id2, Long ineedId,     String type,  // Nuevo parámetro
-							String status, Double amount) {
+							String status, Double amount, Long paymentId) {
 	        this.userId = userId;
 	        this.message = message;
 	        this.isRead = false; // Por defecto, la notificación no está leída
@@ -47,6 +50,7 @@ public class Notification{
 			this.type = type;
 			this.status = status;
 			this.amount = amount;
+			this.paymentId = paymentId;
 	    }
 
 	public Long getId() {
@@ -167,6 +171,18 @@ public class Notification{
 
 	public void setAmount(Double amount) {
 		this.amount = amount;
+	}
+
+	public Long getPaymentId() {
+		return paymentId;
+	}
+
+	public void setPaymentId(Long paymentId) {
+		this.paymentId = paymentId;
+	}
+
+	public void setCreatedAt(Date createdAt) {
+		this.createdAt = createdAt;
 	}
 
 	public Date getCreatedAt() {

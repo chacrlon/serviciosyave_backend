@@ -85,7 +85,8 @@ public class PaymentService {
                     payment.getIneedId(),
                     "requerimiento",
                     "aprobado",
-                    paymentAmount );
+                    paymentAmount,
+                    payment.getId());
             Long providerNotificationId = notificationController.notifyUser(
                     provider.getId(),
                     needy.getId(),
@@ -95,7 +96,8 @@ public class PaymentService {
                     payment.getIneedId(),
                     "requerimiento",
                     "aprobado",
-                    paymentAmount );
+                    paymentAmount,
+                    payment.getId());
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
@@ -142,7 +144,8 @@ public class PaymentService {
                     null,
                     "servicio",
                     "aprobado",
-                    paymentAmount);
+                    paymentAmount,
+                    payment.getId());
             Long buyerNotificationId = notificationController.notifyUser(
                     buyer.getId(),
                     seller.getId(),
@@ -152,7 +155,8 @@ public class PaymentService {
                     null,
                     "servicio",
                     "aprobado",
-                    paymentAmount);
+                    paymentAmount,
+                    payment.getId());
 
             // Aquí puedes almacenar los IDs en la notificación si es necesario
             // Por ejemplo, si tienes una lógica para almacenar los IDs en algún lado
@@ -226,5 +230,7 @@ public class PaymentService {
             payment.setEstatus("rechazado");  
             paymentRepository.save(payment);  
         }  
-    }  
+    }
+
+
 }

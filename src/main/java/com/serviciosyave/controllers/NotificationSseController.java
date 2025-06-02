@@ -29,15 +29,31 @@ public class NotificationSseController {
                 break;  
             }  
         }  
-    }  
+    }
 
-    public void sendNotification(Long id, String message, Long userId, Long userId2, Long vendorServiceId, Long ineedId, String userType) {
-        // Crear un objeto Notification para enviar   
-        String jsonMessage = String.format("{\"id\": %d, \"userId\": %d, \"message\": \"%s\", \"read\": false, \"userId2\": %d, \"vendorServiceId\": %d, \"ineedId\": %d, \"userType\": \"%s\" }", id, userId, message, userId2, vendorServiceId,ineedId, userType);
+    public void sendNotification(Long id, String message, Long userId, Long userId2,
+                                 Long vendorServiceId, Long ineedId, String userType,
+                                 Long paymentId) {  // Nuevo parámetro
+
+        // Crear JSON incluyendo paymentId
+        String jsonMessage = String.format(
+                "{\"id\": %d, \"userId\": %d, \"message\": \"%s\", " +
+                        "\"read\": false, \"userId2\": %d, \"vendorServiceId\": %d, " +
+                        "\"ineedId\": %d, \"userType\": \"%s\", \"paymentId\": %d}",
+                id,
+                userId,
+                message,
+                userId2,
+                vendorServiceId != null ? vendorServiceId : 0,
+                ineedId != null ? ineedId : 0,
+                userType,
+                paymentId != null ? paymentId : 0  // Incluir paymentId
+        );
+
         System.out.println(jsonMessage);
-        for (PrintWriter client : clients) {  
-            client.write("data: " + jsonMessage + "\n\n");  
-            client.flush();  
-        }  
-    } 
+        for (PrintWriter client : clients) {
+            client.write("data: " + jsonMessage + "\n\n");
+            client.flush();
+        }
+    }
 }

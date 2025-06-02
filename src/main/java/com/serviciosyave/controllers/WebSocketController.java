@@ -32,49 +32,117 @@ public class WebSocketController {
     @MessageMapping("/chat/{roomId}")
     @SendTo("/topic/{roomId}")
     public ChatMessage chat(@DestinationVariable String roomId, ChatMessage message) throws JsonProcessingException {
+        // 1. Log del roomId recibido
+        System.out.println("[DEBUG] RoomId recibido: " + roomId);
+
+        Long paymentId = extractPaymentIdFromRoomId(roomId);
+
+        // 2. Log del paymentId extraído
+        System.out.println("[DEBUG] PaymentId extraído: " + paymentId);
 
         ObjectMapper objectMapper = new ObjectMapper();
         ConversationMessage chat = new ConversationMessage();
-                            chat.setRoomId(roomId);
-                            chat.setMessage(objectMapper.writeValueAsString(message));
-                            chat.setTimestamp(LocalDateTime.now());
+        chat.setRoomId(roomId);
+        chat.setMessage(objectMapper.writeValueAsString(message));
+        chat.setTimestamp(LocalDateTime.now());
 
         ConversationMessage savedConversation = conversationMessageRepository.save(chat);
-        Notification notification=null;
-        Optional<Notification> lastNotification = notificationRepository.findTopByUserIdAndUserId2AndEstatusOrderByIdDesc(Long.valueOf(message.getReceiver()), Long.valueOf(message.getSender()), "Message");
- 
+        Notification notification = null;
+
+        // 3. Log de los IDs de usuario
+        System.out.println("[DEBUG] Buscando notificación para userId: " + message.getReceiver()
+                + ", userId2: " + message.getSender());
+
+        // Buscar notificación específica por paymentId
+        Optional<Notification> lastNotification = notificationRepository
+                .findTopByUserIdAndUserId2AndEstatusAndPaymentIdOrderByIdDesc(
+                        Long.valueOf(message.getReceiver()),
+                        Long.valueOf(message.getSender()),
+                        "Message",
+                        paymentId  // <-- Incluir paymentId en la búsqueda
+                );
+
         if (lastNotification.isPresent()) {
-
             notification = lastNotification.get();
-            notificationRepository.updateExistingNotification(
-                notification.getId(),
-                "Tienes un nuevo mensaje: "+message.getMessage()
-            );
 
+            // ACTUALIZAR paymentId además del mensaje
+            notification.setPaymentId(paymentId); // <--- AÑADIR ESTA LÍNEA
+
+            // 4. Log de notificación existente
+            System.out.println("[DEBUG] Notificación existente encontrada. ID: " + notification.getId()
+                    + ", PaymentId actual: " + notification.getPaymentId());
+
+            notificationRepository.updateExistingNotification(
+                    notification.getId(),
+                    "Tienes un nuevo mensaje: " + message.getMessage(),
+                    paymentId
+            );
         } else {
+            // 5. Log antes de crear nueva notificación
+            System.out.println("[DEBUG] Creando NUEVA notificación con paymentId: " + paymentId);
+
             notification = new Notification(
                     Long.valueOf(message.getReceiver()),
-                    "Tienes un nuevo mensaje: "+message.getMessage(),
-                Long.valueOf(message.getSender()),
+                    "Tienes un nuevo mensaje: " + message.getMessage(),
+                    Long.valueOf(message.getSender()),
                     message.getUserType(),
                     message.getVendorServiceId() > 0 ? message.getVendorServiceId() : null,
-                    null,
-                    null,
+                    null, // resultadoProveedor
+                    null, // resultadoConsumidor
                     "Message",
-                    null,
+                    null, // id2
                     message.getIneedId() > 0 ? message.getIneedId() : null,
-                    null, null, null
+                    null, // type
+                    null, // status
+                    null, // amount
+                    paymentId  // PaymentId asignado
             );
+
             notification = notificationRepository.save(notification);
+
+            // 6. Log después de guardar
+            System.out.println("[DEBUG] Notificación creada. ID: " + notification.getId()
+                    + ", PaymentId guardado: " + notification.getPaymentId());
         }
 
-        notificationSseController.sendNotification(notification.getId(),"Tienes un nuevo mensaje: "+message.getMessage(), Long.valueOf(message.getReceiver()), Long.valueOf(message.getSender()), message.getVendorServiceId(), message.getIneedId(), notification.getUserType());
+        // 7. Log antes de enviar SSE
+        System.out.println("[DEBUG] Enviando SSE con paymentId: " + paymentId);
+
+        notificationSseController.sendNotification(
+                notification.getId(),
+                "Tienes un nuevo mensaje: " + message.getMessage(),
+                Long.valueOf(message.getReceiver()),
+                Long.valueOf(message.getSender()),
+                message.getVendorServiceId(),
+                message.getIneedId(),
+                notification.getUserType(),
+                paymentId
+        );
 
         return new ChatMessage(
-        		message.getMessage(), 
-        		message.getUser(),
-        		message.getReceiver(),
-        		message.getSender());
+                message.getMessage(),
+                message.getUser(),
+                message.getReceiver(),
+                message.getSender()
+        );
+    }
+
+    private Long extractPaymentIdFromRoomId(String roomId) {
+        System.out.println("[DEBUG] Extrayendo paymentId de: " + roomId);
+
+        String[] parts = roomId.split("-");
+        if (parts.length >= 3) {
+            try {
+                Long paymentId = Long.parseLong(parts[parts.length - 1]);
+                System.out.println("[DEBUG] PaymentId parseado: " + paymentId);
+                return paymentId;
+            } catch (NumberFormatException e) {
+                System.out.println("[ERROR] No se pudo parsear paymentId: " + parts[parts.length - 1]);
+                return null;
+            }
+        }
+        System.out.println("[WARN] RoomId no tiene suficientes partes: " + parts.length);
+        return null;
     }
 
     @MessageMapping("/countdown")

@@ -1,6 +1,7 @@
 package com.serviciosyave.controllers;
 
 import com.serviciosyave.entities.*;
+import com.serviciosyave.repositories.PaymentRepository;
 import com.serviciosyave.services.*;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.http.HttpStatus;
@@ -35,6 +36,9 @@ public class ClaimsController {
     @Autowired
     private PaymentService paymentService;
 
+    @Autowired
+    private PaymentRepository paymentRepository;
+
     @PostMapping("/create")
     public ResponseEntity<Claims> create(@RequestBody Map<String, String> payloadRequest) {
         try {
@@ -48,6 +52,21 @@ public class ClaimsController {
 
             Optional<User> user = userService.findById(userId);
             Optional<User> receiver = userService.findById(receiverId);
+
+            Payment payment = null;
+            if(ineedId != null) {
+                // Buscar por requerimiento
+                payment = paymentRepository.findByIneedIdAndEstatus(ineedId, "aprobado")
+                        .stream()
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Pago no encontrado para el requerimiento"));
+            } else {
+                // Buscar por servicio
+                payment = paymentRepository.findByVendorServiceIdAndEstatus(vendorServiceId, "aprobado")
+                        .stream()
+                        .findFirst()
+                        .orElseThrow(() -> new RuntimeException("Pago no encontrado para el servicio"));
+            }
 
             if(ineedId != null) {
                 Double ineedAmount = ineedService.findById(ineedId).getPresupuesto();
@@ -74,7 +93,8 @@ public class ClaimsController {
                         responseIneedService.getId(),
                         "requerimiento",
                         "pagado",
-                        ineedAmount );
+                        ineedAmount,
+                        payment.getId());
                 notificationController.notifyUser(receiver.get().getId(),
                         user.get().getId(),
                         messageToSeller,
@@ -83,7 +103,8 @@ public class ClaimsController {
                         responseIneedService.getId(),
                         "requerimiento",
                         "pagado",
-                        ineedAmount);
+                        ineedAmount,
+                        payment.getId());
 
             } else {
                 Optional<VendorService> responseVendorService = vendorService.getServiceById(vendorServiceId);
@@ -106,7 +127,8 @@ public class ClaimsController {
                         null,
                         "servicio",
                         "pagado",
-                        ineedAmount);
+                        ineedAmount,
+                        payment.getId());
                 notificationController.notifyUser(receiver.get().getId(),
                         user.get().getId(),
                         messageToSeller,
@@ -115,7 +137,8 @@ public class ClaimsController {
                         null,
                         "servicio",
                         "pagado",
-                        ineedAmount);
+                        ineedAmount,
+                        payment.getId());
 
             }
 

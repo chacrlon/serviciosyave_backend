@@ -30,34 +30,35 @@ public class NotificationController {
     
     @Autowired
     private PaymentToSellerService paymentToSellerService;
-    
+
     public Long notifyUser(Long sellerId, Long buyerId, String message, String userType, Long vendorServiceId, Long ineedId, String type,   // Nuevo parámetro
-                           String status, Double amount) {
-        List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);  
-        if (existingNotifications.isEmpty()) {  
-            Notification notification = new Notification(  	
-                sellerId,   
-                message,   
-                buyerId,   
-                userType,   
+                           String status, Double amount, Long paymentId) {
+        List<Notification> existingNotifications = notificationRepository.findByUserIdAndMessageAndIsRead(sellerId, message, false);
+        if (existingNotifications.isEmpty()) {
+            Notification notification = new Notification(
+                sellerId,
+                message,
+                buyerId,
+                userType,
                 vendorServiceId,
                 null,
-                null, 
-                userType, 
+                null,
+                userType,
                 null,
                 ineedId,
                     type,
                     status,
-                    amount
+                    amount,
+                    paymentId
             );
             notification = notificationRepository.save(notification);
 
-            // Enviar notificación en tiempo real con el ID  
-            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId, ineedId, userType);
+            // Enviar notificación en tiempo real con el ID
+            notificationSseController.sendNotification(notification.getId(), message, sellerId, buyerId, vendorServiceId, ineedId, userType, paymentId  );
 
-            return notification.getId(); // Devuelve el ID de la notificación creada  
-        }  
-        return null; // Retorna nulo si ya existe la notificación  
+            return notification.getId(); // Devuelve el ID de la notificación creada
+        }
+        return null; // Retorna nulo si ya existe la notificación
     }
     
     @PutMapping("/approve/provider/{id}/{id2}")  

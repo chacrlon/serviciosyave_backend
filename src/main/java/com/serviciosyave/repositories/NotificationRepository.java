@@ -15,10 +15,17 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
 
     @Transactional
     @Modifying
-    @Query("UPDATE Notification n SET n.message = :newMessage, n.isRead = false WHERE n.id = :id AND n.estatus = 'Message'")
+    @Query("UPDATE Notification n SET " +
+            "n.message = :newMessage, " +
+            "n.isRead = false, " +
+            "n.paymentId = :paymentId " +
+            "WHERE n.id = :id " +
+            "AND n.estatus = 'Message' " +
+            "AND n.paymentId = :paymentId")  // Asegura que solo actualice con mismo paymentId
     void updateExistingNotification(
-        @Param("id") Long id,
-        @Param("newMessage") String newMessage
+            @Param("id") Long id,
+            @Param("newMessage") String newMessage,
+            @Param("paymentId") Long paymentId
     );
 
     @Modifying
@@ -34,5 +41,18 @@ public interface NotificationRepository extends JpaRepository<Notification, Long
     List<Notification> findByUserIdAndMessageAndIsRead(Long userId, String message, boolean isRead);
 
     Optional<Notification> findTopByUserIdAndUserId2AndEstatusOrderByIdDesc(Long userId, Long userId2, String estatus);
+
+    @Query("SELECT n FROM Notification n " +
+            "WHERE n.userId = :userId " +
+            "AND n.userId2 = :userId2 " +
+            "AND n.estatus = :estatus " +
+            "AND n.paymentId = :paymentId " +  // Nuevo criterio
+            "ORDER BY n.id DESC")
+    Optional<Notification> findTopByUserIdAndUserId2AndEstatusAndPaymentIdOrderByIdDesc(
+            @Param("userId") Long userId,
+            @Param("userId2") Long userId2,
+            @Param("estatus") String estatus,
+            @Param("paymentId") Long paymentId
+    );
 
 }
